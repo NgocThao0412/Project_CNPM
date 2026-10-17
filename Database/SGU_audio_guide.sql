@@ -4,6 +4,8 @@ USE SGU_audio_guide;
 SET NAMES utf8mb4;
 SET SESSION time_zone = '+00:00';
 
+-- Quản trị viên: tài khoản quản lý; password_hash lưu mật khẩu băm.
+-- auth_version giúp Backend vô hiệu hóa phiên xác thực cũ khi cần.
 CREATE TABLE admins (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(50) NOT NULL,
@@ -23,6 +25,9 @@ CREATE TABLE admins (
   CONSTRAINT ck_admin_active CHECK (is_active IN (0,1))
 ) ENGINE=InnoDB;
 
+-- Yêu cầu khôi phục mật khẩu: lưu token và OTP dạng băm, không lưu OTP gốc.
+-- verified_at: đã xác thực OTP; used_at: đã dùng yêu cầu để đổi mật khẩu.
+-- Backend kiểm tra thời hạn, tối đa 5 lần sai và chỉ cho dùng yêu cầu một lần.
 CREATE TABLE password_reset_tokens (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   admin_id BIGINT UNSIGNED NOT NULL,
@@ -43,6 +48,7 @@ CREATE TABLE password_reset_tokens (
   CONSTRAINT ck_reset_used CHECK (used_at IS NULL OR (used_at >= created_at AND used_at <= expires_at))
 ) ENGINE=InnoDB;
 
+-- Ngôn ngữ thuyết minh. is_active = 1: được hỗ trợ; 0: ngừng cung cấp cho khách.
 CREATE TABLE languages (
   id SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   language_code VARCHAR(35) NOT NULL COMMENT 'Vi du vi, en; ma ngon ngu thay cho quoc ky',
@@ -54,6 +60,7 @@ CREATE TABLE languages (
   CONSTRAINT ck_language_active CHECK (is_active IN (0,1))
 ) ENGINE=InnoDB;
 
+-- Khu vực trong Trường Đại học Sài Gòn; có thể ẩn/hiện khu vực.
 CREATE TABLE campus_areas (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   area_code VARCHAR(50) NOT NULL,
@@ -68,6 +75,8 @@ CREATE TABLE campus_areas (
   CONSTRAINT ck_area_visible CHECK (is_visible IN (0,1))
 ) ENGINE=InnoDB;
 
+-- Điểm tham quan (POI): thông tin địa điểm, tọa độ và bán kính kích hoạt tính bằng mét.
+-- is_visible = 0: ẩn POI khỏi phía khách; giữ dữ liệu để bảo toàn lịch sử.
 CREATE TABLE points_of_interest (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   area_id BIGINT UNSIGNED NOT NULL,
@@ -92,6 +101,8 @@ CREATE TABLE points_of_interest (
   CONSTRAINT ck_poi_visible CHECK (is_visible IN (0,1))
 ) ENGINE=InnoDB;
 
+-- Hình ảnh của POI: lưu đường dẫn, không lưu trực tiếp dữ liệu ảnh.
+-- sort_order quy định thứ tự; ảnh có thứ tự nhỏ nhất là ảnh đại diện.
 CREATE TABLE poi_images (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   poi_id BIGINT UNSIGNED NOT NULL,
@@ -105,6 +116,9 @@ CREATE TABLE poi_images (
   CONSTRAINT ck_image_position CHECK (sort_order > 0)
 ) ENGINE=InnoDB;
 
+-- Nội dung thuyết minh: mỗi cặp POI và ngôn ngữ có tối đa một bản ghi.
+-- Cho sửa tiêu đề, văn bản, trạng thái; không đổi POI/ngôn ngữ của bản ghi cũ.
+-- Muốn chuyển POI/ngôn ngữ: tạo nội dung mới nếu cặp đích chưa tồn tại; nếu đã có thì sửa bài đích.
 CREATE TABLE narration_contents (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   poi_id BIGINT UNSIGNED NOT NULL,
@@ -126,6 +140,11 @@ CREATE TABLE narration_contents (
 
 -- Mot noi dung co the giu nhieu phien ban audio, toi da mot ban dang hien thi.
 -- Khi thay audio: an ban cu va tao ban moi trong cung transaction.
+-- Audio MP3: lưu đường dẫn và metadata; một nội dung có nhiều phiên bản.
+-- duration_seconds là ĐỘ DÀI FILE AUDIO, không phải thời lượng khách đã nghe.
+-- Mỗi nội dung có tối đa một phiên bản is_visible = 1.
+-- Khi thay file, Backend ẩn phiên bản cũ và thêm phiên bản mới trong cùng transaction.
+-- Không ghi đè hoặc xóa file vật lý của phiên bản đã được ghi nhận lượt nghe.
 CREATE TABLE audio_files (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   content_id BIGINT UNSIGNED NOT NULL,
@@ -152,6 +171,7 @@ CREATE TABLE audio_files (
   CONSTRAINT ck_audio_visible CHECK (is_visible IN (0,1))
 ) ENGINE=InnoDB;
 
+-- Lộ trình: mã, tên, mô tả, thời lượng tham quan dự kiến và trạng thái hiển thị.
 CREATE TABLE tour_routes (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   route_code VARCHAR(50) NOT NULL,
@@ -168,6 +188,9 @@ CREATE TABLE tour_routes (
   CONSTRAINT ck_route_visible CHECK (is_visible IN (0,1))
 ) ENGINE=InnoDB;
 
+-- Danh sách POI thuộc lộ trình: mỗi POI xuất hiện tối đa một lần trong một lộ trình.
+-- sort_order xác định thứ tự tham quan; xóa lộ trình chỉ xóa liên kết, không xóa POI.
+-- Khi đổi thứ tự, Backend dùng transaction và vị trí tạm không trùng để tránh lỗi UNIQUE.
 CREATE TABLE tour_route_pois (
   route_id BIGINT UNSIGNED NOT NULL,
   poi_id BIGINT UNSIGNED NOT NULL,
@@ -181,6 +204,9 @@ CREATE TABLE tour_route_pois (
 
 -- Phien an danh, khong phai tai khoan khach hay ma mua ve.
 -- Backend giu token goc trong cookie an toan; DB chi giu hash.
+-- Phiên tham quan ẩn danh, không yêu cầu khách đăng nhập hay mua mã kích hoạt.
+-- started_at: bắt đầu; expires_at: hết hạn; ended_at: kết thúc chủ động nếu có.
+-- Backend giữ token gốc trong cookie an toàn; cơ sở dữ liệu chỉ lưu token_hash.
 CREATE TABLE visitor_sessions (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   token_hash BINARY(32) NOT NULL,
@@ -193,12 +219,23 @@ CREATE TABLE visitor_sessions (
   CONSTRAINT ck_visit_end CHECK (ended_at IS NULL OR ended_at >= started_at)
 ) ENGINE=InnoDB;
 
+-- Nhật ký lượt nghe: mỗi bản ghi là một sự kiện BẮT ĐẦU PHÁT audio của khách.
+-- Chưa lưu số giây nghe thực tế hay tỷ lệ hoàn thành; không suy ra nghe hết từ lượt bắt đầu.
+-- POI và ngôn ngữ được truy xuất qua audio_files -> narration_contents.
+-- GPS: POI được xác định từ vị trí GPS thiết bị trong bán kính kích hoạt.
+-- SIMULATION: khách chọn POI trên bản đồ để mô phỏng vị trí, trải nghiệm/kiểm thử.
+-- Nhấn Play sau khi xác định POI bằng GPS vẫn ghi GPS, không đổi nguồn.
+-- Không dùng MANUAL trong phạm vi nghiệp vụ hiện tại.
+-- Backend quyết định/kiểm tra nguồn; không tin trực tiếp giá trị do client gửi.
+-- GPS không phải bằng chứng tuyệt đối về sự hiện diện; thống kê hai nguồn riêng.
+-- Admin nghe thử audio không được ghi vào nhật ký lượt nghe của khách.
+-- event_id được giữ nguyên khi gửi lại cùng một sự kiện để chống ghi trùng.
 CREATE TABLE listening_logs (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   event_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT 'UUID do backend tao, dung lai khi retry',
   session_id BIGINT UNSIGNED NOT NULL,
   audio_file_id BIGINT UNSIGNED NOT NULL,
-  trigger_source ENUM('GPS', 'MANUAL', 'SIMULATION') NOT NULL,
+  trigger_source ENUM('GPS', 'SIMULATION') NOT NULL COMMENT 'Nguồn xác định POI: GPS thực tế hoặc vị trí mô phỏng; không phân loại theo nút Play',
   started_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT 'Thoi gian UTC do server ghi',
   UNIQUE KEY uq_listen_event (event_id),
   KEY ix_listen_time (started_at),
