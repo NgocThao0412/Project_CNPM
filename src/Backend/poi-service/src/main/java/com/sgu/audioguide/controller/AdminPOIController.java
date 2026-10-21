@@ -18,6 +18,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import com.sgu.audioguide.DTO.UpdatePOIRequestDTO;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+
+import java.util.NoSuchElementException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -109,4 +114,84 @@ public class AdminPOIController {
                     ));
         }
     }
+    @PutMapping(
+        value = "/{id}",
+        consumes = MediaType.APPLICATION_JSON_VALUE
+)
+public ResponseEntity<?> updatePOI(
+        @PathVariable("id") Long id,
+        @Valid @RequestBody UpdatePOIRequestDTO request,
+        BindingResult validation,
+        HttpServletRequest httpRequest
+) {
+    try {
+        authServiceClient.requireAdmin(httpRequest);
+
+        if (validation.hasErrors()) {
+            Map<String, String> errors = new LinkedHashMap<>();
+
+            for (FieldError error : validation.getFieldErrors()) {
+                errors.putIfAbsent(
+                        error.getField(),
+                        error.getDefaultMessage() != null
+                                ? error.getDefaultMessage()
+                                : "Giá trị không hợp lệ"
+                );
+            }
+
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Dữ liệu POI không hợp lệ",
+                    "errors", errors
+            ));
+        }
+
+        poiBUS.updatePOI(id, request);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Cập nhật POI thành công",
+                "id", id
+        ));
+
+    } catch (ResponseStatusException exception) {
+        return ResponseEntity.status(exception.getStatusCode())
+                .body(Map.of(
+                        "message",
+                        exception.getReason() != null
+                                ? exception.getReason()
+                                : "Không thể xác thực tài khoản"
+                ));
+
+    } catch (NoSuchElementException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of(
+                        "message", exception.getMessage()
+                ));
+
+    } catch (DuplicateKeyException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of(
+                        "message", "Mã POI đã tồn tại"
+                ));
+
+    } catch (IllegalArgumentException exception) {
+        return ResponseEntity.badRequest()
+                .body(Map.of(
+                        "message", exception.getMessage()
+                ));
+
+    } catch (DataIntegrityViolationException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of(
+                        "message",
+                        "Dữ liệu liên quan đã thay đổi hoặc vi phạm ràng buộc"
+                ));
+
+    } catch (DataAccessException exception) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(Map.of(
+                        "message",
+                        "Chưa thể cập nhật POI, vui lòng thử lại"
+                ));
+    }
+}
 }

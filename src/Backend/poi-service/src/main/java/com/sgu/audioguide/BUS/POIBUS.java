@@ -3,11 +3,13 @@ package com.sgu.audioguide.BUS;
 import com.sgu.audioguide.DAO.POIDAO;
 import com.sgu.audioguide.DTO.CreatePOIRequestDTO;
 import com.sgu.audioguide.DTO.POIDTO;
+import com.sgu.audioguide.DTO.UpdatePOIRequestDTO;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class POIBUS {
@@ -37,5 +39,42 @@ public class POIBUS {
         }
 
         return poiDAO.insert(request);
+    }
+
+    @Transactional
+    public void updatePOI(Long id, UpdatePOIRequestDTO request) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException(
+                    "ID POI không hợp lệ"
+            );
+        }
+
+        if (!poiDAO.existsById(id)) {
+            throw new NoSuchElementException(
+                    "POI không tồn tại"
+            );
+        }
+
+        if (!poiDAO.areaExists(request.areaId())) {
+            throw new IllegalArgumentException(
+                    "Khu vực không tồn tại"
+            );
+        }
+
+        if (poiDAO.existsByCodeExcludingId(
+                request.poiCode().trim(), id
+        )) {
+            throw new DuplicateKeyException(
+                    "Mã POI đã tồn tại"
+            );
+        }
+
+        int updatedRows = poiDAO.update(id, request);
+
+        if (updatedRows == 0) {
+            throw new NoSuchElementException(
+                    "POI không còn tồn tại để cập nhật"
+            );
+        }
     }
 }
