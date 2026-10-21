@@ -1,15 +1,16 @@
 package com.sgu.audioguide.BUS;
 
-import com.sgu.audioguide.DAO.POIDAO;
-import com.sgu.audioguide.DTO.CreatePOIRequestDTO;
-import com.sgu.audioguide.DTO.POIDTO;
-import com.sgu.audioguide.DTO.UpdatePOIRequestDTO;
+import java.util.List;
+import java.util.NoSuchElementException;
+
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.NoSuchElementException;
+import com.sgu.audioguide.DAO.POIDAO;
+import com.sgu.audioguide.DTO.CreatePOIRequestDTO;
+import com.sgu.audioguide.DTO.POIDTO;
+import com.sgu.audioguide.DTO.UpdatePOIRequestDTO;
 
 @Service
 public class POIBUS {
@@ -74,6 +75,23 @@ public class POIBUS {
         if (updatedRows == 0) {
             throw new NoSuchElementException(
                     "POI không còn tồn tại để cập nhật"
+            );
+        }
+    }
+
+    @Transactional
+    public void updateVisibility(Long id, boolean visible) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException(
+                    "ID POI không hợp lệ"
+            );
+        }
+
+        int updatedRows = poiDAO.updateVisibility(id, visible);
+
+        if (updatedRows == 0 && !poiDAO.existsById(id)) {
+            throw new NoSuchElementException(
+                    "POI không tồn tại"
             );
         }
     }

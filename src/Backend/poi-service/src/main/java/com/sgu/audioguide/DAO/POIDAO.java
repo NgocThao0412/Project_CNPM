@@ -1,15 +1,17 @@
 package com.sgu.audioguide.DAO;
 
-import com.sgu.audioguide.DTO.CreatePOIRequestDTO;
-import com.sgu.audioguide.DTO.POIDTO;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.util.List;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+
+import com.sgu.audioguide.DTO.CreatePOIRequestDTO;
+import com.sgu.audioguide.DTO.POIDTO;
 import com.sgu.audioguide.DTO.UpdatePOIRequestDTO;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.util.List;
 
 @Repository
 public class POIDAO {
@@ -131,37 +133,38 @@ public class POIDAO {
 
         return generatedId.longValue();
     }
+
     public boolean existsById(Long id) {
-    String sql = """
+        String sql = """
             SELECT COUNT(*)
             FROM points_of_interest
             WHERE id = ?
             """;
 
-    Long count = jdbcTemplate.queryForObject(
-            sql, Long.class, id
-    );
+        Long count = jdbcTemplate.queryForObject(
+                sql, Long.class, id
+        );
 
-    return count != null && count > 0;
-}
+        return count != null && count > 0;
+    }
 
-public boolean existsByCodeExcludingId(String poiCode, Long id) {
-    String sql = """
+    public boolean existsByCodeExcludingId(String poiCode, Long id) {
+        String sql = """
             SELECT COUNT(*)
             FROM points_of_interest
             WHERE poi_code = ?
               AND id <> ?
             """;
 
-    Long count = jdbcTemplate.queryForObject(
-            sql, Long.class, poiCode, id
-    );
+        Long count = jdbcTemplate.queryForObject(
+                sql, Long.class, poiCode, id
+        );
 
-    return count != null && count > 0;
-}
+        return count != null && count > 0;
+    }
 
-public int update(Long id, UpdatePOIRequestDTO request) {
-    String sql = """
+    public int update(Long id, UpdatePOIRequestDTO request) {
+        String sql = """
             UPDATE points_of_interest
             SET area_id = ?,
                 poi_code = ?,
@@ -170,13 +173,23 @@ public int update(Long id, UpdatePOIRequestDTO request) {
             WHERE id = ?
             """;
 
-    return jdbcTemplate.update(
-            sql,
-            request.areaId(),
-            request.poiCode().trim(),
-            request.poiName().trim(),
-            request.description(),
-            id
-    );
-}
+        return jdbcTemplate.update(
+                sql,
+                request.areaId(),
+                request.poiCode().trim(),
+                request.poiName().trim(),
+                request.description(),
+                id
+        );
+    }
+
+    public int updateVisibility(Long id, boolean visible) {
+        String sql = """
+            UPDATE points_of_interest
+            SET is_visible = ?
+            WHERE id = ?
+            """;
+
+        return jdbcTemplate.update(sql, visible, id);
+    }
 }
