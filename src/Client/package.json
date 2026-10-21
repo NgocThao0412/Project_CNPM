@@ -1,0 +1,10 @@
+{
+  "name": "sgu-audio-guide-ny-client",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "serve": "python -m http.server 5500"
+  }
+}
