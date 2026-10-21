@@ -23,6 +23,10 @@ public class POIDAO {
     }
 
     public List<POIDTO> findVisiblePOIs() {
+        return findVisiblePOIs("");
+    }
+
+    public List<POIDTO> findVisiblePOIs(String keyword) {
         String sql = """
                 SELECT p.id,
                        p.poi_code,
@@ -43,8 +47,12 @@ public class POIDAO {
                 FROM points_of_interest p
                 JOIN campus_areas a ON a.id = p.area_id
                 WHERE p.is_visible = TRUE
-                  AND a.is_visible = TRUE
-                ORDER BY p.poi_name, p.id
+  AND a.is_visible = TRUE
+  AND (
+      LOCATE(?, p.poi_code) > 0
+      OR LOCATE(?, p.poi_name) > 0
+  )
+ORDER BY p.poi_name, p.id
                 """;
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> new POIDTO(
@@ -58,7 +66,7 @@ public class POIDAO {
                 rs.getBigDecimal("longitude"),
                 rs.getBigDecimal("trigger_radius_m"),
                 rs.getString("image_url")
-        ));
+        ), keyword, keyword);
     }
 
     public boolean existsByCode(String poiCode) {
@@ -191,5 +199,50 @@ public class POIDAO {
             """;
 
         return jdbcTemplate.update(sql, visible, id);
+    }
+
+    public java.util.Optional<POIDTO> findVisibleById(Long id) {
+        String sql = """
+            SELECT p.id,
+                   p.poi_code,
+                   p.poi_name,
+                   p.area_id,
+                   a.area_name,
+                   p.description,
+                   p.latitude,
+                   p.longitude,
+                   p.trigger_radius_m,
+                   (
+                       SELECT i.file_url
+                       FROM poi_images i
+                       WHERE i.poi_id = p.id
+                       ORDER BY i.sort_order, i.id
+                       LIMIT 1
+                   ) AS image_url
+            FROM points_of_interest p
+            JOIN campus_areas a ON a.id = p.area_id
+            WHERE p.id = ?
+              AND p.is_visible = TRUE
+              AND a.is_visible = TRUE
+            """;
+
+        List<POIDTO> results = jdbcTemplate.query(
+                sql,
+                (rs, rowNum) -> new POIDTO(
+                        rs.getLong("id"),
+                        rs.getString("poi_code"),
+                        rs.getString("poi_name"),
+                        rs.getLong("area_id"),
+                        rs.getString("area_name"),
+                        rs.getString("description"),
+                        rs.getBigDecimal("latitude"),
+                        rs.getBigDecimal("longitude"),
+                        rs.getBigDecimal("trigger_radius_m"),
+                        rs.getString("image_url")
+                ),
+                id
+        );
+
+        return results.stream().findFirst();
     }
 }

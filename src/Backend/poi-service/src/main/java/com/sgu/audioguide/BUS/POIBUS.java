@@ -95,4 +95,29 @@ public class POIBUS {
             );
         }
     }
+
+    public POIDTO getVisiblePOIById(Long id) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("ID POI không hợp lệ");
+        }
+
+        return poiDAO.findVisibleById(id)
+                .orElseThrow(()
+                        -> new NoSuchElementException("POI không tồn tại hoặc đã bị ẩn")
+                );
+    }
+
+    public List<POIDTO> searchVisiblePOIs(String keyword) {
+        String normalizedKeyword = keyword == null
+                ? ""
+                : keyword.strip();
+
+        if (normalizedKeyword.length() > 200) {
+            throw new IllegalArgumentException(
+                    "Từ khóa tìm kiếm không được vượt quá 200 ký tự"
+            );
+        }
+
+        return poiDAO.findVisiblePOIs(normalizedKeyword);
+    }
 }
