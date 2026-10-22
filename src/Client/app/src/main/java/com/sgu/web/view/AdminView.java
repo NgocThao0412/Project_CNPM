@@ -17,7 +17,7 @@ public String login(ClientSessionDTO ss, String error, String username) {
         + "<span class=\"eyebrow\">SAIGON AUDIO GUIDE · ADMIN</span>"
         + "<h1>Chăm chút từng<br>câu chuyện.<br>Kết nối từng<br>hành trình.</h1>"
         + "<p>Không gian dành cho người quản lý địa điểm và nội dung thuyết minh.</p>"
-        + "<img src=\"/assets/campus-1.svg\" alt=\"Minh họa khuôn viên\">"
+        + "<img src=\"/assets/saigon-university-campus.png\" alt=\"Trường Đại học Sài Gòn\">"
         + "</section>"
 
         + "<section class=\"login-form\">"
