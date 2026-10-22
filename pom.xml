@@ -19,6 +19,7 @@
     <module>src/Backend/poi-service</module>
     <module>src/Backend/narration-service</module>
     <module>src/Backend/audio-service</module>
+    <module>src/Backend/visitor-service</module>
 </modules>
 
 </project>
