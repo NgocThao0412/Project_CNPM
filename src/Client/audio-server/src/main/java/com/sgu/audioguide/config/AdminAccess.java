@@ -18,7 +18,7 @@ public class AdminAccess {
     @Value("${services.auth.url:http://localhost:8081}") private String authUrl;
     public void requireAdmin(HttpServletRequest request) {
         String cookie=request.getHeader("Cookie");
-        if(cookie==null || !cookie.contains("JSESSIONID="))
+        if(cookie==null || !cookie.contains("SGU_ADMIN_SESSION="))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Vui lòng đăng nhập quản trị");
         try {
             HttpRequest r=HttpRequest.newBuilder(URI.create(authUrl+"/api/auth/me"))

@@ -1,15 +1,17 @@
 package com.sgu.audioguide.config;
 
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /** Fail-closed session validation. Never trust a user-submitted adminId/header. */
 @Component
@@ -18,7 +20,7 @@ public class AdminAccess {
     @Value("${services.auth.url:http://localhost:8081}") private String authUrl;
     public void requireAdmin(HttpServletRequest request) {
         String cookie=request.getHeader("Cookie");
-        if(cookie==null || !cookie.contains("JSESSIONID="))
+        if(cookie==null || !cookie.contains("SGU_ADMIN_SESSION="))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Vui lòng đăng nhập quản trị");
         try {
             HttpRequest r=HttpRequest.newBuilder(URI.create(authUrl+"/api/auth/me"))
