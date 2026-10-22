@@ -8,7 +8,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-
+import com.sgu.audioguide.DTO.AdminPOIDTO;
+import com.sgu.audioguide.DTO.CampusAreaDTO;
 import com.sgu.audioguide.DTO.CreatePOIRequestDTO;
 import com.sgu.audioguide.DTO.POIDTO;
 import com.sgu.audioguide.DTO.UpdatePOIRequestDTO;
@@ -245,4 +246,56 @@ ORDER BY p.poi_name, p.id
 
         return results.stream().findFirst();
     }
+    public List<AdminPOIDTO> findAllForAdmin() {
+    String sql = """
+            SELECT p.id, p.poi_code, p.poi_name,
+                   p.area_id, a.area_name, p.description,
+                   p.latitude, p.longitude, p.trigger_radius_m,
+                   p.is_visible,
+                   (
+                       SELECT i.file_url
+                       FROM poi_images i
+                       WHERE i.poi_id = p.id
+                       ORDER BY i.sort_order, i.id
+                       LIMIT 1
+                   ) AS image_url
+            FROM points_of_interest p
+            JOIN campus_areas a ON a.id = p.area_id
+            ORDER BY p.poi_name, p.id
+            """;
+
+    return jdbcTemplate.query(sql, (rs, rowNum) ->
+            new AdminPOIDTO(
+                    rs.getLong("id"),
+                    rs.getString("poi_code"),
+                    rs.getString("poi_name"),
+                    rs.getLong("area_id"),
+                    rs.getString("area_name"),
+                    rs.getString("description"),
+                    rs.getBigDecimal("latitude"),
+                    rs.getBigDecimal("longitude"),
+                    rs.getBigDecimal("trigger_radius_m"),
+                    rs.getString("image_url"),
+                    rs.getBoolean("is_visible")
+            )
+    );
+}
+
+public List<CampusAreaDTO> findVisibleAreas() {
+    String sql = """
+            SELECT id, area_code, area_name, is_visible
+            FROM campus_areas
+            WHERE is_visible = TRUE
+            ORDER BY area_name, id
+            """;
+
+    return jdbcTemplate.query(sql, (rs, rowNum) ->
+            new CampusAreaDTO(
+                    rs.getLong("id"),
+                    rs.getString("area_code"),
+                    rs.getString("area_name"),
+                    rs.getBoolean("is_visible")
+            )
+    );
+}
 }

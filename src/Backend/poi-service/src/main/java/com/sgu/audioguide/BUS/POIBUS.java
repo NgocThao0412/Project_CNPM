@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sgu.audioguide.DAO.POIDAO;
+import com.sgu.audioguide.DTO.AdminPOIDTO;
+import com.sgu.audioguide.DTO.CampusAreaDTO;
 import com.sgu.audioguide.DTO.CreatePOIRequestDTO;
 import com.sgu.audioguide.DTO.POIDTO;
 import com.sgu.audioguide.DTO.UpdatePOIRequestDTO;
@@ -119,5 +121,13 @@ public class POIBUS {
         }
 
         return poiDAO.findVisiblePOIs(normalizedKeyword);
+    }
+
+    public List<AdminPOIDTO> getAdminPOIs() {
+        return poiDAO.findAllForAdmin();
+    }
+
+    public List<CampusAreaDTO> getVisibleAreas() {
+        return poiDAO.findVisibleAreas();
     }
 }
