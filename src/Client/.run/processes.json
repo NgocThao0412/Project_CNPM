@@ -1,0 +1,17 @@
+﻿[
+    {
+        "name":  "narration-server",
+        "pid":  23888,
+        "jar":  "narration-server\\narration-server.jar"
+    },
+    {
+        "name":  "audio-server",
+        "pid":  11976,
+        "jar":  "audio-server\\audio-server.jar"
+    },
+    {
+        "name":  "Client",
+        "pid":  14084,
+        "jar":  "app\\Client.jar"
+    }
+]
