@@ -15,8 +15,10 @@
     <name>SGU Audio Guide Backend</name>
 
     <modules>
-        <module>src/Backend/auth-service</module>
-        <module>src/Backend/poi-service</module>
-    </modules>
+    <module>src/Backend/auth-service</module>
+    <module>src/Backend/poi-service</module>
+    <module>src/Backend/narration-service</module>
+    <module>src/Backend/audio-service</module>
+</modules>
 
 </project>
