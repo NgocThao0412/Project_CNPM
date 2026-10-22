@@ -41,12 +41,7 @@ public class AudioController {
             @RequestParam(name = "admin", defaultValue = "0") int adminMode,
             HttpServletRequest request
     ) {
-        if (adminMode != 0 && adminMode != 1) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "admin chỉ nhận 0 hoặc 1"
-            );
-        }
+        validateAdminMode(adminMode);
 
         boolean adminPreview = adminMode == 1;
 
@@ -76,10 +71,33 @@ public class AudioController {
             produces = "audio/mpeg"
     )
     public ResponseEntity<Resource> download(
-            @PathVariable("id") long id
+            @PathVariable("id") long id,
+            @RequestParam(name = "admin", defaultValue = "0") int adminMode,
+            HttpServletRequest request
     ) {
+        validateAdminMode(adminMode);
+
+        Resource audio;
+
+        if (adminMode == 1) {
+            access.requireAdmin(request);
+            audio = bus.openForPreview(id);
+        } else {
+            audio = bus.open(id);
+        }
+
         return ResponseEntity.ok()
+                .header("Cache-Control", "no-store")
                 .contentType(MediaType.parseMediaType("audio/mpeg"))
-                .body(bus.open(id));
+                .body(audio);
+    }
+
+    private void validateAdminMode(int adminMode) {
+        if (adminMode != 0 && adminMode != 1) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "admin chỉ nhận 0 hoặc 1"
+            );
+        }
     }
 }

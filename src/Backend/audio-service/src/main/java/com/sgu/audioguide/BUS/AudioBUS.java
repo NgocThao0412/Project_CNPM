@@ -159,4 +159,31 @@ public class AudioBUS {
             );
         }
     }
+
+    public Resource openForPreview(long id) {
+        if (id <= 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "ID audio phải lớn hơn 0"
+            );
+        }
+
+        dao.findForPreview(id).orElseThrow(()
+                -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Không tìm thấy audio"
+                )
+        );
+
+        Path file = dir.resolve(id + ".mp3");
+
+        if (!Files.isRegularFile(file)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Tệp audio không tồn tại"
+            );
+        }
+
+        return new FileSystemResource(file);
+    }
 }

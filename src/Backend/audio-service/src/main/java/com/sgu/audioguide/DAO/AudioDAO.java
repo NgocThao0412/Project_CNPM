@@ -101,4 +101,14 @@ public class AudioDAO {
         return db.query(sql, AudioDAO::map, contentId);
     }
 
+    public Optional<AudioDTO> findForPreview(long id) {
+        return db.query("""
+            SELECT id, content_id, file_name, file_url,
+                   file_size_bytes, duration_seconds,
+                   version_number, is_visible
+            FROM audio_files
+            WHERE id = ?
+            """, AudioDAO::map, id).stream().findFirst();
+    }
+
 }
