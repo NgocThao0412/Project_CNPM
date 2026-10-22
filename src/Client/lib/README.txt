@@ -1,0 +1,1 @@
+MySQL Connector/J 9.7.0 was copied unchanged from the user-provided Project_CNPM(2).zip, target/backend-0.0.1-SNAPSHOT.jar. Required only in live/MySQL mode. Its original META-INF licenses remain in the JAR. No credentials or database contents are bundled.

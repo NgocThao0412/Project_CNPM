@@ -1,0 +1,14 @@
+[
+  {
+    "service": "auth-service",
+    "boot": "Spring application started",
+    "unauthenticatedStatus": 401,
+    "mysql": "not tested"
+  },
+  {
+    "service": "poi-service",
+    "boot": "Spring application started",
+    "unauthenticatedStatus": 401,
+    "mysql": "not tested"
+  }
+]
