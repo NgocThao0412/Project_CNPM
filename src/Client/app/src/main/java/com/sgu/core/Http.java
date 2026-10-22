@@ -143,7 +143,7 @@ public final class Http {
     public static Reply request(String method,String url,String cookie,String type,byte[] body,Map<String,String> extra)throws IOException,InterruptedException {
         URI uri=URI.create(url);
         if(!Set.of("http","https").contains(uri.getScheme()))throw new Error(400,"Unsupported URL");
-        HttpRequest.Builder b=HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(25)).header("Accept","application/json");
+        HttpRequest.Builder b=HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(25)).header("Accept","*/*");
         if(cookie!=null&&!cookie.isEmpty())b.header("Cookie",cookie);
         if(type!=null&&!type.isBlank())b.header("Content-Type",type);
         extra.forEach(b::header);
