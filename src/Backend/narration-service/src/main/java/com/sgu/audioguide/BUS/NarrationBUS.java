@@ -2,11 +2,13 @@ package com.sgu.audioguide.BUS;
 
 import java.util.List;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.sgu.audioguide.DAO.NarrationDAO;
+import com.sgu.audioguide.DTO.AdminNarrationWriteDTO;
 import com.sgu.audioguide.DTO.NarrationDTO;
 import com.sgu.audioguide.DTO.NarrationWriteDTO;
 
@@ -40,8 +42,9 @@ public class NarrationBUS {
     public void visibility(long id, boolean v) {
         if (dao.visible(id, v) == 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy thuyết minh");
-    
-        }}
+
+        }
+    }
 
     private void validate(NarrationWriteDTO n) {
         if (n == null || n.poiId() == null || n.poiId() < 1 || n.languageCode() == null || n.languageCode().isBlank()
@@ -72,5 +75,100 @@ public class NarrationBUS {
         }
 
         return dao.visible(poiId, normalizedCode);
+    }
+
+    public NarrationDTO getAdminDetail(long id) {
+        if (id <= 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "ID thuyết minh phải lớn hơn 0"
+            );
+        }
+
+        return dao.find(id).orElseThrow(()
+                -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Không tìm thấy thuyết minh"
+                )
+        );
+    }
+
+    private NarrationWriteDTO convertAdminRequest(
+            AdminNarrationWriteDTO request,
+            Boolean defaultVisible
+    ) {
+        if (request == null
+                || request.languageId() == null
+                || request.languageId() <= 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Vui lòng chọn ngôn ngữ hợp lệ"
+            );
+        }
+
+        String languageCode = dao.findActiveLanguageCode(
+                request.languageId()
+        ).orElseThrow(()
+                -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Ngôn ngữ không tồn tại hoặc đã ngừng hỗ trợ"
+                )
+        );
+
+        NarrationWriteDTO converted = new NarrationWriteDTO(
+                request.poiId(),
+                languageCode,
+                request.title(),
+                request.content(),
+                request.visible() == null
+                ? defaultVisible
+                : request.visible()
+        );
+
+        try {
+            validate(converted);
+        } catch (IllegalArgumentException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    exception.getMessage()
+            );
+        }
+
+        return converted;
+    }
+
+    public NarrationDTO createFromAdmin(AdminNarrationWriteDTO request) {
+        NarrationWriteDTO converted = convertAdminRequest(request, true);
+
+        try {
+            return create(converted);
+        } catch (DuplicateKeyException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "POI đã có nội dung thuyết minh cho ngôn ngữ này"
+            );
+        }
+    }
+
+    public NarrationDTO updateFromAdmin(
+            long id,
+            AdminNarrationWriteDTO request
+    ) {
+        NarrationDTO current = getAdminDetail(id);
+
+        NarrationWriteDTO converted = convertAdminRequest(
+                request,
+                current.isVisible()
+        );
+
+        if (!current.poiId().equals(converted.poiId())
+                || !current.languageCode().equals(converted.languageCode())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Không được đổi POI hoặc ngôn ngữ của bài đã tạo"
+            );
+        }
+
+        return update(id, converted);
     }
 }

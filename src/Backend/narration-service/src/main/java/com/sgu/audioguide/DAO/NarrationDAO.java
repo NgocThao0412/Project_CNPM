@@ -19,7 +19,8 @@ public class NarrationDAO {
         this.db = db;
     }
     private static final String SELECT = """
-        SELECT n.id,n.poi_id,l.language_code,n.title,n.content,n.is_visible,
+       SELECT n.id,n.poi_id,n.language_id,l.language_code,l.language_name,
+       n.title,n.content,n.is_visible, 
           (SELECT a.file_url FROM audio_files a WHERE a.content_id=n.id AND a.is_visible=1
              ORDER BY a.version_number DESC LIMIT 1) audio_url
         FROM narration_contents n JOIN languages l ON l.id=n.language_id
@@ -27,9 +28,21 @@ public class NarrationDAO {
         JOIN campus_areas ca ON ca.id=p.area_id
         """;
 
-    private static NarrationDTO map(java.sql.ResultSet r, int row) throws java.sql.SQLException {
-        return new NarrationDTO(r.getLong("id"), r.getLong("poi_id"), r.getString("language_code"),
-                r.getString("title"), r.getString("content"), r.getString("audio_url"), r.getBoolean("is_visible"));
+    private static NarrationDTO map(
+            java.sql.ResultSet r,
+            int row
+    ) throws java.sql.SQLException {
+        return new NarrationDTO(
+                r.getLong("id"),
+                r.getLong("poi_id"),
+                r.getLong("language_id"),
+                r.getString("language_code"),
+                r.getString("language_name"),
+                r.getString("title"),
+                r.getString("content"),
+                r.getString("audio_url"),
+                r.getBoolean("is_visible")
+        );
     }
 
     public List<NarrationDTO> visible() {
@@ -104,5 +117,13 @@ public class NarrationDAO {
                 NarrationDAO::map,
                 parameters.toArray()
         );
+    }
+
+    public Optional<String> findActiveLanguageCode(long id) {
+        return db.query(
+                "SELECT language_code FROM languages WHERE id=? AND is_active=1",
+                (rs, rowNum) -> rs.getString("language_code"),
+                id
+        ).stream().findFirst();
     }
 }
