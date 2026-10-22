@@ -34,3 +34,5 @@ build/
 # Audio demo và file tải lên khi chạy
 /poi-01-vi.mp3
 /src/Client/audio-server/data/
+/poi-01-en.mp3
+/src/Backend/audio-service/data/

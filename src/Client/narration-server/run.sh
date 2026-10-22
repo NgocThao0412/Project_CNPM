@@ -1,4 +1,5 @@
 #!/bin/sh
 set -eu
-cd "$(dirname "$0")"
-exec mvn spring-boot:run "$@"
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$ROOT"
+exec java "-Dclient.home=$ROOT" -jar "$ROOT/narration-server/narration-server.jar"

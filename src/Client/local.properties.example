@@ -1,0 +1,7 @@
+# Copy to local.properties. Never commit real secrets.
+# sgu.db.url=jdbc:mysql://127.0.0.1:3306/SGU_audio_guide?connectionTimeZone=UTC
+# sgu.db.username=sgu_app
+# sgu.db.password=YOUR_MYSQL_PASSWORD
+# web.port=8080
+# web.secure.cookie=true
+# Only enable Secure cookies when serving the browser over HTTPS.
