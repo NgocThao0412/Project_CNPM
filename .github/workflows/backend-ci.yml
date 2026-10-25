@@ -66,7 +66,7 @@ jobs:
 
       - name: Build and test five backend services
         run: bash ./mvnw --batch-mode --no-transfer-progress verify
-              - name: Prepare backend release
+      - name: Prepare backend release
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: |
           mkdir -p backend-release
