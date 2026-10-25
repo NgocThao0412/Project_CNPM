@@ -1,0 +1,68 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: ci_test_password
+          MYSQL_ROOT_HOST: "%"
+          MYSQL_DATABASE: SGU_audio_guide
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pci_test_password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+
+    env:
+      SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/SGU_audio_guide?connectionTimeZone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ci_test_password
+      SGU_DB_URL: jdbc:mysql://127.0.0.1:3306/SGU_audio_guide?connectionTimeZone=UTC
+      SGU_DB_USER: root
+      SGU_DB_PASSWORD: ci_test_password
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v7
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Import database for tests
+        env:
+          MYSQL_CONTAINER: ${{ job.services.mysql.id }}
+        run: |
+          docker exec -i \
+            -e MYSQL_PWD="$SGU_DB_PASSWORD" \
+            "$MYSQL_CONTAINER" \
+            mysql --default-character-set=utf8mb4 \
+            -u root SGU_audio_guide \
+            < Database/sgu_audio_guide.sql
+
+      - name: Build and test five backend services
+        run: bash ./mvnw --batch-mode --no-transfer-progress verify
