@@ -77,8 +77,10 @@ public final class ClientController {
         String p=x.getRequestURI().getPath(),method=x.getRequestMethod();
         // These four endpoints are the team's visitor-service contract. All browser
         // requests stay on Client port 8080; Java forwards to 8085 in LIVE mode.
-        if(p.equals("/api/visitor/sessions") || p.equals("/api/visitor/heartbeat")
-                || p.equals("/api/visitor/end")) {
+        if(p.equals("/api/visitor/sessions")
+        || p.equals("/api/visitor/heartbeat")
+        || p.equals("/api/visitor/end")
+        || p.equals("/api/visitor/listening-events")) {
             visitorApi(x,p,method);
             return;
         }
@@ -490,6 +492,52 @@ public final class ClientController {
             return;
         }
         String token=activity.checkedToken(x.getRequestHeaders().getFirst("X-Visitor-Token"));
+        if (path.equals("/api/visitor/listening-events")) {
+    String contentType = x.getRequestHeaders()
+            .getFirst("Content-Type");
+
+    if (contentType == null
+            || !contentType.toLowerCase(Locale.ROOT)
+                    .startsWith("application/json")) {
+        throw new Http.Error(415, "Yêu cầu phải là JSON.");
+    }
+
+    byte[] body = x.getRequestBody().readNBytes(2049);
+
+    if (body.length > 2048) {
+        throw new Http.Error(413, "Dữ liệu lượt nghe quá lớn.");
+    }
+
+    Map<String, Object> value = Json.object(
+            new String(body, StandardCharsets.UTF_8)
+    );
+
+    if (!(value.get("eventId") instanceof String eventId)
+            || !eventId.matches(
+                    "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}"
+                    + "-[0-9a-f]{4}-[0-9a-f]{12}"
+            )) {
+        throw new Http.Error(400, "Mã sự kiện không hợp lệ.");
+    }
+
+    if (!(value.get("audioFileId") instanceof Number number)
+            || !Double.isFinite(number.doubleValue())
+            || number.doubleValue() != number.longValue()
+            || number.longValue() <= 0
+            || number.doubleValue() > 9_007_199_254_740_991d) {
+        throw new Http.Error(400, "ID audio không hợp lệ.");
+    }
+
+    activity.recordListening(
+            token,
+            eventId,
+            number.longValue()
+    );
+
+    x.getResponseHeaders().set("Cache-Control", "no-store");
+    x.sendResponseHeaders(204, -1);
+    return;
+}
         if(path.equals("/api/visitor/heartbeat")) {
             String contentType=x.getRequestHeaders().getFirst("Content-Type");
             if(contentType==null || !contentType.toLowerCase(Locale.ROOT).startsWith("application/json"))

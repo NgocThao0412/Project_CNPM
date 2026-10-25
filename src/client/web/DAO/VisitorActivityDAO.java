@@ -56,6 +56,30 @@ public final class VisitorActivityDAO {
                 Map.of("X-Visitor-Token", token)
         ).require();
     }
+    public void recordListening(
+        String token,
+        String eventId,
+        long audioFileId
+) throws Exception {
+    token = checkedToken(token);
+
+    byte[] body = Json.stringify(
+            Data.row(
+                    "eventId", eventId,
+                    "audioFileId", audioFileId,
+                    "triggerSource", "SIMULATION"
+            )
+    ).getBytes(StandardCharsets.UTF_8);
+
+    Http.request(
+            "POST",
+            endpoint("/api/visitor/listening-events"),
+            "",
+            "application/json",
+            body,
+            Map.of("X-Visitor-Token", token)
+    ).require();
+}
 
     public void end(String token) throws Exception {
         token = checkedToken(token);

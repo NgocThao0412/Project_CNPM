@@ -41,7 +41,7 @@ public class AdminAudioController {
 
         if (request.getContentLengthLong() > MAX_BYTES) {
             throw new ResponseStatusException(
-                    HttpStatus.PAYLOAD_TOO_LARGE,
+                    HttpStatus.CONTENT_TOO_LARGE,
                     "File audio tối đa 20 MB"
             );
         }
