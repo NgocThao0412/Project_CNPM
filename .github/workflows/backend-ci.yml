@@ -66,6 +66,8 @@ jobs:
 
       - name: Build and test five backend services
         run: bash ./mvnw --batch-mode --no-transfer-progress verify
+      - name: Build Client
+        run: bash ./mvnw --batch-mode --no-transfer-progress -f src/client/pom.xml verify
       - name: Prepare backend release
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: |
@@ -75,10 +77,10 @@ jobs:
           cp src/backend/narration-service/target/narration-server-1.0.0.jar backend-release/
           cp src/backend/audio-service/target/audio-server-1.0.0.jar backend-release/
           cp src/backend/visitor-service/target/visitor-service-1.0.0.jar backend-release/
+          cp src/client/target/client-0.0.1-SNAPSHOT.jar backend-release/
           printf '%s\n' "$GITHUB_SHA" > backend-release/commit.txt
           cd backend-release
-          sha256sum *.jar > SHA256SUMS
-
+                    find . -type f ! -name SHA256SUMS -exec sha256sum {} + > SHA256SUMS
       - name: Upload backend release
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v7
