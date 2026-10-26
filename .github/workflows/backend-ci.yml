@@ -77,7 +77,10 @@ jobs:
           cp src/backend/narration-service/target/narration-server-1.0.0.jar backend-release/
           cp src/backend/audio-service/target/audio-server-1.0.0.jar backend-release/
           cp src/backend/visitor-service/target/visitor-service-1.0.0.jar backend-release/
-          cp src/client/target/client-0.0.1-SNAPSHOT.jar backend-release/
+          mkdir -p backend-release/client
+          cp src/client/target/Client.jar backend-release/client/
+          cp src/client/config.properties backend-release/client/
+          cp -r src/client/lib backend-release/client/
           printf '%s\n' "$GITHUB_SHA" > backend-release/commit.txt
           cd backend-release
                     find . -type f ! -name SHA256SUMS -exec sha256sum {} + > SHA256SUMS
