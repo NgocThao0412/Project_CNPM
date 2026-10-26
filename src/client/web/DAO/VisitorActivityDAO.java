@@ -152,6 +152,53 @@ public final class VisitorActivityDAO {
 
         return number.intValue();
     }
+        public Map<String, Object> listeningStats(
+            ClientSessionDTO admin,
+            Map<String, String> filters
+    ) throws Exception {
+        if (admin == null || !admin.loggedIn()) {
+            throw new Http.Error(
+                    401,
+                    "Vui lòng đăng nhập quản trị."
+            );
+        }
+
+        StringBuilder query = new StringBuilder();
+
+        // Chỉ chuyển tiếp các bộ lọc API hỗ trợ.
+        for (String name : new String[]{
+                "from", "to", "poiId", "languageCode"
+        }) {
+            String value = filters.get(name);
+
+            if (value == null || value.isBlank()) {
+                continue;
+            }
+
+            value = value.trim();
+            if (value.length() > 100) {
+                throw new Http.Error(
+                        400,
+                        "Giá trị bộ lọc quá dài: " + name
+                );
+            }
+
+            query.append(query.length() == 0 ? '?' : '&')
+                    .append(name)
+                    .append('=')
+                    .append(Http.enc(value));
+        }
+
+        return Data.map(
+                Http.call(
+                        "GET",
+                        endpoint("/api/admin/listening-stats")
+                                + query.toString(),
+                        admin.upstreamCookie,
+                        null
+                ).require().json()
+        );
+    }
 
     public static String checkedToken(String token) {
         if (token == null

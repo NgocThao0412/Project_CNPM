@@ -193,6 +193,103 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
              + "Hãy tạo nội dung trước khi tải MP3.</td></tr>");
         return b.append("</tbody></table></div></section>").toString();
     }
+        public String users(
+            List<Map<String, Object>> pois,
+            List<Map<String, Object>> languages
+    ) {
+        StringBuilder b = new StringBuilder(users());
+
+        b.append("""
+                <section class="panel" id="listening-history">
+                  <h2>Lịch sử lượt nghe</h2>
+                  <p>Thống kê theo thời gian, địa điểm và ngôn ngữ.</p>
+
+                  <form id="listening-filter">
+                    <div class="form-grid">
+                      <label>Từ ngày
+                        <input type="date" name="from" required>
+                      </label>
+                      <label>Đến ngày
+                        <input type="date" name="to" required>
+                      </label>
+                      <label>Địa điểm
+                        <select name="poiId">
+                          <option value="">Tất cả địa điểm</option>
+                """);
+
+        for (var poi : pois) {
+            b.append("<option value=\"")
+                    .append(Data.id(poi, "id"))
+                    .append("\">")
+                    .append(e(Data.text(poi, "poiName")))
+                    .append("</option>");
+        }
+
+        b.append("""
+                        </select>
+                      </label>
+                      <label>Ngôn ngữ
+                        <select name="languageCode">
+                          <option value="">Tất cả ngôn ngữ</option>
+                """);
+
+        for (var language : languages) {
+            b.append("<option value=\"")
+                    .append(e(Data.text(language, "languageCode")))
+                    .append("\">")
+                    .append(e(Data.text(language, "languageName")))
+                    .append("</option>");
+        }
+
+        b.append("""
+                        </select>
+                      </label>
+                    </div>
+                    <div class="form-actions">
+                      <button class="btn" type="submit">Xem thống kê</button>
+                    </div>
+                  </form>
+
+                  <p id="listening-message" role="status" aria-live="polite"></p>
+
+                  <div class="visitor-users-summary">
+                    <div class="visitor-users-tile">
+                      <span>Tổng lượt nghe</span>
+                      <strong id="history-listens">—</strong>
+                    </div>
+                    <div class="visitor-users-tile">
+                      <span>Số phiên có nghe</span>
+                      <strong id="history-sessions">—</strong>
+                    </div>
+                  </div>
+
+                  <p class="help">
+                    Một phiên có thể nghe nhiều lần.
+                    Số phiên có nghe không phải số người duy nhất.
+                    Không cộng số phiên từng dòng để tính tổng vì một phiên
+                    có thể nghe ở nhiều ngày, địa điểm hoặc ngôn ngữ.
+                  </p>
+
+                  <div class="table-wrap">
+                    <table class="data-table">
+                      <thead>
+                        <tr>
+                          <th>Ngày</th>
+                          <th>Địa điểm</th>
+                          <th>Ngôn ngữ</th>
+                          <th>Lượt nghe</th>
+                          <th>Phiên có nghe</th>
+                        </tr>
+                      </thead>
+                      <tbody id="listening-rows"></tbody>
+                    </table>
+                  </div>
+                </section>
+                <script src="/assets/listening-stats.js" defer></script>
+                """);
+
+        return b.toString();
+    }
 
     /** Backend reports aggregate visitor and listener counts, not named accounts. */
     public String users() {

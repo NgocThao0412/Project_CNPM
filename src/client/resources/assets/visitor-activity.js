@@ -54,11 +54,119 @@
     } catch (_) { /* Backend will expire stale visitor after 30 s. Retry next tick. */ }
   }
 
-  if (player) {
-    const sync = () => { listening = !player.paused && !player.ended; void heartbeat(); };
-    player.addEventListener('playing', sync);
-    for (const name of ['pause','ended','error','emptied','abort']) {
-      player.addEventListener(name, () => { listening=false; void heartbeat(); });
+    if (player) {
+    let currentPlay = null;
+
+    function newEventId() {
+      const bytes = crypto.getRandomValues(new Uint8Array(16));
+      bytes[6] = (bytes[6] & 0x0f) | 0x40;
+      bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+      const hex = Array.from(
+        bytes, value => value.toString(16).padStart(2, '0')
+      ).join('');
+
+      return [
+        hex.slice(0, 8),
+        hex.slice(8, 12),
+        hex.slice(12, 16),
+        hex.slice(16, 20),
+        hex.slice(20)
+      ].join('-');
+    }
+
+    async function sendListeningEvent(event) {
+      if (event.sent || event.sending || event.stopped || closing) return;
+      event.sending = true;
+      event.attempts++;
+
+      try {
+        // Giữ nguyên token và eventId khi gửi lại cùng một lượt.
+        if (!event.token) {
+          await heartbeat();
+          event.token = await currentToken();
+        }
+
+        const response = await request('/api/visitor/listening-events', {
+          headers: {
+            'X-Visitor-Token': event.token,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            eventId: event.id,
+            audioFileId: event.audioId
+          })
+        });
+
+        if (response.ok) {
+          event.sent = true;
+        } else {
+          // Dữ liệu hoặc phiên không hợp lệ: không gửi lặp vô hạn.
+          if (response.status >= 400 &&
+              response.status < 500 &&
+              response.status !== 429) {
+            event.stopped = true;
+          }
+          throw new Error('Listening API HTTP ' + response.status);
+        }
+      } catch (error) {
+        console.warn('Chưa lưu được lượt nghe:', error.message);
+      } finally {
+        event.sending = false;
+
+        if (!event.sent && !event.stopped && !closing) {
+          if (event.attempts < 5) {
+            setTimeout(() => {
+              void sendListeningEvent(event);
+            }, 5000);
+          } else {
+            event.stopped = true;
+            console.warn('Đã dừng thử gửi lượt nghe sau 5 lần.');
+          }
+        }
+      }
+    }
+
+    player.addEventListener('playing', () => {
+      listening = true;
+      void heartbeat();
+
+      const audioId = Number(player.dataset.audioId);
+      if (!Number.isSafeInteger(audioId) || audioId <= 0) {
+        console.warn('Trình phát thiếu ID audio hợp lệ.');
+        return;
+      }
+
+      const source = player.currentSrc || player.src;
+
+      if (!currentPlay ||
+          currentPlay.audioId !== audioId ||
+          currentPlay.source !== source) {
+        currentPlay = {
+          id: newEventId(),
+          audioId,
+          source,
+          token: null,
+          sent: false,
+          sending: false,
+          stopped: false,
+          attempts: 0
+        };
+
+        void sendListeningEvent(currentPlay);
+      }
+    });
+
+    for (const name of ['pause', 'ended', 'error', 'emptied', 'abort']) {
+      player.addEventListener(name, () => {
+        listening = false;
+        void heartbeat();
+
+        // Nghe hết hoặc nạp bài mới: lần phát sau là lượt mới.
+        if (name === 'ended' || name === 'emptied') {
+          currentPlay = null;
+        }
+      });
     }
   }
 

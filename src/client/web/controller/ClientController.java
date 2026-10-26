@@ -91,7 +91,29 @@ public final class ClientController {
             Http.json(x,200,activity.stats(adminSession));
             return;
         }
+        if (p.equals("/api/admin/listening-stats")) {
+            x.getResponseHeaders().set("Cache-Control", "no-store");
 
+            if (!method.equals("GET")) {
+                x.getResponseHeaders().set("Allow", "GET");
+                throw new Http.Error(405, "Method not allowed");
+            }
+
+            ClientSessionDTO adminSession = session(x);
+
+            // Kiểm tra đăng nhập với auth-service.
+            api.me(adminSession);
+
+            Http.json(
+                    x,
+                    200,
+                    activity.listeningStats(
+                            adminSession,
+                            Http.query(x)
+                    )
+            );
+            return;
+        }
         // Existing service routes continue through the built-in gateway.
         if(p.startsWith("/api/")) {
             gateway.handle(x);
@@ -256,7 +278,7 @@ public final class ClientController {
             success(x,"/admin/pois","Đã cập nhật trạng thái POI.");
             return;
         } if(p.equals("/admin/users")&&method.equals("GET")) {
-            page(x,ss,"Người dùng","admin",admin.users());
+            page(x,ss,"Người dùng","admin",admin.users(api.pois(ss, true), api.languages(ss)));
             return;
         } if(p.equals("/admin/audio")&&method.equals("GET")) {
             page(x,ss,"Quản lý audio","admin",
