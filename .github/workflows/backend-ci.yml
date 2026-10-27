@@ -83,7 +83,7 @@ jobs:
           cp -r src/client/lib backend-release/client/
           printf '%s\n' "$GITHUB_SHA" > backend-release/commit.txt
           cd backend-release
-                    find . -type f ! -name SHA256SUMS -exec sha256sum {} + > SHA256SUMS
+          find . -type f ! -name SHA256SUMS -exec sha256sum {} + > SHA256SUMS
       - name: Upload backend release
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v7
