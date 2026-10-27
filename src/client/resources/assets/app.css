@@ -229,10 +229,28 @@ body.admin-area {background:#f0f5fb}
 .dash-stat-heading .icon {width:25px;height:25px}
 .dash-stat strong {font-size:clamp(30px,3vw,41px);line-height:1.12;letter-spacing:-1.2px;margin:12px 0 2px}
 .dash-stat-label {font-weight:750;font-size:13px}
-.stat-blue {background:linear-gradient(128deg,#248fe4,#1873c8)}
-.stat-green {background:linear-gradient(128deg,#16bf9b,#0a9d7b)}
-.stat-violet {background:linear-gradient(128deg,#9b64db,#7a4dbd)}
-.stat-orange {background:linear-gradient(128deg,#ff9f40,#f27d25)}
+.dash-stats .dash-stat.stat-blue {
+    background: linear-gradient(128deg, #248fe4, #1873c8);
+}
+
+.dash-stats .dash-stat.stat-green {
+    background: linear-gradient(128deg, #16bf9b, #0a9d7b);
+}
+
+.dash-stats .dash-stat.stat-violet {
+    background: linear-gradient(128deg, #9b64db, #7a4dbd);
+}
+
+.dash-stats .dash-stat.stat-orange {
+    background: linear-gradient(128deg, #ff9f40, #f27d25);
+}
+
+.dash-stats .dash-stat,
+.dash-stats .dash-stat strong,
+.dash-stats .dash-stat .dash-stat-label,
+.dash-stats .dash-stat .dash-stat-heading {
+    color: #ffffff;
+}
 .admin-action-panel,.dash-panel {border:1px solid #e2ebf5;background:white;border-radius:19px;box-shadow:0 6px 22px #193e6609}
 .admin-action-panel {display:flex;align-items:center;gap:24px;padding:18px 22px;margin-bottom:18px}
 .admin-action-panel h2 {font-size:15px;margin:0;display:flex;align-items:center;gap:9px;flex:0 0 auto}
