@@ -1,0 +1,515 @@
+/* Giao diện quản trị SGU */
+body.admin-area {
+    --admin-blue: #086b9e;
+    --admin-line: #c5dfec;
+    --admin-header: 68px;
+    background: #f5f8fb;
+    color: #20384b;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Dùng một thanh tiêu đề gọn cho trang quản trị */
+.admin-area > .site-header {
+    display: none;
+}
+
+.admin-area .page.admin-shell {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    min-height: calc(100dvh - var(--admin-header));
+    margin: var(--admin-header) 0 0;
+    padding: 0;
+    max-width: none;
+}
+
+.admin-area .admin-topbar {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    height: var(--admin-header);
+    min-height: 0;
+    padding: 10px 22px;
+    background: var(--admin-blue);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 16px;
+    box-shadow: 0 2px 8px #163c5514;
+}
+
+.admin-area .admin-topbar-heading {
+    min-width: 0;
+    gap: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+.admin-area .admin-topbar-heading small {
+    color: #e0f1fa;
+    font-size: 12px;
+}
+
+.admin-area .admin-bar-logo {
+    flex: 0 0 auto;
+    object-fit: contain;
+    background: white;
+    border-radius: 50%;
+    padding: 2px;
+}
+
+.admin-area .admin-menu-toggle {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 42px;
+    height: 42px;
+    border: 1px solid #ffffff70;
+    border-radius: 9px;
+    background: #ffffff15;
+    color: white;
+    font: inherit;
+    font-size: 23px;
+    cursor: pointer;
+}
+
+.admin-area .admin-menu-toggle:hover {
+    background: #ffffff30;
+}
+
+.admin-area .admin-topbar-actions {
+    width: auto;
+    gap: 14px;
+    flex: 0 0 auto;
+}
+
+.admin-area .admin-user {
+    font-size: 13px;
+}
+
+.admin-area .admin-logout {
+    min-height: 40px;
+    padding: 8px 14px;
+    border: 1px solid #ffffff80;
+    border-radius: 8px;
+    background: #ffffff12;
+    font-size: 13px;
+}
+
+.admin-area .admin-logout:hover {
+    background: #ffffff30;
+}
+
+/* Menu dọc */
+.admin-area .admin-sidebar {
+    position: sticky;
+    top: var(--admin-header);
+    align-self: start;
+    height: calc(100dvh - var(--admin-header));
+    overflow-y: auto;
+    padding: 18px 12px;
+    background: white;
+    color: #24445b;
+    border-right: 1px solid var(--admin-line);
+    scrollbar-width: thin;
+}
+
+.admin-area .admin-sidebar::after {
+    display: none;
+}
+
+.admin-area .sidebar-heading {
+    display: flex;
+    padding: 5px 10px 20px;
+    border-bottom: 1px solid var(--admin-line);
+    color: var(--admin-blue);
+    font-size: 14px;
+}
+
+.admin-area .sidebar-heading-icon {
+    background: #e8f4fb;
+    color: var(--admin-blue);
+}
+
+.admin-area .sidebar-heading small,
+.admin-area .sidebar-signature small {
+    color: #667f90;
+}
+
+.admin-area .sidebar-links {
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    margin: 12px 0 24px;
+    gap: 0;
+}
+
+.admin-area .sidebar-link {
+    min-height: 58px;
+    flex-shrink: 0;
+    padding: 14px 10px;
+    border-bottom: 1px solid #dce9f0;
+    border-radius: 0;
+    background: transparent;
+    color: #294557;
+    box-shadow: none;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: normal;
+}
+
+.admin-area .sidebar-link .icon {
+    flex: 0 0 auto;
+    color: var(--admin-blue);
+}
+
+.admin-area .sidebar-link:hover {
+    background: #eef7fc;
+    color: #075c8b;
+}
+
+.admin-area .sidebar-link.active {
+    background: #dceef8;
+    color: #00689f;
+    border-bottom: 2px solid #0783bd;
+    font-weight: 700;
+}
+
+.admin-area .sidebar-link.active .icon {
+    color: #00689f;
+}
+
+.admin-area .sidebar-signature {
+    display: block;
+    margin: auto 10px 0;
+    padding-top: 18px;
+    border-top: 1px solid var(--admin-line);
+    color: var(--admin-blue);
+}
+
+/* Nội dung và các khung */
+.admin-area .admin-workspace {
+    min-width: 0;
+}
+
+.admin-area .admin-workspace-body {
+    max-width: 1600px;
+    padding: 24px;
+}
+
+.admin-area .admin-welcome,
+.admin-area .dash-stat,
+.admin-area .dash-panel,
+.admin-area .admin-action-panel,
+.admin-area .visitor-live-strip,
+.admin-area .panel,
+.admin-area .table-wrap {
+    border: 1px solid var(--admin-line);
+    border-radius: 14px;
+    box-shadow: 0 3px 9px #163c550b;
+}
+
+.admin-area .admin-welcome {
+    min-height: 170px;
+    margin-bottom: 20px;
+}
+
+.admin-area .admin-welcome-copy {
+    padding: 24px;
+}
+
+.admin-area .admin-welcome h1 {
+    margin: 0 0 12px;
+    color: #143b59;
+    font-size: clamp(24px, 2.8vw, 36px);
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+/* ================================
+   NỘI DUNG QUẢN TRỊ
+================================ */
+
+.admin-area .admin-workspace {
+    min-width: 0;
+    width: 100%;
+}
+
+.admin-area .admin-workspace-body {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.admin-area .admin-welcome {
+    background: #fff;
+    overflow: hidden;
+}
+
+.admin-area .admin-welcome p {
+    color: #61798a;
+    line-height: 1.6;
+}
+
+.admin-area .dash-stat,
+.admin-area .dash-panel,
+.admin-area .admin-action-panel {
+    background: #fff;
+    min-width: 0;
+    transition: box-shadow .2s ease;
+}
+
+.admin-area .dash-stat:hover,
+.admin-area .dash-panel:hover {
+    box-shadow: 0 6px 18px #163c5518;
+}
+
+.admin-area .panel,
+.admin-area .table-wrap {
+    background: #fff;
+    min-width: 0;
+}
+
+.admin-area .table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.admin-area .data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-area .data-table th {
+    background: #edf6fb;
+    color: #075d8e;
+    font-weight: 700;
+}
+
+.admin-area .data-table th,
+.admin-area .data-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #dfebf2;
+    text-align: left;
+}
+
+.admin-area .data-table tbody tr:hover {
+    background: #f5faff;
+}
+
+.admin-area input,
+.admin-area select,
+.admin-area textarea {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.admin-area button,
+.admin-area a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ================================
+   THU GỌN SIDEBAR - DESKTOP
+================================ */
+
+@media (min-width: 901px) {
+    .admin-area.admin-menu-collapsed
+    .page.admin-shell {
+        grid-template-columns: 0 minmax(0, 1fr);
+    }
+
+    .admin-area.admin-menu-collapsed
+    .admin-sidebar {
+        width: 0;
+        padding: 0;
+        border: 0;
+        overflow: hidden;
+        visibility: hidden;
+    }
+
+    .admin-area .admin-sidebar {
+        transition:
+            padding .2s ease,
+            width .2s ease;
+    }
+}
+
+/* ================================
+   TABLET VÀ MOBILE
+================================ */
+
+@media (max-width: 900px) {
+    body.admin-area {
+        --admin-header: 64px;
+    }
+
+    .admin-area .page.admin-shell {
+        display: block;
+        margin-top: var(--admin-header);
+        min-height: calc(100dvh - var(--admin-header));
+    }
+
+    .admin-area .admin-topbar {
+        height: var(--admin-header);
+        padding: 8px 14px;
+    }
+
+    .admin-area .admin-topbar-heading {
+        font-size: 14px;
+        gap: 8px;
+    }
+
+    .admin-area .admin-topbar-heading small {
+        font-size: 11px;
+    }
+
+    .admin-area .admin-sidebar {
+        position: fixed;
+        z-index: 45;
+        top: var(--admin-header);
+        left: 0;
+        width: min(300px, 85vw);
+        height: calc(100dvh - var(--admin-header));
+        background: #fff;
+        overflow-y: auto;
+        transform: translateX(-105%);
+        visibility: hidden;
+        transition: transform .25s ease,
+                    visibility .25s ease;
+        box-shadow: 4px 0 18px #102c4b18;
+    }
+
+    .admin-area.admin-menu-open .admin-sidebar {
+        transform: translateX(0);
+        visibility: visible;
+    }
+
+    .admin-area .admin-workspace {
+        width: 100%;
+    }
+
+    .admin-area .admin-workspace-body {
+        padding: 18px;
+    }
+
+    .admin-area .admin-welcome {
+        min-height: auto;
+    }
+
+    .admin-area .admin-welcome-copy {
+        padding: 20px;
+    }
+
+    .admin-area .admin-menu-toggle {
+        display: grid;
+    }
+}
+
+/* ================================
+   ĐIỆN THOẠI
+================================ */
+
+@media (max-width: 600px) {
+    .admin-area .admin-topbar {
+        gap: 8px;
+        padding: 8px 10px;
+    }
+
+    .admin-area .admin-topbar-heading {
+        min-width: 0;
+        gap: 7px;
+        font-size: 12px;
+    }
+
+    .admin-area .admin-topbar-heading small {
+        font-size: 10px;
+    }
+
+    .admin-area .admin-bar-logo {
+        width: 30px;
+        height: 30px;
+    }
+
+    .admin-area .admin-menu-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 19px;
+    }
+
+    .admin-area .admin-topbar-actions {
+        gap: 6px;
+    }
+
+    .admin-area .admin-user {
+        display: none;
+    }
+
+    .admin-area .admin-logout {
+        min-height: 34px;
+        padding: 7px 9px;
+        font-size: 11px;
+    }
+
+    .admin-area .admin-workspace-body {
+        padding: 12px;
+    }
+
+    .admin-area .admin-welcome,
+    .admin-area .dash-stat,
+    .admin-area .dash-panel,
+    .admin-area .admin-action-panel,
+    .admin-area .panel {
+        border-radius: 12px;
+    }
+
+    .admin-area .admin-welcome-copy {
+        padding: 16px;
+    }
+
+    .admin-area .admin-welcome h1 {
+        font-size: 24px;
+    }
+
+    .admin-area .metrics,
+    .admin-area .upload-grid,
+    .admin-area .form-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .admin-area .form-actions {
+        flex-wrap: wrap;
+    }
+
+    .admin-area .data-table {
+        min-width: 620px;
+    }
+}
+
+/* ================================
+   HỖ TRỢ NGƯỜI DÙNG GIẢM CHUYỂN ĐỘNG
+================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-area .admin-sidebar,
+    .admin-area .dash-stat,
+    .admin-area .dash-panel {
+        transition: none;
+    }
+}
+
+
+/* Lớp nền mờ khi mở sidebar trên mobile */
+@media (max-width: 900px) {
+    .admin-area.admin-menu-open::before {
+        content: "";
+        position: fixed;
+        inset: var(--admin-header) 0 0;
+        background: rgba(12, 35, 54, 0.35);
+        z-index: 44;
+    }
+}

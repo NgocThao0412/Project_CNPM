@@ -61,7 +61,7 @@ public final class Layout {
             else if (title.contains("thuyết minh") || title.contains("Nội dung")) current = "contents";
             String person = adminName(session);
             pageContent = "<main id=\"main\" class=\"page admin-shell\">"
-                    + "<aside class=\"admin-sidebar\" aria-label=\"Điều hướng quản trị\">"
+                    + "<aside id=\"admin-sidebar\" class=\"admin-sidebar\" aria-label=\"Điều hướng quản trị\">"
                     + "<div class=\"sidebar-heading\"><span class=\"sidebar-heading-icon\">"
                     + icon("audio") + "</span><span>QUẢN TRỊ SGU<small>Campus Audio Guide</small></span></div>"
                     + "<nav class=\"sidebar-links\">"
@@ -75,8 +75,16 @@ public final class Layout {
                     + "<div class=\"sidebar-signature\">Saigon Audio Guide<small>Trường Đại học Sài Gòn</small></div>"
                     + "</aside>"
                     + "<div class=\"admin-workspace\">"
-                    + "<div class=\"admin-topbar\"><div class=\"admin-topbar-heading\">"
-                    + icon("audio") + "<span>HỆ THỐNG QUẢN TRỊ<small>Saigon Audio Guide · SGU</small></span></div>"
+                    + "<div class=\"admin-topbar\">"
+                    + "<div class=\"admin-topbar-heading\">"
+                    + "<button type=\"button\" class=\"admin-menu-toggle\""
+                    + " aria-controls=\"admin-sidebar\" aria-expanded=\"true\""
+                    + " aria-label=\"Ẩn hoặc hiện menu quản trị\">"
+                    + "<span aria-hidden=\"true\">☰</span></button>"
+                    + "<img src=\"/assets/logo-sgu.png\" alt=\"\""
+                    + " class=\"admin-bar-logo\" width=\"38\" height=\"38\">"
+                    + "<span>QUẢN TRỊ SGU"
+                    + "<small>Saigon Audio Guide</small></span></div>"
                     + "<div class=\"admin-topbar-actions\"><span class=\"admin-user\">"
                     + icon("user") + "<span>Quản trị viên: <strong>" + e(person) + "</strong></span></span>"
                     + "<form method=\"post\" action=\"/logout\">"
@@ -98,6 +106,10 @@ public final class Layout {
                 + "<title>" + e(title) + " | Saigon Audio Guide</title>"
                 + "<link rel=\"icon\" href=\"/assets/logo-sgu.png\" type=\"image/png\">"
                 + "<link rel=\"stylesheet\" href=\"/assets/app.css?v=visitors-20261023\">"
+                + (adminArea
+    ? "<link rel=\"stylesheet\" href=\"/assets/admin-theme.css?v=2\">"
+      + "<script defer src=\"/assets/admin-shell.js?v=2\"></script>"
+    : "")
                 + (adminArea ? "<script defer src=\"/assets/admin-visitors.js\"></script>" :
                     trackVisitor ? "<script defer src=\"/assets/visitor-activity.js\"></script>" : "")
                 + "</head><body class=\"" + (adminArea ? "admin-area" : management ? "management-page" : "visitor-page")
