@@ -374,3 +374,31 @@ body.admin-area {background:#f0f5fb}
  .visitor-users-title {flex-direction:column}
  .visitor-users-tile {padding:15px;min-height:105px}
 }
+
+/* Public header: four-language selector (VI / EN / ZH / KO). */
+.header-language { display:flex; align-items:center; gap:5px; margin-left:7px; flex-shrink:0; }
+.language-select-label { display:inline-flex; align-items:center; gap:6px; min-height:42px;
+  border:1px solid #cfe1f5; background:#f4f9ff; color:#135cac; border-radius:13px;
+  padding:0 9px; transition:border-color .15s, background .15s; }
+.language-select-label:hover { background:#eaf4ff; border-color:#9cc8f5; }
+.language-select-label .icon { width:17px; height:17px; }
+.header-language-select { color:inherit; background:transparent; border:0; max-width:123px;
+  font-size:13px; font-weight:750; min-height:37px; cursor:pointer; outline:none; }
+.header-language-select:focus-visible { outline:2px solid #2589ea; outline-offset:2px; border-radius:5px; }
+.header-language-select option { color:#17375c; background:white; }
+.language-apply { border:1px solid #cfe1f5; border-radius:9px; background:white;
+  color:#135cac; padding:7px; font-size:11px; font-weight:700; }
+.header-language.js-ready .language-apply { display:none; }
+.header-language-mobile { display:none; }
+.site-header--centered .desktop-nav.header-right { gap:clamp(1px,.5vw,9px); }
+.site-header--centered .nav-link { padding-left:10px; padding-right:10px; }
+@media (min-width:921px) and (max-width:1240px) {
+  .header-language-select { max-width:75px; font-size:12px; }
+  .language-select-label { padding:0 5px; gap:2px; }
+  .site-header--centered .desktop-nav.header-right { gap:0; }
+  .site-header--centered .nav-link { padding-left:6px; padding-right:6px; }
+}
+@media (max-width:920px) {
+  .header-language-mobile { display:flex; justify-self:center; margin:4px auto 0; }
+  .header-language-select { max-width:125px; }
+}
