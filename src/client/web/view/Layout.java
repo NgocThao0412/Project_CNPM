@@ -1,9 +1,9 @@
-package web.view;
+package com.sgu.web.view;
 
-import core.Data;
-import core.Settings;
-import web.DTO.ClientSessionDTO;
-import static web.view.Html.*;
+import com.sgu.core.Data;
+import com.sgu.core.Settings;
+import com.sgu.web.DTO.ClientSessionDTO;
+import static com.sgu.web.view.Html.*;
 
 /** The same Java-rendered layout works on desktop and mobile browsers. */
 public final class Layout {
@@ -13,6 +13,12 @@ public final class Layout {
 
     public String page(ClientSessionDTO session, String title, String tab,
                        String content, String notice) {
+        return page(session, title, tab, content, notice, "vi");
+    }
+
+    public String page(ClientSessionDTO session, String title, String tab,
+                       String content, String notice, String locale) {
+        String selectedLanguage = UiLanguage.normalize(locale);
         boolean management = "admin".equals(tab) || "status".equals(tab) || "login".equals(tab);
         boolean adminArea = session != null && session.loggedIn()
                 && ("admin".equals(tab) || "status".equals(tab));
@@ -34,7 +40,9 @@ public final class Layout {
                 + nav("/", "Khám phá", "home", tab)
                 + nav("/places", "Địa điểm", "places", tab)
                 + nav("/map", "Bản đồ", "map", tab)
-                + "</nav>";
+                + languagePicker(selectedLanguage, false)
+                + "</nav>"
+                + languagePicker(selectedLanguage, true);
 
         String back = "";
         if (adminArea && session.canGoBackInAdmin()) {
@@ -61,7 +69,7 @@ public final class Layout {
             else if (title.contains("thuyết minh") || title.contains("Nội dung")) current = "contents";
             String person = adminName(session);
             pageContent = "<main id=\"main\" class=\"page admin-shell\">"
-                    + "<aside id=\"admin-sidebar\" class=\"admin-sidebar\" aria-label=\"Điều hướng quản trị\">"
+                    + "<aside class=\"admin-sidebar\" aria-label=\"Điều hướng quản trị\">"
                     + "<div class=\"sidebar-heading\"><span class=\"sidebar-heading-icon\">"
                     + icon("audio") + "</span><span>QUẢN TRỊ SGU<small>Campus Audio Guide</small></span></div>"
                     + "<nav class=\"sidebar-links\">"
@@ -75,16 +83,8 @@ public final class Layout {
                     + "<div class=\"sidebar-signature\">Saigon Audio Guide<small>Trường Đại học Sài Gòn</small></div>"
                     + "</aside>"
                     + "<div class=\"admin-workspace\">"
-                    + "<div class=\"admin-topbar\">"
-                    + "<div class=\"admin-topbar-heading\">"
-                    + "<button type=\"button\" class=\"admin-menu-toggle\""
-                    + " aria-controls=\"admin-sidebar\" aria-expanded=\"true\""
-                    + " aria-label=\"Ẩn hoặc hiện menu quản trị\">"
-                    + "<span aria-hidden=\"true\">☰</span></button>"
-                    + "<img src=\"/assets/logo-sgu.png\" alt=\"\""
-                    + " class=\"admin-bar-logo\" width=\"38\" height=\"38\">"
-                    + "<span>QUẢN TRỊ SGU"
-                    + "<small>Saigon Audio Guide</small></span></div>"
+                    + "<div class=\"admin-topbar\"><div class=\"admin-topbar-heading\">"
+                    + icon("audio") + "<span>HỆ THỐNG QUẢN TRỊ<small>Saigon Audio Guide · SGU</small></span></div>"
                     + "<div class=\"admin-topbar-actions\"><span class=\"admin-user\">"
                     + icon("user") + "<span>Quản trị viên: <strong>" + e(person) + "</strong></span></span>"
                     + "<form method=\"post\" action=\"/logout\">"
@@ -98,18 +98,15 @@ public final class Layout {
                     + content + "</main>";
         }
 
-        return "<!doctype html><html lang=\"vi\"><head>"
+        String html = "<!doctype html><html lang=\"" + selectedLanguage + "\"><head>"
                 + "<meta charset=\"utf-8\">"
                 + "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1,viewport-fit=cover\">"
                 + "<meta name=\"theme-color\" content=\"#1262cb\">"
                 + "<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">"
                 + "<title>" + e(title) + " | Saigon Audio Guide</title>"
                 + "<link rel=\"icon\" href=\"/assets/logo-sgu.png\" type=\"image/png\">"
-                + "<link rel=\"stylesheet\" href=\"/assets/app.css?v=visitors-20261023\">"
-                + (adminArea
-    ? "<link rel=\"stylesheet\" href=\"/assets/admin-theme.css?v=2\">"
-      + "<script defer src=\"/assets/admin-shell.js?v=2\"></script>"
-    : "")
+                + "<link rel=\"stylesheet\" href=\"/assets/app.css?v=lang4-20261028\">"
+                + (!management ? "<script defer src=\"/assets/visitor-language.js\"></script>" : "")
                 + (adminArea ? "<script defer src=\"/assets/admin-visitors.js\"></script>" :
                     trackVisitor ? "<script defer src=\"/assets/visitor-activity.js\"></script>" : "")
                 + "</head><body class=\"" + (adminArea ? "admin-area" : management ? "management-page" : "visitor-page")
@@ -121,12 +118,32 @@ public final class Layout {
                 + center + "</div></header>"
                 + pageContent
                 + (adminArea ? "" : "<footer class=\"site-footer\"><strong>Saigon Audio Guide</strong>"
-                    + "<span>© 2026 Saigon Audio Guide | Khám phá và kết nối.</span></footer>")
+                    + "<span>© 2026 Saigon Audio Guide. All rights reserved.</span></footer>")
                 + (management ? "" : "<nav class=\"bottom-nav\" aria-label=\"Điều hướng mobile\">"
                     + mobile("/", "Khám phá", "home", tab, "home")
                     + mobile("/places", "Địa điểm", "places", tab, "pin")
                     + mobile("/map", "Bản đồ", "map", tab, "map") + "</nav>")
                 + "</body></html>";
+        return !management ? UiLanguage.localizeHtml(html, selectedLanguage) : html;
+    }
+
+    /** Header language selector: works without inline JavaScript (CSP script-src self). */
+    private static String languagePicker(String code, boolean mobile) {
+        StringBuilder b = new StringBuilder("<form method=\"get\" action=\"/language\" class=\"header-language ");
+        b.append(mobile ? "header-language-mobile" : "header-language-desktop");
+        b.append("\" aria-label=\"Chọn ngôn ngữ / Select language\">");
+        b.append("<label class=\"language-select-label\">").append(icon("globe"));
+        b.append("<select name=\"lang\" class=\"header-language-select\" aria-label=\"Ngôn ngữ / Language\">");
+        String[][] choices = {{"vi", "Tiếng Việt"}, {"en", "English"}, {"zh", "中文"}, {"ko", "한국어"}};
+        for (String[] choice : choices) {
+            b.append("<option value=\"").append(choice[0]).append("\"");
+            if (choice[0].equals(code)) b.append(" selected");
+            b.append(">").append(choice[1]).append("</option>");
+        }
+        b.append("</select></label>");
+        b.append("<input type=\"hidden\" name=\"next\" value=\"/\">");
+        b.append("<button type=\"submit\" class=\"language-apply\">OK</button></form>");
+        return b.toString();
     }
 
     public static String adminName(ClientSessionDTO session) {
