@@ -121,7 +121,7 @@ public final class Layout {
                 + center + "</div></header>"
                 + pageContent
                 + (adminArea ? "" : "<footer class=\"site-footer\"><strong>Saigon Audio Guide</strong>"
-                    + "<span>Đồ án Công nghệ phần mềm · Nhóm 12</span></footer>")
+                    + "<span>© 2026 Saigon Audio Guide | Khám phá và kết nối.</span></footer>")
                 + (management ? "" : "<nav class=\"bottom-nav\" aria-label=\"Điều hướng mobile\">"
                     + mobile("/", "Khám phá", "home", tab, "home")
                     + mobile("/places", "Địa điểm", "places", tab, "pin")
