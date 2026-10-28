@@ -1,6 +1,6 @@
-package com.sgu.web.view;
+package web.view;
 
-import com.sgu.core.Http;
+import core.Http;
 import com.sun.net.httpserver.HttpExchange;
 import java.nio.charset.StandardCharsets;
 import java.net.URI;

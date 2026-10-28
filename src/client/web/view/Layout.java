@@ -1,9 +1,9 @@
-package com.sgu.web.view;
+package web.view;
 
-import com.sgu.core.Data;
-import com.sgu.core.Settings;
-import com.sgu.web.DTO.ClientSessionDTO;
-import static com.sgu.web.view.Html.*;
+import core.Data;
+import core.Settings;
+import web.DTO.ClientSessionDTO;
+import static web.view.Html.*;
 
 /** The same Java-rendered layout works on desktop and mobile browsers. */
 public final class Layout {

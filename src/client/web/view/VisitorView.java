@@ -1,8 +1,8 @@
-package com.sgu.web.view;
-import com.sgu.core.*;
-import com.sgu.web.DTO.*;
+package web.view;
+import core.*;
+import web.DTO.*;
 import java.util.*;
-import static com.sgu.web.view.Html.*;
+import static web.view.Html.*;
 /** Server-rendered Java UI shared by iOS Safari, Android Chrome and desktop browsers. */
 public final class VisitorView {
     private final Settings s;
