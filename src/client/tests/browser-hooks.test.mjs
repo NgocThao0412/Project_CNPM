@@ -1,16 +1,20 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { webcrypto } from 'node:crypto';
 
 const browserJS = fs.readFileSync('resources/assets/visitor-activity.js','utf8');
 const store=new Map();
 const events={};
 const timers=[];
 const requests=[];
-const audio={paused:true,ended:false,addEventListener(name,fn){events[name]=fn;}};
+const audio={paused:true,ended:false,dataset:{audioId:'2'},src:'http://localhost:8080/media/audio/2',addEventListener(name,fn){events[name]=fn;}};
 const documentEvents={};
 const visitorToken='backend-issued-random-token-abc';
 const sandbox={
+  crypto:webcrypto,
+  setTimeout(){},
+  console:{warn(){}},
   document:{body:{dataset:{visitorActivity:'true'}},querySelector(){return audio;},addEventListener(name,fn){documentEvents[name]=fn;},hidden:false},
   window:{addEventListener(name,fn){events[name]=fn;}},
   URL,URLSearchParams,location:{href:'http://localhost:8080/place?id=2',origin:'http://localhost:8080',pathname:'/place',search:'?id=2'},
@@ -33,13 +37,14 @@ assert.equal(JSON.parse(requests[1].opts.body).listening,false);
 assert.equal(timers[0].ms,10000);
 assert.equal(store.get('sgu.audioGuide.visitorToken'),visitorToken);
 
+const latestHeartbeat = () => requests.filter(r => r.url === '/api/visitor/heartbeat').at(-1);
 audio.paused=false;events.playing();await flush();
-assert.equal(JSON.parse(requests.at(-1).opts.body).listening,true);
+assert.equal(JSON.parse(latestHeartbeat().opts.body).listening,true);
 audio.paused=true;events.pause();await flush();
-assert.equal(JSON.parse(requests.at(-1).opts.body).listening,false);
+assert.equal(JSON.parse(latestHeartbeat().opts.body).listening,false);
 audio.paused=false;events.playing();await flush();
 audio.ended=true;events.ended();await flush();
-assert.equal(JSON.parse(requests.at(-1).opts.body).listening,false);
+assert.equal(JSON.parse(latestHeartbeat().opts.body).listening,false);
 timers[0].fn();await flush();assert.equal(requests.at(-1).url,'/api/visitor/heartbeat');
 
 // An internal route change cannot end the token/guest session.
