@@ -228,10 +228,7 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
                   </div>
 
                   <p class="help">
-                    Một phiên có thể nghe nhiều lần.
-                    Số phiên có nghe không phải số người duy nhất.
-                    Không cộng số phiên từng dòng để tính tổng vì một phiên
-                    có thể nghe ở nhiều ngày, địa điểm hoặc ngôn ngữ.
+
                   </p>
 
                   <div class="table-wrap">
@@ -258,7 +255,7 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
     /** Backend reports aggregate visitor and listener counts, not named accounts. */
     public String users() {
         return "<div class=\"section-header\"><div><h2>Người dùng · Khách tham quan</h2>"
-            + "<p>Thống kê các phiên truy cập ẩn danh và người đang nghe thuyết minh.</p></div></div>"
+            + "<p></p></div></div>"
             + "<section class=\"visitor-users-summary\">"
             + "<div class=\"visitor-users-tile\"><span>Đang truy cập</span><strong data-online-count>—</strong></div>"
             + "<div class=\"visitor-users-tile listening\"><span>Đang nghe</span>"
@@ -266,10 +263,7 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
             + "<section class=\"panel\"><div class=\"visitor-users-title\">"
             + "<h3>Trạng thái kết nối visitor-service</h3>"
             + "<p data-visitor-note>Đang lấy thống kê từ API…</p></div>"
-            + "<p class=\"help\">Đang nghe là tập con của đang truy cập, không cộng hai số lại. "
-            + "Khách không cần đăng nhập. Client gửi heartbeat mỗi 10 giây; "
-            + "Backend chỉ tính phiên nhận tín hiệu trong 30 giây gần nhất. "
-            + "Các số tự cập nhật sau mỗi 5 giây.</p></section>";
+            + "<p class=\"help\"></p></section>";
     }
 
     public String pois(ClientSessionDTO ss,List<Map<String,Object>> pois,String q) {
