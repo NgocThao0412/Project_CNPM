@@ -166,7 +166,6 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
         b.append("""
                 <section class="panel" id="listening-history">
                   <h2>Lịch sử lượt nghe</h2>
-                  <p>Thống kê theo thời gian, địa điểm và ngôn ngữ.</p>
 
                   <form id="listening-filter">
                     <div class="form-grid">
@@ -226,13 +225,6 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
                       <strong id="history-sessions">—</strong>
                     </div>
                   </div>
-
-                  <p class="help">
-                    Một phiên có thể nghe nhiều lần.
-                    Số phiên có nghe không phải số người duy nhất.
-                    Không cộng số phiên từng dòng để tính tổng vì một phiên
-                    có thể nghe ở nhiều ngày, địa điểm hoặc ngôn ngữ.
-                  </p>
 
                   <div class="table-wrap">
                     <table class="data-table">
