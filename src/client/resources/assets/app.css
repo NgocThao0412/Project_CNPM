@@ -594,3 +594,94 @@ body.login-page .error-box { margin: 0 0 18px; }
 @media (prefers-reduced-motion: reduce) {
     .header-waving-flag { animation: none; }
 }
+
+
+/* ========== Trang Thống kê: bộ lọc lịch sử lượt nghe ========== */
+/* Chỉ tác động khu vực #listening-history, không thay đổi các form khác. */
+#listening-history #listening-filter { margin-top: 12px; }
+#listening-history #listening-filter .stats-filter-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: clamp(14px, 2.8vw, 38px);
+  row-gap: 13px;
+  max-width: 100%;
+  align-items: center;
+}
+#listening-history #listening-filter .stats-filter-field {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 235px);
+  align-items: center;
+  justify-content: start;
+  gap: 10px;
+  margin: 0;
+  font-size: 13px;
+  color: #153b70;
+  font-weight: 650;
+}
+#listening-history #listening-filter .stats-filter-field > span { white-space: nowrap; }
+#listening-history #listening-filter .stats-filter-field input,
+#listening-history #listening-filter .stats-filter-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  height: 40px;
+  padding: 8px 13px;
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+  border: 1px solid #ccdcf0;
+  border-radius: 11px;
+  box-shadow: 0 3px 9px rgba(14, 68, 132, 0.055);
+  color: #193c68;
+  font-size: 13px;
+  font-weight: 500;
+  transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+  color-scheme: light;
+}
+#listening-history #listening-filter .stats-filter-field input:hover,
+#listening-history #listening-filter .stats-filter-field select:hover { border-color: #89b5ee; }
+#listening-history #listening-filter .stats-filter-field input:focus,
+#listening-history #listening-filter .stats-filter-field select:focus {
+  outline: none;
+  border-color: #1e7cda;
+  box-shadow: 0 0 0 3px rgba(36, 126, 221, .13);
+  background: #fff;
+}
+#listening-history #listening-filter .stats-filter-field select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='m2 2 5 5 5-5' stroke='%234976ac' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"), linear-gradient(180deg, #fff, #f8fbff);
+  background-position: right 14px center, center;
+  background-size: 12px auto, cover;
+  background-repeat: no-repeat;
+  padding-right: 35px;
+}
+#listening-history #listening-filter .stats-filter-field input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: .7; }
+#listening-history #listening-filter .form-actions { margin-top: 16px; justify-content: flex-start; }
+#listening-history #listening-filter .stats-filter-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  border-radius: 12px;
+  padding: 10px 22px;
+  border: 1px solid #1971d4;
+  background: linear-gradient(125deg, #2184e1, #075bc7);
+  box-shadow: 0 6px 14px rgba(17, 103, 208, .18);
+  font-weight: 750;
+  font-size: 13px;
+  color: #fff;
+}
+#listening-history #listening-filter .stats-filter-submit:hover { background: linear-gradient(125deg, #0d72d5, #064caf); transform: translateY(-1px); box-shadow: 0 9px 19px rgba(17,103,208,.22); }
+#listening-history #listening-filter .stats-filter-submit svg { flex: 0 0 auto; }
+@media (max-width: 990px) {
+  #listening-history #listening-filter .stats-filter-field { grid-template-columns: 68px minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  #listening-history #listening-filter .stats-filter-grid { grid-template-columns: 1fr; gap: 12px; }
+  #listening-history #listening-filter .stats-filter-field { grid-template-columns: 76px minmax(0, 1fr); }
+}
+@media (max-width: 420px) {
+  #listening-history #listening-filter .stats-filter-field { grid-template-columns: 1fr; gap: 5px; }
+  #listening-history #listening-filter .stats-filter-field input,
+  #listening-history #listening-filter .stats-filter-field select { min-height: 44px; height: 44px; font-size: 16px; }
+  #listening-history #listening-filter .stats-filter-submit { width: 100%; }
+}
