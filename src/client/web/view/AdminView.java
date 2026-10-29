@@ -19,7 +19,7 @@ public String login(ClientSessionDTO ss, String error, String username) {
         + "<strong>Trường Đại học Sài Gòn</strong>"
         + "</div>"
         + "<h1>Đăng nhập quản trị</h1>"
-        + "<p class=\"login-description\">Sử dụng tài khoản được cấp bởi hệ thống.</p>"
+        + "<p class=\"login-description\"></p>"
         + (error == null || error.isBlank() ? "" : layout.error(error))
         + "<form method=\"post\" action=\"/login\" class=\"login-auth-form\">"
         + hidden("csrf", ss.csrf)
