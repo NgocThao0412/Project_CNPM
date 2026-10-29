@@ -3,7 +3,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("sgu-map");
     const pointsBox = document.getElementById("sgu-map-points");
 
-    if (!container || !pointsBox || !window.maptilersdk) return;
+    if (!container || !pointsBox) return;
+
+    if (!window.maptilersdk) {
+        console.error("MapTiler SDK chưa được tải.");
+        return;
+    }
 
     maptilersdk.config.apiKey = container.dataset.key;
 
@@ -28,10 +33,11 @@ document.addEventListener("DOMContentLoaded", function () {
         el.href = "/map?id=" + encodeURIComponent(point.dataset.id)
                 + "&basemap=osm";
         el.title = "Xem địa điểm: " + name;
+        el.setAttribute("aria-label", "Xem địa điểm: " + name);
 
         const pin = document.createElement("span");
         pin.className = "sgu-poi-pin";
-        pin.textContent = "●";
+        pin.setAttribute("aria-hidden", "true");
 
         const label = document.createElement("span");
         label.className = "sgu-poi-label";
@@ -51,11 +57,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     map.on("error", function (event) {
-    const message = String(event.error?.message || event.error || "");
-
-    if (message.includes('Cannot remove non-existing layer "Halo Layer"')) {
-        return;
-    }
-
-    console.error("SGU map error:", event.error);
+        console.error("SGU map error:", event.error);
+    });
 });
