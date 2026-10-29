@@ -127,6 +127,8 @@ public final class Layout {
                 + "<title>" + e(title) + " | Saigon Audio Guide</title>"
                 + "<link rel=\"icon\" href=\"/assets/logo-sgu.png\" type=\"image/png\">"
                 + "<link rel=\"stylesheet\" href=\"/assets/app.css?v=flagwave-20261029\">"
+                + (adminArea ? "<link rel=\"stylesheet\" href=\"/assets/admin-theme.css?v=restore-20261030\">" : "")
+                + (adminArea ? "<script defer src=\"/assets/admin-shell.js?v=restore-20261030\"></script>" : "")
                 + (!management ? "<script defer src=\"/assets/visitor-language.js\"></script>" : "")
                 + (adminArea ? "<script defer src=\"/assets/admin-visitors.js\"></script>" :
                     trackVisitor ? "<script defer src=\"/assets/visitor-activity.js\"></script>" : "")
