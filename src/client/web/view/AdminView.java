@@ -12,49 +12,25 @@ public final class AdminView {
     }
     
 public String login(ClientSessionDTO ss, String error, String username) {
-    return "<div class=\"login-grid\">"
-        + "<section class=\"login-intro\">"
-        + "<span class=\"eyebrow\">SAIGON AUDIO GUIDE · ADMIN</span>"
-        + "<h1>Chăm chút từng<br>câu chuyện.<br>Kết nối từng<br>hành trình.</h1>"
-        + "<p>Không gian dành cho người quản lý địa điểm và nội dung thuyết minh.</p>"
-        + "<img src=\"/assets/saigon-university-campus.png\" alt=\"Trường Đại học Sài Gòn\">"
-        + "</section>"
-
-        + "<section class=\"login-form\">"
-        + "<span class=\"eyebrow\">WELCOME BACK</span>"
-        + "<h2>Đăng nhập quản trị</h2>"
-        + "<p>Sử dụng tài khoản được cấp bởi hệ thống.</p>"
-
+    // Only the login-page presentation changes. Authentication and CSRF remain unchanged.
+    return "<section class=\"login-grid\" aria-label=\"Đăng nhập quản trị\">"
+        + "<div class=\"login-brand\">"
+        + "<img src=\"/assets/logo-sgu.png\" alt=\"Logo Trường Đại học Sài Gòn\" width=\"68\" height=\"68\">"
+        + "<strong>Trường Đại học Sài Gòn</strong>"
+        + "</div>"
+        + "<h1>Đăng nhập quản trị</h1>"
+        + "<p class=\"login-description\">Sử dụng tài khoản được cấp bởi hệ thống.</p>"
         + (error == null || error.isBlank() ? "" : layout.error(error))
-
-        + "<form method=\"post\" action=\"/login\">"
+        + "<form method=\"post\" action=\"/login\" class=\"login-auth-form\">"
         + hidden("csrf", ss.csrf)
-
-        + input(
-            "Tên đăng nhập",
-            "username",
-            username,
-            "text",
-            "required maxlength=\"50\" autocomplete=\"username\" placeholder=\"Nhập username\""
-        )
-
-        + input(
-            "Mật khẩu",
-            "password",
-            "",
-            "password",
-            "required autocomplete=\"current-password\" placeholder=\"Nhập mật khẩu\""
-        )
-
-        + "<button class=\"btn\">"
-        + icon("lock")
-        + "Đăng nhập"
-        + "</button>"
+        + input("Tên đăng nhập", "username", username, "text",
+                "required maxlength=\"50\" autocomplete=\"username\" placeholder=\"Nhập tên đăng nhập\"")
+        + input("Mật khẩu", "password", "", "password",
+                "required autocomplete=\"current-password\" placeholder=\"Nhập mật khẩu\"")
+        + "<button class=\"btn login-submit\" type=\"submit\">"
+        + icon("lock") + "Đăng nhập</button>"
         + "</form>"
-
-        + link("/", "← Quay lại trang khách", "btn btn-ghost")
-        + "</section>"
-        + "</div>";
+        + "</section>";
 }
 
 private static String dashboardMetric(String style, String label, long number,

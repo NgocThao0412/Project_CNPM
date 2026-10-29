@@ -19,6 +19,7 @@ public final class Layout {
     public String page(ClientSessionDTO session, String title, String tab,
                        String content, String notice, String locale) {
         String selectedLanguage = UiLanguage.normalize(locale);
+        boolean loginPage = "login".equals(tab);
         boolean management = "admin".equals(tab) || "status".equals(tab) || "login".equals(tab);
         boolean adminArea = session != null && session.loggedIn()
                 && ("admin".equals(tab) || "status".equals(tab));
@@ -49,7 +50,7 @@ public final class Layout {
             back = "<div class=\"page-back-wrap\">"
                     + link("/admin/back", "<span aria-hidden=\"true\">←</span> Quay lại", "page-back")
                     + "</div>";
-        } else if (!adminArea && ("login".equals(tab) || "status".equals(tab))) {
+        } else if (!adminArea && "status".equals(tab)) {
             back = "<div class=\"page-back-wrap\">"
                     + link("/", "<span aria-hidden=\"true\">←</span> Quay lại", "page-back")
                     + "</div>";
@@ -93,6 +94,10 @@ public final class Layout {
                     + "</div></div>"
                     + "<div class=\"admin-workspace-body\">" + back + noticeHtml + content + "</div>"
                     + "</div></main>";
+        } else if (loginPage) {
+            // The login is a standalone centered card; other pages retain their header/back links.
+            pageContent = "<main id=\"main\" class=\"page login-page-shell\">"
+                    + noticeHtml + content + "</main>";
         } else {
             pageContent = "<main id=\"main\" class=\"page\">" + back + noticeHtml
                     + content + "</main>";
@@ -109,15 +114,15 @@ public final class Layout {
                 + (!management ? "<script defer src=\"/assets/visitor-language.js\"></script>" : "")
                 + (adminArea ? "<script defer src=\"/assets/admin-visitors.js\"></script>" :
                     trackVisitor ? "<script defer src=\"/assets/visitor-activity.js\"></script>" : "")
-                + "</head><body class=\"" + (adminArea ? "admin-area" : management ? "management-page" : "visitor-page")
+                + "</head><body class=\"" + (loginPage ? "login-page" : adminArea ? "admin-area" : management ? "management-page" : "visitor-page")
                 + "\"" + (trackVisitor ? " data-visitor-activity=\"true\"" : "") + ">"
                 + "<a class=\"skip\" href=\"#main\">Đến nội dung</a>"
-                + "<header class=\"site-header site-header--centered"
+                + (loginPage ? "" : "<header class=\"site-header site-header--centered"
                 + (management ? " site-header--minimal" : "") + "\">"
                 + "<div class=\"header-inner\"><div class=\"header-left\">" + brand + "</div>"
-                + center + "</div></header>"
+                + center + "</div></header>")
                 + pageContent
-                + (adminArea ? "" : "<footer class=\"site-footer\"><strong>Saigon Audio Guide</strong>"
+                + (adminArea || loginPage ? "" : "<footer class=\"site-footer\"><strong>Saigon Audio Guide</strong>"
                     + "<span>© 2026 Saigon Audio Guide. All rights reserved.</span></footer>")
                 + (management ? "" : "<nav class=\"bottom-nav\" aria-label=\"Điều hướng mobile\">"
                     + mobile("/", "Khám phá", "home", tab, "home")
