@@ -302,7 +302,7 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
             b.append("<tr><td><strong>").append(e(n.get("title"))).append("</strong><small>").append(excerpt(n.get("content"),75)).append("</small></td><td data-label=\"Địa điểm\">").append(e(poi)).append("</td><td><span class=\"tag\">").append(icon("globe")).append(e(n.get("languageName"))).append("</span></td><td><span class=\"tag ").append(Data.bool(n,"visible",true)?"tag-green":"tag-muted").append("\">").append(Data.bool(n,"visible",true)?"Đang hiển thị":"Đã ẩn").append("</span></td><td><div class=\"row-actions\">").append(link("/admin/content?id="+n.get("id"),icon("edit")+"Sửa & MP3","btn btn-light btn-small")).append(link("/place?id="+n.get("poiId")+"&lang="+Http.enc(Data.text(n,"languageCode"))+"&preview=1",icon("audio")+"Nghe thử","btn btn-light btn-small")).append("</div></td></tr>");
         }
         b.append("</tbody></table></div>");
-        return layout.adminNav(ss,"contents")+"<div class=\"section-header\"><div><h2>Nội dung thuyết minh</h2><p>Mỗi cặp POI và ngôn ngữ có một bài thuyết minh.</p></div>"+link("/admin/content",icon("plus")+"Thêm nội dung","btn")+"</div>"+VisitorView.search("/admin/contents",q,"Tìm bài thuyết minh hoặc địa điểm...")+b;
+        return layout.adminNav(ss,"contents")+"<div class=\"section-header\"><div><h2>Nội dung thuyết minh</h2><p></p></div>"+link("/admin/content",icon("plus")+"Thêm nội dung","btn")+"</div>"+VisitorView.search("/admin/contents",q,"Tìm bài thuyết minh hoặc địa điểm...")+b;
     }
     public String contentForm(ClientSessionDTO ss,Map<String,Object> v,List<Map<String,Object>> pois,List<Map<String,Object>> langs,Map<String,Object> audio,String error) {
         long id=v.containsKey("id")?Data.id(v,"id"):0;
