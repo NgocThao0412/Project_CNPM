@@ -442,8 +442,8 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
                 + "<script src=\"/assets/auto-narration.js\" defer></script>";
     }
     public String status(List<Map<String,Object>> health) {
-        StringBuilder b=new StringBuilder("<div class=\"page-intro\"><div><span class=\"eyebrow\">CONNECTION CHECK</span><h1>Trạng thái kết nối</h1></div>"+link("/status","Kiểm tra lại","btn btn-light")+"</div><section class=\"panel\"><div class=\"status-list\">");
+        StringBuilder b=new StringBuilder("<div class=\"page-intro\"><div><span class=\"eyebrow\"></span><h1>Trạng thái kết nối</h1></div>"+link("/status","Kiểm tra lại","btn btn-light")+"</div><section class=\"panel\"><div class=\"status-list\">");
         for(var r:health)b.append("<div class=\"status-row\"><div><strong>").append(e(r.get("service"))).append("</strong><small class=\"api-details\">").append(e(r.get("url"))).append("</small></div><span class=\"tag ").append("OK".equals(r.get("status"))?"tag-green":"tag-muted").append("\">").append(e(r.get("status"))).append("</span></div>");
-        return b.append("</div><p class=\"help section-space\">UP chỉ xác nhận server đang chạy. Để kiểm tra dữ liệu, hãy đăng nhập, thêm POI, thêm nội dung, tải MP3 và nghe trên trang khách.</p></section>").toString();
+        return b.append("</div><p class=\"help section-space\"></p></section>").toString();
     }
 }
