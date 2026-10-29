@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 78" role="img" aria-hidden="true">
+<defs>
+  <clipPath id="cloth"><path d="M8 10 C27 3, 41 15, 60 10 S93 4, 112 12 L112 66 C95 58, 78 69, 60 63 S27 69, 8 64 Z"/></clipPath>
+  <linearGradient id="fold" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#ffffff" stop-opacity=".06"/>
+    <stop offset=".18" stop-color="#000000" stop-opacity=".10"/>
+    <stop offset=".36" stop-color="#ffffff" stop-opacity=".25"/>
+    <stop offset=".54" stop-color="#000000" stop-opacity=".12"/>
+    <stop offset=".72" stop-color="#ffffff" stop-opacity=".17"/>
+    <stop offset=".9" stop-color="#000000" stop-opacity=".09"/>
+    <stop offset="1" stop-color="#ffffff" stop-opacity=".03"/>
+  </linearGradient>
+  <filter id="shadow" x="-25%" y="-30%" width="150%" height="170%">
+    <feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#0f3b66" flood-opacity=".26"/>
+  </filter>
+</defs>
+<path d="M8 10 C27 3, 41 15, 60 10 S93 4, 112 12 L112 66 C95 58, 78 69, 60 63 S27 69, 8 64 Z" fill="#fff" filter="url(#shadow)"/>
+<g clip-path="url(#cloth)"><rect x="0" y="0" width="120" height="78" fill="#e9232e"/><polygon points="32.00,15.00 34.65,22.36 42.46,22.60 36.28,27.39 38.47,34.90 32.00,30.50 25.53,34.90 27.72,27.39 21.54,22.60 29.35,22.36" fill="#ffde00"/><polygon points="53.00,12.70 54.06,15.54 57.09,15.67 54.71,17.56 55.53,20.48 53.00,18.80 50.47,20.48 51.29,17.56 48.91,15.67 51.94,15.54" fill="#ffde00"/><polygon points="62.00,23.70 63.06,26.54 66.09,26.67 63.71,28.56 64.53,31.48 62.00,29.80 59.47,31.48 60.29,28.56 57.91,26.67 60.94,26.54" fill="#ffde00"/><polygon points="62.00,37.70 63.06,40.54 66.09,40.67 63.71,42.56 64.53,45.48 62.00,43.80 59.47,45.48 60.29,42.56 57.91,40.67 60.94,40.54" fill="#ffde00"/><polygon points="52.00,47.70 53.06,50.54 56.09,50.67 53.71,52.56 54.53,55.48 52.00,53.80 49.47,55.48 50.29,52.56 47.91,50.67 50.94,50.54" fill="#ffde00"/><rect width="120" height="78" fill="url(#fold)"/></g>
+</svg>

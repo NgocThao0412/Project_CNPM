@@ -31,12 +31,28 @@ public final class Layout {
                 + "<strong class=\"brand-school\">Trường Đại học Sài Gòn</strong>"
                 + "</span>", "brand brand-left");
 
+        // The flag follows the existing selected UI language (VI / EN / ZH / KO).
+        // This changes only the decoration below the centered title.
+        String flagName = switch (selectedLanguage) {
+            case "en" -> "Anh";
+            case "zh" -> "Trung Quốc";
+            case "ko" -> "Hàn Quốc";
+            default -> "Việt Nam";
+        };
+        String waveBars = "<i></i><i></i><i></i><i></i><i></i>";
+        String flagDecoration = "<div class=\"header-flag-decor\" role=\"img\" aria-label=\"Cờ "
+                + flagName + " giữa hai dải sóng âm\">"
+                + "<span class=\"header-wave header-wave--left\" aria-hidden=\"true\">"
+                + waveBars + "</span>"
+                + "<img class=\"header-waving-flag\" src=\"/assets/flag-"
+                + selectedLanguage + ".svg\" alt=\"\" width=\"58\" height=\"38\">"
+                + "<span class=\"header-wave header-wave--right\" aria-hidden=\"true\">"
+                + waveBars + "</span></div>";
+
         String center = management ? ""
                 : "<div class=\"header-center\">"
                 + link("/", "Saigon Audio Guide", "header-title")
-                + "<span class=\"header-audio-mark\" aria-hidden=\"true\">"
-                + "<span></span><span></span><span></span><span></span><span></span>"
-                + "</span></div>"
+                + flagDecoration + "</div>"
                 + "<nav class=\"desktop-nav header-right\" aria-label=\"Điều hướng chính\">"
                 + nav("/", "Khám phá", "home", tab)
                 + nav("/places", "Địa điểm", "places", tab)
@@ -110,7 +126,7 @@ public final class Layout {
                 + "<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">"
                 + "<title>" + e(title) + " | Saigon Audio Guide</title>"
                 + "<link rel=\"icon\" href=\"/assets/logo-sgu.png\" type=\"image/png\">"
-                + "<link rel=\"stylesheet\" href=\"/assets/app.css?v=lang4-20261028\">"
+                + "<link rel=\"stylesheet\" href=\"/assets/app.css?v=flagwave-20261029\">"
                 + (!management ? "<script defer src=\"/assets/visitor-language.js\"></script>" : "")
                 + (adminArea ? "<script defer src=\"/assets/admin-visitors.js\"></script>" :
                     trackVisitor ? "<script defer src=\"/assets/visitor-activity.js\"></script>" : "")

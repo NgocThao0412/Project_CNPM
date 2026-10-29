@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 78" role="img" aria-hidden="true">
+<defs>
+  <clipPath id="cloth"><path d="M8 10 C27 3, 41 15, 60 10 S93 4, 112 12 L112 66 C95 58, 78 69, 60 63 S27 69, 8 64 Z"/></clipPath>
+  <linearGradient id="fold" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#ffffff" stop-opacity=".06"/>
+    <stop offset=".18" stop-color="#000000" stop-opacity=".10"/>
+    <stop offset=".36" stop-color="#ffffff" stop-opacity=".25"/>
+    <stop offset=".54" stop-color="#000000" stop-opacity=".12"/>
+    <stop offset=".72" stop-color="#ffffff" stop-opacity=".17"/>
+    <stop offset=".9" stop-color="#000000" stop-opacity=".09"/>
+    <stop offset="1" stop-color="#ffffff" stop-opacity=".03"/>
+  </linearGradient>
+  <filter id="shadow" x="-25%" y="-30%" width="150%" height="170%">
+    <feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#0f3b66" flood-opacity=".26"/>
+  </filter>
+</defs>
+<path d="M8 10 C27 3, 41 15, 60 10 S93 4, 112 12 L112 66 C95 58, 78 69, 60 63 S27 69, 8 64 Z" fill="#fff" filter="url(#shadow)"/>
+<g clip-path="url(#cloth)"><rect width="120" height="78" fill="#173b7f"/>
+<path d="M8 10L112 66 M112 10L8 66" stroke="white" stroke-width="19"/>
+<path d="M8 10L112 66 M112 10L8 66" stroke="#cd1b36" stroke-width="8"/>
+<path d="M60 0V78 M0 38H120" stroke="white" stroke-width="24"/>
+<path d="M60 0V78 M0 38H120" stroke="#cb1834" stroke-width="11"/><rect width="120" height="78" fill="url(#fold)"/></g>
+</svg>

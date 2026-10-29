@@ -525,3 +525,72 @@ body.login-page .error-box { margin: 0 0 18px; }
     .login-brand strong { font-size: 16px; }
     body.login-page .login-auth-form .field input { font-size: 16px; }
 }
+
+
+/* SGU header: waving language flag between two symmetric audio waveforms.
+   Only the decoration under Saigon Audio Guide is changed. */
+.header-flag-decor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 38px;
+    white-space: nowrap;
+    margin-top: -1px;
+}
+.header-waving-flag {
+    display: block;
+    width: 58px;
+    height: 38px;
+    object-fit: contain;
+    flex: 0 0 auto;
+    filter: drop-shadow(0 3px 3px rgba(12, 56, 115, .19));
+    animation: sgu-flag-float 3.6s ease-in-out infinite;
+}
+.header-wave {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 30px;
+}
+.header-wave::before,
+.header-wave::after {
+    content: "";
+    width: 32px;
+    height: 2px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #e2f3ff, #9fd4ff);
+}
+.header-wave--left::after,
+.header-wave--right::before { display: none; }
+.header-wave--right::after {
+    background: linear-gradient(90deg, #9fd4ff, #e2f3ff);
+}
+.header-wave i {
+    display: block;
+    width: 4px;
+    height: 6px;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #5ec5ff, #0877e0);
+    box-shadow: 0 0 0 1px rgba(15, 122, 218, .02);
+}
+.header-wave i:nth-child(2),
+.header-wave i:nth-child(4) { height: 15px; }
+.header-wave i:nth-child(3) { height: 25px; }
+@keyframes sgu-flag-float {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50% { transform: translateY(-2px) rotate(1deg); }
+}
+@media (max-width: 620px) {
+    .header-flag-decor { gap: 6px; min-height: 32px; margin-top: 0; }
+    .header-waving-flag { width: 48px; height: 32px; }
+    .header-wave { gap: 2px; }
+    .header-wave::before, .header-wave::after { width: 20px; }
+    .header-wave i { width: 3px; }
+    .header-wave i:nth-child(2), .header-wave i:nth-child(4) { height: 11px; }
+    .header-wave i:nth-child(3) { height: 17px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .header-waving-flag { animation: none; }
+}
