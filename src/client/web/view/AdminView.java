@@ -19,7 +19,7 @@ public String login(ClientSessionDTO ss, String error, String username) {
         + "<strong>Trường Đại học Sài Gòn</strong>"
         + "</div>"
         + "<h1>Đăng nhập quản trị</h1>"
-        + "<p class=\"login-description\"></p>"
+        + "<p class=\"login-description\">Sử dụng tài khoản được cấp bởi hệ thống.</p>"
         + (error == null || error.isBlank() ? "" : layout.error(error))
         + "<form method=\"post\" action=\"/login\" class=\"login-auth-form\">"
         + hidden("csrf", ss.csrf)
@@ -44,23 +44,11 @@ private static String dashboardMetric(String style, String label, long number,
 
 public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
                        List<Map<String,Object>> contents, List<Map<String,Object>> langs) {
-    String person = Layout.adminName(ss);
-    java.time.ZonedDateTime time = java.time.ZonedDateTime.now(
-            java.time.ZoneId.of("Asia/Ho_Chi_Minh"));
-    String date = time.format(java.time.format.DateTimeFormatter.ofPattern(
-            "EEEE, dd/MM/yyyy", java.util.Locale.forLanguageTag("vi-VN")));
     long shown = pois.stream().filter(p -> Data.bool(p, "visible", true)).count();
 
     StringBuilder b = new StringBuilder();
-    b.append("<section class=\"admin-welcome\"><div class=\"admin-welcome-copy\">"
-            + "<span class=\"eyebrow\">SAIGON AUDIO GUIDE · QUẢN TRỊ</span>"
-            + "<h1>Xin chào, <span>")
-            .append(e(person)).append("!</span></h1>"
-            + "<p>Quản lý hành trình khám phá, điểm tham quan và các bài thuyết minh về "
-            + "Trường Đại học Sài Gòn.</p>"
-            + "<span class=\"admin-welcome-date\">").append(icon("clock"))
-            .append(e(date)).append("</span></div></section>");
-
+    // The welcome banner is deliberately omitted on the overview page.
+    // All dashboard statistics, links and visitor polling remain unchanged.
     b.append("<section class=\"dash-stats\" aria-label=\"Tổng quan dữ liệu\">")
      .append(dashboardMetric("stat-blue", "Địa điểm", pois.size(), "pin", "Tổng số POI"))
      .append(dashboardMetric("stat-green", "Đang hiển thị", shown, "map", "Khách có thể xem"))

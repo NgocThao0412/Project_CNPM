@@ -78,7 +78,7 @@ public final class Layout {
                     + sidebar("/admin/pois", "Quản lý địa điểm", "pin", "pois", current)
                     + sidebar("/admin/contents", "Nội dung thuyết minh", "book", "contents", current)
                     + sidebar("/admin/audio", "Quản lý audio", "audio", "audio", current)
-                    + sidebar("/admin/users", "Người dùng", "user", "users", current)
+                    + sidebar("/admin/users", "Thống kê", "user", "users", current)
                     + sidebar("/status", "Trạng thái kết nối", "cloud", "status", current)
                     + "</nav>"
                     + "<div class=\"sidebar-signature\">Saigon Audio Guide<small>Trường Đại học Sài Gòn</small></div>"
