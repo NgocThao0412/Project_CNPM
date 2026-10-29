@@ -45,7 +45,7 @@ public final class Http {
     }
     public static void headers(HttpExchange x) {
         x.getResponseHeaders().set("X-Content-Type-Options","nosniff");
-        x.getResponseHeaders().set("Referrer-Policy","same-origin");
+        x.getResponseHeaders().set("Referrer-Policy","strict-origin-when-cross-origin");
         x.getResponseHeaders().set("Cache-Control","no-store");
     }
     public static void bytes(HttpExchange x,int status,String mime,byte[] data)throws IOException {
