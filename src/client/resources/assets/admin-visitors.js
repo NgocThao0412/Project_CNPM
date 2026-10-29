@@ -35,7 +35,7 @@
         throw new Error('Malformed stats');
       visitorsNodes.forEach(el=>el.textContent=String(visitors));
       listenersNodes.forEach(el=>el.textContent=String(listeners));
-      if(note)note.textContent='Số liệu từ visitor-service · Cập nhật mỗi 5 giây';
+      if(note)note.textContent='';
       // This API provides aggregate counts, not personal visitor/session data.
       rowMessage('Backend cung cấp tổng số phiên ẩn danh, không cung cấp danh sách khách.');
     } catch (_) { unavailable('Chưa kết nối API thống kê hoặc phiên quản trị hết hạn.'); }
