@@ -276,7 +276,9 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
             table.append("<tr><td><img class=\"table-avatar\" src=\"").append(VisitorView.picture(p)).append("\" alt=\"\"><strong>").append(e(p.get("poiName"))).append("</strong><small>").append(e(p.get("poiCode"))).append("</small></td><td data-label=\"Khu vực\">").append(e(p.get("areaName"))).append("</td><td data-label=\"GPS\"><span>").append(e(p.get("latitude"))).append(", ").append(e(p.get("longitude"))).append("</span><small>Bán kính ").append(e(p.get("triggerRadiusM"))).append(" m</small></td><td><span class=\"tag ").append(visible?"tag-green":"tag-muted").append("\">").append(visible?"Đang hiển thị":"Đã ẩn").append("</span></td><td><div class=\"row-actions\">").append(link("/admin/poi?id="+id,icon("edit")+"Sửa","btn btn-light btn-small")).append(link("/admin/poi/visibility?id="+id,visible?"Ẩn":"Hiện","btn btn-light btn-small")).append("</div></td></tr>");
         }
         table.append("</tbody></table></div>");
-        return layout.adminNav(ss,"pois")+"<div class=\"section-header\"><div><h2>Danh sách POI</h2><p>"+link("/admin/poi",icon("plus")+"Thêm POI","btn")+"</div>"+VisitorView.search("/admin/pois",q,"Tìm theo tên hoặc mã POI...")+(pois.isEmpty()?"<div class=\"empty\">Chưa có POI. Hãy thêm địa điểm đầu tiên.</div>":table);
+        return layout.adminNav(ss,"pois")+"<div class=\"section-header\"><div><h2>Danh sách POI</h2></div>"
+    + link("/admin/poi", icon("plus")+"Thêm POI", "btn")
+    + "</div>" +VisitorView.search("/admin/pois",q,"Tìm theo tên hoặc mã POI...")+(pois.isEmpty()?"<div class=\"empty\">Chưa có POI. Hãy thêm địa điểm đầu tiên.</div>":table);
     }
     public String poiForm(ClientSessionDTO ss,Map<String,Object> value,List<Map<String,Object>> areas,String error) {
         long id=value.containsKey("id")?Data.id(value,"id"):0;
