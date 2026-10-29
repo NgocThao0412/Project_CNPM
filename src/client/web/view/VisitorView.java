@@ -92,10 +92,28 @@ public final class VisitorView {
         list.append("</div>");
         double lat=Data.number(active,"latitude"),lon=Data.number(active,"longitude");
         String drawing;
-        if(osm) {
-            String url="https://www.openstreetmap.org/export/embed.html?bbox="+(lon-.002)+"%2C"+(lat-.0015)+"%2C"+(lon+.002)+"%2C"+(lat+.0015)+"&layer=mapnik&marker="+lat+"%2C"+lon;
-            drawing="<iframe class=\"map-iframe\" title=\"Bản đồ OpenStreetMap\" loading=\"lazy\" src=\""+e(url)+"\"></iframe>";
-        } else {
+       
+if (osm) {
+    String mapKey = System.getenv("MAPTILER_API_KEY");
+
+    if (mapKey != null && !mapKey.isBlank()) {
+        String url = "https://api.maptiler.com/maps/streets-v4/?key="
+                + java.net.URLEncoder.encode(
+                    mapKey, java.nio.charset.StandardCharsets.UTF_8)
+                + "#18/" + lat + "/" + lon;
+
+        drawing = "<iframe class=\"map-iframe\" "
+                + "title=\"Bản đồ MapTiler\" "
+                + "loading=\"lazy\" "
+                + "referrerpolicy=\"strict-origin-when-cross-origin\" "
+                + "src=\"" + e(url) + "\"></iframe>";
+    } else {
+        drawing = "<div class=\"map-error\">"
+                + "Chưa cấu hình bản đồ MapTiler."
+                + "</div>";
+    }
+} else {
+
             double minLat=pois.stream().mapToDouble(m->Data.number(m,"latitude")).min().orElse(lat)-.0004,maxLat=pois.stream().mapToDouble(m->Data.number(m,"latitude")).max().orElse(lat)+.0004,minLon=pois.stream().mapToDouble(m->Data.number(m,"longitude")).min().orElse(lon)-.0004,maxLon=pois.stream().mapToDouble(m->Data.number(m,"longitude")).max().orElse(lon)+.0004;
             StringBuilder svg=new StringBuilder("<svg viewBox=\"0 0 760 460\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"Sơ đồ tọa độ POI. Bấm từng điểm để mô phỏng.\"><defs><pattern id=\"grid\" width=\"48\" height=\"48\" patternUnits=\"userSpaceOnUse\"><path d=\"M48 0H0V48\" fill=\"none\" stroke=\"#c5dcea\" stroke-width=\"1\"/></pattern></defs><rect width=\"760\" height=\"460\" fill=\"url(#grid)\"/><rect x=\"25\" y=\"22\" width=\"225\" height=\"48\" rx=\"13\" fill=\"white\"/><text x=\"42\" y=\"51\" font-size=\"12\" font-family=\"Arial\" fill=\"#2c628b\">Sơ đồ tọa độ · Mô phỏng</text>");
             for(var p:pois) {
