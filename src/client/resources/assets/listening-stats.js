@@ -129,8 +129,7 @@
       listens.textContent = totalListens;
       sessions.textContent = totalSessions;
       message.textContent =
-        `Từ ${displayDate(data.from)} đến ${displayDate(data.to)} · ` +
-        `Múi giờ: ${data.timezone}. Bấm “Xem thống kê” để cập nhật.`;
+        `Bấm “Xem thống kê” để cập nhật.`;
     } catch (error) {
       listens.textContent = '—';
       sessions.textContent = '—';
