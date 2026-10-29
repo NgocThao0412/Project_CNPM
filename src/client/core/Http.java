@@ -64,7 +64,22 @@ public final class Http {
     }
     public static void html(HttpExchange x,int status,String html)throws IOException {
         headers(x);
-        x.getResponseHeaders().set("Content-Security-Policy","default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self'; frame-src https://api.maptiler.com; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
+        
+x.getResponseHeaders().set(
+    "Content-Security-Policy",
+    "default-src 'self'; "
+    + "script-src 'self' https://cdn.maptiler.com; "
+    + "style-src 'self' 'unsafe-inline' https://cdn.maptiler.com; "
+    + "img-src 'self' data: blob: https:; "
+    + "connect-src 'self' https://api.maptiler.com https://*.maptiler.com; "
+    + "font-src 'self' data: https://cdn.maptiler.com; "
+    + "worker-src 'self' blob:; "
+    + "media-src 'self'; "
+    + "frame-src https://api.maptiler.com; "
+    + "form-action 'self'; "
+    + "frame-ancestors 'none'; "
+    + "base-uri 'none'"
+);
         bytes(x,status,"text/html; charset=utf-8",html.getBytes(StandardCharsets.UTF_8));
     }
     public static void redirect(HttpExchange x,String location)throws IOException {

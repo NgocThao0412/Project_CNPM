@@ -92,28 +92,41 @@ public final class VisitorView {
         list.append("</div>");
         double lat=Data.number(active,"latitude"),lon=Data.number(active,"longitude");
         String drawing;
-       
+        
 if (osm) {
     String mapKey = System.getenv("MAPTILER_API_KEY");
 
-    if (mapKey != null && !mapKey.isBlank()) {
-        String url = "https://api.maptiler.com/maps/streets-v4/?key="
-                + java.net.URLEncoder.encode(
-                    mapKey, java.nio.charset.StandardCharsets.UTF_8)
-                + "#18/" + lat + "/" + lon;
-
-        drawing = "<iframe class=\"map-iframe\" "
-                + "title=\"Bản đồ MapTiler\" "
-                + "loading=\"lazy\" "
-                + "referrerpolicy=\"strict-origin-when-cross-origin\" "
-                + "src=\"" + e(url) + "\"></iframe>";
+    if (mapKey == null || mapKey.isBlank()) {
+        drawing = "<div class=\"map-error\">Chưa cấu hình MapTiler.</div>";
     } else {
-        drawing = "<div class=\"map-error\">"
-                + "Chưa cấu hình bản đồ MapTiler."
-                + "</div>";
+        StringBuilder points = new StringBuilder();
+
+        for (var p : pois) {
+            long poiId = Data.id(p, "id");
+
+            points.append("<div class=\"sgu-map-point\"")
+                .append(" data-id=\"").append(poiId).append("\"")
+                .append(" data-name=\"").append(e(p.get("poiName"))).append("\"")
+                .append(" data-lat=\"").append(Data.number(p, "latitude")).append("\"")
+                .append(" data-lon=\"").append(Data.number(p, "longitude")).append("\"")
+                .append(" data-active=\"").append(poiId == id).append("\"")
+                .append("></div>");
+        }
+
+        drawing =
+            "<link rel=\"stylesheet\" "
+            + "href=\"https://cdn.maptiler.com/maptiler-sdk-js/v4.2.0/maptiler-sdk.css\">"
+            + "<div id=\"sgu-map\" class=\"sgu-map-canvas\""
+            + " data-key=\"" + e(mapKey) + "\""
+            + " data-lat=\"" + lat + "\""
+            + " data-lon=\"" + lon + "\"></div>"
+            + "<div id=\"sgu-map-points\" hidden>"
+            + points
+            + "</div>"
+            + "<script defer src=\"https://cdn.maptiler.com/maptiler-sdk-js/v4.2.0/maptiler-sdk.umd.min.js\"></script>"
+            + "<script defer src=\"/assets/poi-map.js\"></script>";
     }
 } else {
-
             double minLat=pois.stream().mapToDouble(m->Data.number(m,"latitude")).min().orElse(lat)-.0004,maxLat=pois.stream().mapToDouble(m->Data.number(m,"latitude")).max().orElse(lat)+.0004,minLon=pois.stream().mapToDouble(m->Data.number(m,"longitude")).min().orElse(lon)-.0004,maxLon=pois.stream().mapToDouble(m->Data.number(m,"longitude")).max().orElse(lon)+.0004;
             StringBuilder svg=new StringBuilder("<svg viewBox=\"0 0 760 460\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"Sơ đồ tọa độ POI. Bấm từng điểm để mô phỏng.\"><defs><pattern id=\"grid\" width=\"48\" height=\"48\" patternUnits=\"userSpaceOnUse\"><path d=\"M48 0H0V48\" fill=\"none\" stroke=\"#c5dcea\" stroke-width=\"1\"/></pattern></defs><rect width=\"760\" height=\"460\" fill=\"url(#grid)\"/><rect x=\"25\" y=\"22\" width=\"225\" height=\"48\" rx=\"13\" fill=\"white\"/><text x=\"42\" y=\"51\" font-size=\"12\" font-family=\"Arial\" fill=\"#2c628b\">Sơ đồ tọa độ · Mô phỏng</text>");
             for(var p:pois) {

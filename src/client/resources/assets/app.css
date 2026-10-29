@@ -685,3 +685,83 @@ body.login-page .error-box { margin: 0 0 18px; }
   #listening-history #listening-filter .stats-filter-field select { min-height: 44px; height: 44px; font-size: 16px; }
   #listening-history #listening-filter .stats-filter-submit { width: 100%; }
 }
+
+/* SGU Audio Guide - Interactive POI map */
+
+.sgu-map-canvas {
+    width: 100%;
+    height: 520px;
+    min-height: 420px;
+    position: relative;
+}
+
+.sgu-poi-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.sgu-poi-pin {
+    width: 27px;
+    height: 27px;
+    border-radius: 50% 50% 50% 0;
+    background: #1268d6;
+    color: white;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px #0004;
+    transform: rotate(-45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0;
+}
+
+.sgu-poi-pin::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+}
+
+.sgu-poi-label {
+    position: absolute;
+    bottom: 37px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    color: #12345a;
+    padding: 5px 9px;
+    border: 1px solid #d2dfef;
+    border-radius: 8px;
+    font: 700 12px Arial, sans-serif;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px #0002;
+}
+
+.sgu-poi-marker.selected .sgu-poi-pin {
+    background: #e63946;
+    width: 34px;
+    height: 34px;
+}
+
+.sgu-poi-marker.selected .sgu-poi-label {
+    background: #e63946;
+    color: white;
+    border-color: #e63946;
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .sgu-map-canvas {
+        height: 420px;
+    }
+
+    .sgu-poi-label {
+        font-size: 10px;
+        padding: 4px 6px;
+    }
+}
