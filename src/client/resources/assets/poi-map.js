@@ -51,6 +51,11 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     map.on("error", function (event) {
-        console.error("SGU map error:", event.error);
-    });
+    const message = String(event.error?.message || event.error || "");
+
+    if (message.includes('Cannot remove non-existing layer "Halo Layer"')) {
+        return;
+    }
+
+    console.error("SGU map error:", event.error);
 });
