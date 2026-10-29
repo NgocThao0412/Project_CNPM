@@ -139,7 +139,7 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
         for(var p:pois) names.put(Data.id(p,"id"),Data.text(p,"poiName"));
         StringBuilder b=new StringBuilder(layout.adminNav(ss,"contents")
             + "<div class=\"section-header\"><div><h2>Quản lý audio</h2>"
-            + "<p>Chọn bài thuyết minh để tải MP3, thay bản audio hoặc nghe thử.</p></div>"
+            + "<p></p></div>"
             + link("/admin/contents","Quản lý nội dung","btn btn-light") + "</div>"
             + "<section class=\"panel\"><div class=\"table-wrap\"><table class=\"data-table\">"
             + "<thead><tr><th>Bài thuyết minh</th><th>Địa điểm</th><th>Ngôn ngữ</th><th>Thao tác</th>"
@@ -276,7 +276,7 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
             table.append("<tr><td><img class=\"table-avatar\" src=\"").append(VisitorView.picture(p)).append("\" alt=\"\"><strong>").append(e(p.get("poiName"))).append("</strong><small>").append(e(p.get("poiCode"))).append("</small></td><td data-label=\"Khu vực\">").append(e(p.get("areaName"))).append("</td><td data-label=\"GPS\"><span>").append(e(p.get("latitude"))).append(", ").append(e(p.get("longitude"))).append("</span><small>Bán kính ").append(e(p.get("triggerRadiusM"))).append(" m</small></td><td><span class=\"tag ").append(visible?"tag-green":"tag-muted").append("\">").append(visible?"Đang hiển thị":"Đã ẩn").append("</span></td><td><div class=\"row-actions\">").append(link("/admin/poi?id="+id,icon("edit")+"Sửa","btn btn-light btn-small")).append(link("/admin/poi/visibility?id="+id,visible?"Ẩn":"Hiện","btn btn-light btn-small")).append("</div></td></tr>");
         }
         table.append("</tbody></table></div>");
-        return layout.adminNav(ss,"pois")+"<div class=\"section-header\"><div><h2>Danh sách POI</h2><p>"+pois.size()+" địa điểm · Bao gồm cả POI đã ẩn</p></div>"+link("/admin/poi",icon("plus")+"Thêm POI","btn")+"</div>"+VisitorView.search("/admin/pois",q,"Tìm theo tên hoặc mã POI...")+(pois.isEmpty()?"<div class=\"empty\">Chưa có POI. Hãy thêm địa điểm đầu tiên.</div>":table);
+        return layout.adminNav(ss,"pois")+"<div class=\"section-header\"><div><h2>Danh sách POI</h2><p>"+link("/admin/poi",icon("plus")+"Thêm POI","btn")+"</div>"+VisitorView.search("/admin/pois",q,"Tìm theo tên hoặc mã POI...")+(pois.isEmpty()?"<div class=\"empty\">Chưa có POI. Hãy thêm địa điểm đầu tiên.</div>":table);
     }
     public String poiForm(ClientSessionDTO ss,Map<String,Object> value,List<Map<String,Object>> areas,String error) {
         long id=value.containsKey("id")?Data.id(value,"id"):0;
@@ -296,7 +296,7 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
             b.append("<tr><td><strong>").append(e(n.get("title"))).append("</strong><small>").append(excerpt(n.get("content"),75)).append("</small></td><td data-label=\"Địa điểm\">").append(e(poi)).append("</td><td><span class=\"tag\">").append(icon("globe")).append(e(n.get("languageName"))).append("</span></td><td><span class=\"tag ").append(Data.bool(n,"visible",true)?"tag-green":"tag-muted").append("\">").append(Data.bool(n,"visible",true)?"Đang hiển thị":"Đã ẩn").append("</span></td><td><div class=\"row-actions\">").append(link("/admin/content?id="+n.get("id"),icon("edit")+"Sửa & MP3","btn btn-light btn-small")).append(link("/place?id="+n.get("poiId")+"&lang="+Http.enc(Data.text(n,"languageCode"))+"&preview=1",icon("audio")+"Nghe thử","btn btn-light btn-small")).append("</div></td></tr>");
         }
         b.append("</tbody></table></div>");
-        return layout.adminNav(ss,"contents")+"<div class=\"section-header\"><div><h2>Nội dung thuyết minh</h2><p>Mỗi cặp POI và ngôn ngữ có một bài thuyết minh.</p></div>"+link("/admin/content",icon("plus")+"Thêm nội dung","btn")+"</div>"+VisitorView.search("/admin/contents",q,"Tìm bài thuyết minh hoặc địa điểm...")+b;
+        return layout.adminNav(ss,"contents")+"<div class=\"section-header\"><div><h2>Nội dung thuyết minh</h2><p></p></div>"+link("/admin/content",icon("plus")+"Thêm nội dung","btn")+"</div>"+VisitorView.search("/admin/contents",q,"Tìm bài thuyết minh hoặc địa điểm...")+b;
     }
     public String contentForm(ClientSessionDTO ss,Map<String,Object> v,List<Map<String,Object>> pois,List<Map<String,Object>> langs,Map<String,Object> audio,String error) {
         long id=v.containsKey("id")?Data.id(v,"id"):0;
@@ -447,8 +447,8 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
                 + "<script src=\"/assets/auto-narration.js\" defer></script>";
     }
     public String status(List<Map<String,Object>> health) {
-        StringBuilder b=new StringBuilder("<div class=\"page-intro\"><div><span class=\"eyebrow\">CONNECTION CHECK</span><h1>Trạng thái kết nối</h1></div>"+link("/status","Kiểm tra lại","btn btn-light")+"</div><section class=\"panel\"><div class=\"status-list\">");
+        StringBuilder b=new StringBuilder("<div class=\"page-intro\"><div><span class=\"eyebrow\"></span><h1>Trạng thái kết nối</h1></div>"+link("/status","Kiểm tra lại","btn btn-light")+"</div><section class=\"panel\"><div class=\"status-list\">");
         for(var r:health)b.append("<div class=\"status-row\"><div><strong>").append(e(r.get("service"))).append("</strong><small class=\"api-details\">").append(e(r.get("url"))).append("</small></div><span class=\"tag ").append("OK".equals(r.get("status"))?"tag-green":"tag-muted").append("\">").append(e(r.get("status"))).append("</span></div>");
-        return b.append("</div><p class=\"help section-space\">UP chỉ xác nhận server đang chạy. Để kiểm tra dữ liệu, hãy đăng nhập, thêm POI, thêm nội dung, tải MP3 và nghe trên trang khách.</p></section>").toString();
+        return b.append("</div><p class=\"help section-space\"></p></section>").toString();
     }
 }
