@@ -139,7 +139,7 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
         for(var p:pois) names.put(Data.id(p,"id"),Data.text(p,"poiName"));
         StringBuilder b=new StringBuilder(layout.adminNav(ss,"contents")
             + "<div class=\"section-header\"><div><h2>Quản lý audio</h2>"
-            + "<p>Chọn bài thuyết minh để tải MP3, thay bản audio hoặc nghe thử.</p></div>"
+            + "<p></p></div>"
             + link("/admin/contents","Quản lý nội dung","btn btn-light") + "</div>"
             + "<section class=\"panel\"><div class=\"table-wrap\"><table class=\"data-table\">"
             + "<thead><tr><th>Bài thuyết minh</th><th>Địa điểm</th><th>Ngôn ngữ</th><th>Thao tác</th>"
