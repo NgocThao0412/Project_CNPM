@@ -27,14 +27,40 @@ public final class ApiDAO {
     public List<Map<String,Object>> audio(ClientSessionDTO ss,long id,boolean admin)throws Exception {
         return Data.list(call(ss,"GET","/api/audio?contentId="+id+(admin?"&admin=1":""),null));
     }
-    public void login(ClientSessionDTO ss,String username,String password)throws Exception {
-        Http.Reply r=Http.call("POST",s.gateway()+"/api/auth/login","",Data.row("username",username,"password",password)).require();
-        String h=r.header("Set-Cookie");
-        String cookie=Arrays.stream(h.split(";")).map(String::trim).filter(v->v.startsWith("SGU_ADMIN_SESSION=")).findFirst().orElse("");
-        if(!cookie.matches("SGU_ADMIN_SESSION=[A-Za-z0-9._-]{1,256}"))throw new Http.Error(502,"Auth service chưa trả cookie SGU_ADMIN_SESSION.");
-        ss.upstreamCookie=cookie;
-        ss.admin=Data.map(Data.map(r.json()).get("admin"));
+    public void login(ClientSessionDTO ss, String username, String password) throws Exception {
+    try {
+        Http.Reply r = Http.call(
+            "POST",
+            s.gateway() + "/api/auth/login",
+            "",
+            Data.row("username", username, "password", password)
+        ).require();
+
+        String h = r.header("Set-Cookie");
+        String cookie = Arrays.stream(h.split(";"))
+            .map(String::trim)
+            .filter(v -> v.startsWith("SGU_ADMIN_SESSION="))
+            .findFirst()
+            .orElse("");
+
+        if (!cookie.matches("SGU_ADMIN_SESSION=[A-Za-z0-9._-]{1,256}")) {
+            throw new Http.Error(502, "Auth service chưa trả cookie SGU_ADMIN_SESSION.");
+        }
+
+        ss.upstreamCookie = cookie;
+        ss.admin = Data.map(Data.map(r.json()).get("admin"));
+
+        // Đăng nhập thành công
+        System.out.println("hello");
+
+    } catch (Http.Error e) {
+        if (e.status == 401) {
+            // Sai tài khoản hoặc mật khẩu
+            System.out.println("hello hello");
+        }
+        throw e;
     }
+}
     public void me(ClientSessionDTO ss)throws Exception {
         if(!ss.loggedIn())throw new Http.Error(401,"Vui lòng đăng nhập.");
         try {
