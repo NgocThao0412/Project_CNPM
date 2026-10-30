@@ -193,7 +193,7 @@
     }).catch(() => {}); } catch (_) {}
   });
   void heartbeat();
-  setInterval(() => { void heartbeat(); },10000);
+  setInterval(() => { void heartbeat(); },3000);
   document.addEventListener('visibilitychange',() => {
     if(!document.hidden) void heartbeat();
   });

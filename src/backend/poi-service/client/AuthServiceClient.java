@@ -46,7 +46,7 @@ public class AuthServiceClient {
         }
 
         try {
-            AdminIdentity admin = restClient.get()
+            AdminIdentity admin = restClient.get() // POI Service gọi Auth Service để xác thực phiên đăng nhập
                     .uri("/api/auth/me")
                     .header(
                             HttpHeaders.COOKIE,
