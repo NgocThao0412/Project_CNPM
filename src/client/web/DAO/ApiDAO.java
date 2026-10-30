@@ -123,9 +123,9 @@ public final class ApiDAO {
     public List<Map<String,Object>> health() {
         List<Map<String,Object>> rows=new ArrayList<>();
         Map<String,String> targets=new LinkedHashMap<>();
-        targets.put("Client API",s.gateway()+"/health");
-        targets.put("narration-server",s.narration()+"/health");
-        targets.put("audio-server",s.audio()+"/health");
+        targets.put("Client API", s.gateway() + "/health");
+targets.put("narration-server", s.narration() + "/api/health");
+targets.put("audio-server", s.audio() + "/api/health");
         targets.put("poi-service",s.gateway()+"/api/pois");
         for(var e:targets.entrySet()) {
             try {
