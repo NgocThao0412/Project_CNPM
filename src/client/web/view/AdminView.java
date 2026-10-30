@@ -261,7 +261,7 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
             + "<div class=\"visitor-users-tile listening\"><span>Đang nghe</span>"
             + "<strong data-listening-count>—</strong></div></section>"
             + "<section class=\"panel\"><div class=\"visitor-users-title\">"
-            + "<h3>Trạng thái kết nối visitor-service</h3>"
+            //+ "<h3>Trạng thái kết nối visitor-service</h3>"
             + "<p data-visitor-note>Đang lấy thống kê từ API…</p></div>"
             + "<p class=\"help\"></p></section>";
     }
