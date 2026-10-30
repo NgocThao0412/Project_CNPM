@@ -53,7 +53,7 @@ public final class VisitorView {
     public String places(List<Map<String,Object>> pois,String q) {
         String term=q.toLowerCase(Locale.ROOT).trim();
         var shown=pois.stream().filter(m->(Data.text(m,"poiName")+" "+Data.text(m,"poiCode")+" "+Data.text(m,"areaName")).toLowerCase(Locale.ROOT).contains(term)).toList();
-        return "<div class=\"page-intro\"><div><span class=\"eyebrow\">DISCOVER SGU</span><h1>Địa điểm tham quan</h1><p>Tìm một điểm đến, mở ra một câu chuyện.</p></div>"+link("/map",icon("map")+"Xem trên bản đồ","btn btn-light")+"</div>"+search("/places",q,"Tìm tên địa điểm, mã POI hoặc khu vực...")+"<div class=\"count\">"+shown.size()+" địa điểm đang hiển thị</div><div class=\"cards\">"+cards(shown)+"</div>";
+        return "<div class=\"page-intro\"><div><span class=\"eyebrow\"></span><h1>Địa điểm tham quan</h1><p></p></div>"+link("/map",icon("map")+"Xem trên bản đồ","btn btn-light")+"</div>"+search("/places",q,"Tìm tên địa điểm, mã POI hoặc khu vực...")+"<div class=\"count\">"+shown.size()+" địa điểm đang hiển thị</div><div class=\"cards\">"+cards(shown)+"</div>";
     }
     public static String search(String action,String q,String placeholder) {
         return "<form class=\"search-bar\" method=\"get\" action=\""+e(action)+"\">"+icon("search")+"<input name=\"q\" aria-label=\"Tìm kiếm\" value=\""+e(q)+"\" placeholder=\""+e(placeholder)+"\"><button class=\"btn\">Tìm kiếm</button></form>";
