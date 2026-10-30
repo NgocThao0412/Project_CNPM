@@ -302,7 +302,7 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
     }
     public String contentForm(ClientSessionDTO ss,Map<String,Object> v,List<Map<String,Object>> pois,List<Map<String,Object>> langs,Map<String,Object> audio,String error) {
         long id=v.containsKey("id")?Data.id(v,"id"):0;
-        String form="<section class=\"panel\"><span class=\"eyebrow\">STORY EDITOR</span><h2>"+(id==0?"Thêm bài thuyết minh":"Biên tập nội dung")+"</h2>"+(error.isBlank()?"":layout.error(error))+"<form method=\"post\" action=\"/admin/content/save\">"+hidden("csrf",ss.csrf)+hidden("id",id)+"<div class=\"form-grid\">"+select("Địa điểm (POI)","poiId",pois,"poiName",v.getOrDefault("poiId",pois.isEmpty()?0:pois.getFirst().get("id")),id>0)+select("Ngôn ngữ","languageId",langs,"languageName",v.getOrDefault("languageId",langs.isEmpty()?0:langs.getFirst().get("id")),id>0)+"<div class=\"full\">"+input("Tiêu đề","title",v.get("title"),"text","required maxlength=\"200\"")+"</div><div class=\"full\">"+area("Văn bản thuyết minh","content",v.get("content"),10)+"</div></div><label class=\"check-line\"><input name=\"visible\" value=\"true\" type=\"checkbox\" "+(Data.bool(v,"visible",true)?"checked":"")+">Hiển thị cho khách tham quan</label><p class=\"help\">"+(id>0?"Không đổi POI/ngôn ngữ của bài cũ để giữ đúng lịch sử audio. Cần đổi thì tạo bài mới.":"Lưu nội dung trước, sau đó tải MP3 tương ứng.")+"</p><div class=\"form-actions\"><button class=\"btn\">"+icon("check")+"Lưu nội dung</button>"+link("/admin/contents","Hủy","btn btn-light")+"</div></form></section>";
+        String form="<section class=\"panel\"><span class=\"eyebrow\"></span><h2>"+(id==0?"Thêm bài thuyết minh":"Biên tập nội dung")+"</h2>"+(error.isBlank()?"":layout.error(error))+"<form method=\"post\" action=\"/admin/content/save\">"+hidden("csrf",ss.csrf)+hidden("id",id)+"<div class=\"form-grid\">"+select("Địa điểm (POI)","poiId",pois,"poiName",v.getOrDefault("poiId",pois.isEmpty()?0:pois.getFirst().get("id")),id>0)+select("Ngôn ngữ","languageId",langs,"languageName",v.getOrDefault("languageId",langs.isEmpty()?0:langs.getFirst().get("id")),id>0)+"<div class=\"full\">"+input("Tiêu đề","title",v.get("title"),"text","required maxlength=\"200\"")+"</div><div class=\"full\">"+area("Văn bản thuyết minh","content",v.get("content"),10)+"</div></div><label class=\"check-line\"><input name=\"visible\" value=\"true\" type=\"checkbox\" "+(Data.bool(v,"visible",true)?"checked":"")+">Hiển thị cho khách tham quan</label><p class=\"help\">"+(id>0?"Lưu nội dung trước, sau đó tải MP3 tương ứng.")+"</p><div class=\"form-actions\"><button class=\"btn\">"+icon("check")+"Lưu nội dung</button>"+link("/admin/contents","Hủy","btn btn-light")+"</div></form></section>";
         // TRANSLATION_CONTROLS
         var translationLanguages = langs.stream()
                 .filter(language -> Set.of("vi","en","zh","ko")
@@ -326,9 +326,7 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
             String translationControls =
                     "<hr class=\"player-separator\">"
                     + "<h3>Dịch tự động</h3>"
-                    + "<p class=\"help\">Tiêu đề và văn bản đang nhập "
-                    + "sẽ được dịch từ ngôn ngữ của bài sang ngôn ngữ đích. "
-                    + "Bạn được kiểm tra bản dịch trước khi lưu.</p>"
+                    + "<p class=\"help\"></p>"
                     + select(
                             "Ngôn ngữ đích",
                             "targetLanguageId",
@@ -367,18 +365,14 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
         String autoControls =
                 "<hr class=\"player-separator\">"
                 + "<h3>Tạo trọn bộ thuyết minh</h3>"
-                + "<p class=\"help\">Chọn ngôn ngữ gốc Tiếng Việt. "
-                + "Hệ thống lưu bài Việt, dịch sang Anh, Trung, Hàn "
-                + "và tạo giọng đọc cho cả bốn ngôn ngữ. "
-                + "Nội dung gốc tối đa 6000 ký tự.</p>"
+                + "<p class=\"help\"></p>"
                 + "<label class=\"check-line\">"
                 + "<input type=\"checkbox\" name=\"replaceExisting\" "
                 + "value=\"true\" "
                 + (Data.bool(v,"replaceExisting",false) ? "checked" : "")
                 + ">Thay nội dung và tạo lại audio của các bài đã có"
                 + "</label>"
-                + "<p class=\"help\">Để trống lựa chọn trên nếu chỉ muốn "
-                + "bổ sung các bài hoặc audio còn thiếu.</p>"
+                + "<p class=\"help\"></p>"
                 + "<div class=\"form-actions\">"
                 + "<button class=\"btn\" type=\"submit\" "
                 + "formaction=\"/admin/content/auto\" formmethod=\"post\">"
@@ -395,7 +389,7 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
         else {
             if(audio!=null)upload+="<strong>"+e(audio.get("fileName"))+"</strong><p class=\"help\">"+seconds(audio.get("durationSeconds"))+" · Phiên bản "+e(audio.get("versionNumber"))+"</p><audio controls preload=\"metadata\" src=\"/media/audio/"+Data.id(audio,"id")+"?preview=1\"></audio>";
             else upload+="<p>Chưa gắn MP3 cho nội dung này.</p>";
-            upload+="<form method=\"post\" enctype=\"multipart/form-data\" action=\"/admin/audio/upload\">"+hidden("csrf",ss.csrf)+hidden("id",id)+"<label class=\"field\"><span>Chọn MP3 từ máy</span><input type=\"file\" name=\"file\" accept=\"audio/mpeg,.mp3\" required></label><p class=\"help\">Tải file mới sẽ tạo phiên bản mới. Bản cũ được giữ lại, không ghi đè.</p><button class=\"btn\">"+icon("cloud")+(audio==null?"Tải MP3 lên":"Thay audio")+"</button></form><hr class=\"player-separator\">"+link("/place?id="+v.get("poiId")+"&lang="+Http.enc(Data.text(v,"languageCode"))+"&preview=1",icon("audio")+"Nghe thử trang chi tiết","btn btn-light");
+            upload+="<form method=\"post\" enctype=\"multipart/form-data\" action=\"/admin/audio/upload\">"+hidden("csrf",ss.csrf)+hidden("id",id)+"<label class=\"field\"><span>Chọn MP3 từ máy</span><input type=\"file\" name=\"file\" accept=\"audio/mpeg,.mp3\" required></label><p class=\"help\"></p><button class=\"btn\">"+icon("cloud")+(audio==null?"Tải MP3 lên":"Thay audio")+"</button></form><hr class=\"player-separator\">"+link("/place?id="+v.get("poiId")+"&lang="+Http.enc(Data.text(v,"languageCode"))+"&preview=1",icon("audio")+"Nghe thử trang chi tiết","btn btn-light");
         } return layout.adminNav(ss,"contents")+"<div class=\"upload-grid\">"+form+upload+"</aside></div>";
     }
     public String autoProgress(ClientSessionDTO ss, String jobId) {
