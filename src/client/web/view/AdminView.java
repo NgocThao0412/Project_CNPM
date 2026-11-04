@@ -280,9 +280,62 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
     + link("/admin/poi", icon("plus")+"Thêm POI", "btn")
     + "</div>" +VisitorView.search("/admin/pois",q,"Tìm theo tên hoặc mã POI...")+(pois.isEmpty()?"<div class=\"empty\">Chưa có POI. Hãy thêm địa điểm đầu tiên.</div>":table);
     }
-    public String poiForm(ClientSessionDTO ss,Map<String,Object> value,List<Map<String,Object>> areas,String error) {
-        long id=value.containsKey("id")?Data.id(value,"id"):0;
-        return layout.adminNav(ss,"pois")+"<div class=\"narrow\"><section class=\"panel\"><span class=\"eyebrow\"></span><h2>"+(id==0?"Thêm địa điểm":"Chỉnh sửa địa điểm")+"</h2><p class=\"help\"></p>"+(error.isBlank()?"":layout.error(error))+"<form method=\"post\" action=\"/admin/poi/save\">"+hidden("csrf",ss.csrf)+hidden("id",id)+"<div class=\"form-grid\">"+input("Mã POI","poiCode",value.get("poiCode"),"text","required maxlength=\"50\" placeholder=\"SGU-004\"")+input("Tên địa điểm","poiName",value.get("poiName"),"text","required maxlength=\"200\"")+"<div class=\"full\">"+select("Khu vực","areaId",areas,"areaName",value.getOrDefault("areaId",areas.isEmpty()?0:areas.getFirst().get("id")),false)+"</div><div class=\"full\">"+area("Mô tả địa điểm","description",value.get("description"),4)+"</div>"+input("Vĩ độ","latitude",value.get("latitude"),"number","required min=\"-90\" max=\"90\" step=\"0.0000001\"")+input("Kinh độ","longitude",value.get("longitude"),"number","required min=\"-180\" max=\"180\" step=\"0.0000001\"")+input("Bán kính kích hoạt (m)","triggerRadiusM",value.get("triggerRadiusM"),"number","required min=\"0.01\" max=\"999999.99\" step=\"0.01\"")+"</div><div class=\"form-actions\"><button class=\"btn\">"+icon("check")+"Lưu POI</button>"+link("/admin/pois","Hủy","btn btn-light")+"</div></form></section></div>";
+    public String poiForm(ClientSessionDTO ss, Map<String,Object> value,
+            List<Map<String,Object>> areas, List<Map<String,Object>> images, String error) {
+        long id=value.containsKey("id") ? Data.id(value,"id") : 0;
+        StringBuilder photoSection=new StringBuilder("<div class=\"poi-photo-section full\">"
+                + "<h3>Hình ảnh địa điểm</h3>"
+                + "<p class=\"help\">Chọn 1 ảnh JPG, PNG hoặc WebP (tối đa 5 MB) cho mỗi lần lưu."
+                + " Có thể thêm ảnh khác khi chỉnh sửa địa điểm, tối đa 10 ảnh.</p>"
+                + "<label class=\"poi-photo-picker\" for=\"poi-image-input\">"
+                + icon("cloud") + "<span>Chọn hình ảnh từ máy tính</span>"
+                + "<input id=\"poi-image-input\" name=\"poiImage\" type=\"file\""
+                + " accept=\"image/jpeg,image/png,image/webp\"></label>"
+                + "<div class=\"poi-photo-preview\" id=\"poi-image-preview\" hidden>"
+                + "<img alt=\"Ảnh sắp tải lên\" id=\"poi-image-preview-img\">"
+                + "<span id=\"poi-image-filename\"></span>"
+                + "<button type=\"button\" class=\"btn btn-light btn-small\" id=\"poi-image-clear\">Bỏ chọn</button>"
+                + "</div><p class=\"poi-photo-error\" id=\"poi-image-error\" role=\"alert\" hidden></p>");
+        StringBuilder deleteForms=new StringBuilder();
+        if(!images.isEmpty()) {
+            photoSection.append("<div class=\"poi-photo-gallery\" aria-label=\"Ảnh địa điểm đã lưu\">");
+            for(var image:images) {
+                long imageId=Data.id(image,"id");
+                String url=Data.text(image,"fileUrl");
+                String src=url.startsWith("https://")?e(url):"/media/admin/poi/"+id+"/"+imageId;
+                String formId="poi-image-delete-"+imageId;
+                photoSection.append("<div class=\"poi-photo-card\"><img loading=\"lazy\" src=\"")
+                        .append(src).append("\" alt=\"Ảnh của địa điểm\">")
+                        .append("<span>Ảnh ").append(e(image.get("sortOrder"))).append("</span>")
+                        .append("<button class=\"btn btn-light btn-small\" type=\"submit\" form=\"")
+                        .append(formId).append("\">Xóa ảnh</button></div>");
+                deleteForms.append("<form method=\"post\" action=\"/admin/poi/image/delete\""
+                        + " class=\"poi-photo-delete-form\" id=\"").append(formId).append("\">"
+                        + hidden("csrf",ss.csrf)+hidden("id",id)+hidden("imageId",imageId)+"</form>");
+            }
+            photoSection.append("</div>");
+        } else if(id>0) {
+            photoSection.append("<p class=\"help\">Địa điểm này chưa có ảnh.</p>");
+        }
+        photoSection.append("</div>");
+        return layout.adminNav(ss,"pois")
+                + "<div class=\"narrow\"><section class=\"panel\"><span class=\"eyebrow\"></span><h2>"
+                + (id==0?"Thêm địa điểm":"Chỉnh sửa địa điểm")+"</h2><p class=\"help\"></p>"
+                + (error.isBlank()?"":layout.error(error))
+                + "<form method=\"post\" enctype=\"multipart/form-data\" action=\"/admin/poi/save\">"
+                + hidden("csrf",ss.csrf)+hidden("id",id)+"<div class=\"form-grid\">"
+                + input("Mã POI","poiCode",value.get("poiCode"),"text","required maxlength=\"50\" placeholder=\"SGU-004\"")
+                + input("Tên địa điểm","poiName",value.get("poiName"),"text","required maxlength=\"200\"")
+                + "<div class=\"full\">"+select("Khu vực","areaId",areas,"areaName",
+                        value.getOrDefault("areaId",areas.isEmpty()?0:areas.getFirst().get("id")),false)+"</div>"
+                + "<div class=\"full\">"+area("Mô tả địa điểm","description",value.get("description"),4)+"</div>"
+                + input("Vĩ độ","latitude",value.get("latitude"),"number","required min=\"-90\" max=\"90\" step=\"0.0000001\"")
+                + input("Kinh độ","longitude",value.get("longitude"),"number","required min=\"-180\" max=\"180\" step=\"0.0000001\"")
+                + input("Bán kính kích hoạt (m)","triggerRadiusM",value.get("triggerRadiusM"),"number",
+                        "required min=\"0.01\" max=\"999999.99\" step=\"0.01\"")
+                + photoSection + "</div><div class=\"form-actions\"><button class=\"btn\">"
+                + icon("check")+"Lưu POI</button>"+link("/admin/pois","Hủy","btn btn-light")
+                + "</div></form>"+deleteForms+"</section></div>";
     }
     public String confirmVisibility(ClientSessionDTO ss,Map<String,Object> poi) {
         boolean visible=Data.bool(poi,"visible",true);

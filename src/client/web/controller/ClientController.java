@@ -261,6 +261,11 @@ public final class ClientController {
             boolean preview="1".equals(q.get("preview"));
             Http.proxy(x,api.media(ss,id,preview,method,x.getRequestHeaders().getFirst("Range")));
             return;
+        } if(p.matches("/media/admin/poi/[0-9]+/[0-9]+")&&method.equals("GET")) {
+            api.me(ss); // Admin-only preview, including pictures of hidden POIs.
+            String[] ids=p.split("/");
+            Http.proxy(x,api.adminPoiImage(ss,Long.parseLong(ids[4]),Long.parseLong(ids[5])));
+            return;
         } if(p.matches("/media/poi/[0-9]+")&&method.equals("GET")) {
             poiImage(x,ss,Long.parseLong(p.substring(p.lastIndexOf('/')+1)));
             return;
@@ -280,16 +285,45 @@ public final class ClientController {
         } if(p.equals("/admin/poi")&&method.equals("GET")) {
             long id=id(q);
             Map<String,Object> value=id==0?new LinkedHashMap<>():ClientBUS.byId(api.pois(ss,true),id);
-            page(x,ss,"Biên tập POI","admin",admin.poiForm(ss,value,api.areas(ss),""));
+            page(x,ss,"Biên tập POI","admin",admin.poiForm(ss,value,api.areas(ss),
+                    id==0?List.of():api.poiImages(ss,id),""));
             return;
         } if(p.equals("/admin/poi/save")&&method.equals("POST")) {
+            long savedId=id(f);
+            boolean poiSaved=false;
             try {
-                api.savePoi(ss,id(f),ClientBUS.poiForm(f));
+                Multipart.Part photo=parts.get("poiImage");
+                if(photo!=null&&!photo.filename().isBlank()&&photo.bytes().length>0) {
+                    if(photo.bytes().length>5*1024*1024)
+                        throw new Http.Error(413,"Mỗi ảnh phải nhỏ hơn hoặc bằng 5 MB.");
+                    if(!Set.of("image/jpeg","image/png","image/webp").contains(photo.type()))
+                        throw new Http.Error(400,"Chỉ hỗ trợ hình ảnh JPG, PNG hoặc WebP.");
+                }
+                savedId=api.savePoi(ss,savedId,ClientBUS.poiForm(f));
+                poiSaved=true;
+                if(photo!=null&&!photo.filename().isBlank()&&photo.bytes().length>0) {
+                    api.uploadPoiImage(ss,savedId,photo.filename(),photo.type(),photo.bytes());
+                }
                 success(x,"/admin/pois","Đã lưu POI thành công.");
             }
             catch(Http.Error ex) {
                 if(ex.status==401)throw ex;
-                page(x,ss,"Biên tập POI","admin",admin.poiForm(ss,new LinkedHashMap<>(f),api.areas(ss),ex.getMessage()));
+                Map<String,Object> values=new LinkedHashMap<>(f);
+                values.put("id",savedId);
+                String message=(poiSaved?"Thông tin địa điểm đã được lưu, nhưng tải ảnh thất bại. Hãy chọn lại ảnh và lưu tiếp: ":"")+ex.getMessage();
+                page(x,ss,"Biên tập POI","admin",admin.poiForm(ss,values,api.areas(ss),
+                        savedId==0?List.of():api.poiImages(ss,savedId),message));
+            }
+            return;
+        } if(p.equals("/admin/poi/image/delete")&&method.equals("POST")) {
+            long poiId=id(f);
+            try {
+                api.deletePoiImage(ss,poiId,ClientBUS.positive(f.get("imageId")));
+                success(x,"/admin/poi?id="+poiId,"Đã xóa ảnh địa điểm.");
+            } catch(Http.Error ex) {
+                if(ex.status==401)throw ex;
+                page(x,ss,"Biên tập POI","admin",admin.poiForm(ss,
+                        ClientBUS.byId(api.pois(ss,true),poiId),api.areas(ss),api.poiImages(ss,poiId),ex.getMessage()));
             }
             return;
         } if(p.equals("/admin/poi/visibility")&&method.equals("GET")) {

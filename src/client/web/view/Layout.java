@@ -129,6 +129,8 @@ public final class Layout {
                 + "<link rel=\"stylesheet\" href=\"/assets/app.css?v=flagwave-20261029\">"
                 + (adminArea ? "<link rel=\"stylesheet\" href=\"/assets/admin-theme.css?v=restore-20261030\">" : "")
                 + (adminArea ? "<script defer src=\"/assets/admin-shell.js?v=restore-20261030\"></script>" : "")
+                + (adminArea ? "<link rel=\"stylesheet\" href=\"/assets/poi-images.css?v=1\">"
+                        + "<script defer src=\"/assets/poi-images.js?v=1\"></script>" : "")
                 + (!management ? "<script defer src=\"/assets/visitor-language.js\"></script>" : "")
                 + (adminArea ? "<script defer src=\"/assets/admin-visitors.js\"></script>" :
                     trackVisitor ? "<script defer src=\"/assets/visitor-activity.js\"></script>" : "")
