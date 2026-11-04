@@ -64,7 +64,7 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
         + "<div class=\"visitor-live-card\"><span>Đang truy cập</span><strong data-online-count>—</strong></div>"
         + "<div class=\"visitor-live-card visitor-listening\"><span>Đang nghe thuyết minh</span>"
         + "<strong data-listening-count>—</strong></div></div>"
-        + link("/admin/users", "Xem người dùng →", "visitor-live-link") + "</section>");
+        + link("/admin/users", "Thống kê và báo cáo →", "visitor-live-link") + "</section>");
 
     b.append("<section class=\"admin-action-panel\"><h2>")
      .append(icon("plus")).append("Thao tác nhanh</h2><div class=\"admin-actions\">")
@@ -157,11 +157,123 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
              + "Hãy tạo nội dung trước khi tải MP3.</td></tr>");
         return b.append("</tbody></table></div></section>").toString();
     }
+    /** UC-19: the admin POI API returns the current catalogue, including hidden POIs. */
+    private String poiCountSection(List<Map<String,Object>> pois) {
+        long shown = pois.stream().filter(p -> Data.bool(p, "visible", true)).count();
+        Map<String,long[]> areas = new TreeMap<>();
+        for (Map<String,Object> poi : pois) {
+            String areaName = Data.text(poi, "areaName").trim();
+            if (areaName.isEmpty()) areaName = "Chưa phân khu";
+            long[] counts = areas.computeIfAbsent(areaName, ignored -> new long[2]);
+            counts[0]++;
+            if (Data.bool(poi, "visible", true)) counts[1]++;
+        }
+        StringBuilder b = new StringBuilder("""
+                <section class="panel sgu-poi-statistics" id="poi-statistics">
+                  <div class="report-heading"><div>
+                    <h2>Thống kê số lượng POI</h2>
+                    <p>Dữ liệu hiện tại từ danh sách địa điểm quản trị, bao gồm POI đã ẩn.</p>
+                  </div></div>
+                  <div class="report-metrics">
+                """);
+        b.append("<div class=\"report-metric\"><span>Tổng số POI</span><strong>")
+         .append(pois.size()).append("</strong></div>")
+         .append("<div class=\"report-metric\"><span>Đang hiển thị</span><strong>")
+         .append(shown).append("</strong></div>")
+         .append("<div class=\"report-metric\"><span>Đã ẩn</span><strong>")
+         .append(pois.size()-shown).append("</strong></div>")
+         .append("<div class=\"report-metric\"><span>Số khu vực</span><strong>")
+         .append(areas.size()).append("</strong></div></div>");
+        b.append("""
+                <h3 class="report-subheading">Phân bố POI theo khu vực</h3>
+                <div class="table-wrap"><table class="data-table">
+                  <thead><tr><th>Khu vực</th><th>Tổng POI</th><th>Đang hiển thị</th><th>Đã ẩn</th></tr></thead>
+                  <tbody>
+                """);
+        for (Map.Entry<String,long[]> area : areas.entrySet()) {
+            long[] counts = area.getValue();
+            b.append("<tr><td>").append(e(area.getKey())).append("</td><td>")
+             .append(counts[0]).append("</td><td>").append(counts[1])
+             .append("</td><td>").append(counts[0]-counts[1]).append("</td></tr>");
+        }
+        if (areas.isEmpty()) b.append("<tr><td colspan=\"4\">Chưa có POI trong hệ thống.</td></tr>");
+        return b.append("</tbody></table></div></section>").toString();
+    }
+
+    /** UC-21: report combines current POI count and filtered historical listening logs. */
+    private String summaryReportSection(List<Map<String,Object>> pois,
+                                        List<Map<String,Object>> languages) {
+        long shown = pois.stream().filter(p -> Data.bool(p, "visible", true)).count();
+        StringBuilder b = new StringBuilder();
+        b.append("<section class=\"panel sgu-report\" id=\"summary-report\" data-poi-total=\"")
+         .append(pois.size()).append("\" data-poi-visible=\"").append(shown)
+         .append("\"><div class=\"report-heading\"><div><h2>Xem và xuất báo cáo tổng hợp</h2>")
+         .append("<p>Lọc theo ngày, POI và ngôn ngữ; xem kết quả hoặc xuất báo cáo.</p>")
+         .append("</div></div><form id=\"report-filter\" class=\"report-filter\">")
+         .append("""
+                <div class="report-filter-grid">
+                  <label class="report-field">Từ ngày<input type="date" name="from" required></label>
+                  <label class="report-field">Đến ngày<input type="date" name="to" required></label>
+                  <label class="report-field">Địa điểm<select name="poiId" id="report-poi">
+                    <option value="">Tất cả địa điểm</option>
+                """);
+        for (var poi : pois) {
+            b.append("<option value=\"").append(Data.id(poi,"id"))
+             .append("\" data-visible=\"").append(Data.bool(poi,"visible",true) ? "1" : "0")
+             .append("\">").append(e(Data.text(poi,"poiName"))).append("</option>");
+        }
+        b.append("""
+                   </select></label>
+                   <label class="report-field">Ngôn ngữ<select name="languageCode" id="report-language">
+                     <option value="">Tất cả ngôn ngữ</option>
+                """);
+        for (var language : languages) {
+            String code = Data.text(language,"languageCode").toLowerCase(Locale.ROOT);
+            if (!Set.of("vi", "en", "zh", "ko").contains(code)) continue;
+            b.append("<option value=\"").append(e(code)).append("\">")
+             .append(e(Data.text(language,"languageName"))).append("</option>");
+        }
+        b.append("""
+                    </select></label>
+                  </div>
+                  <div class="report-actions">
+                    <button class="btn" type="submit" id="report-load">Xem báo cáo</button>
+                    <button class="btn btn-light" type="button" id="report-export-csv" disabled>Xuất CSV (Excel)</button>
+                    <button class="btn btn-light" type="button" id="report-print" disabled>In / Lưu PDF</button>
+                  </div>
+                </form>
+                <p class="report-feedback" id="report-feedback" role="status" aria-live="polite">Chọn bộ lọc và nhấn “Xem báo cáo”.</p>
+                <div class="report-printable">
+                  <div class="report-print-title">
+                    <h3>BÁO CÁO TỔNG HỢP · SGU AUDIO GUIDE</h3>
+                    <p id="report-period">Chưa tải dữ liệu</p>
+                    <p id="report-selection"></p>
+                  </div>
+                  <div class="report-metrics">
+                    <div class="report-metric"><span id="report-poi-count-label">POI hiện tại</span><strong id="report-poi-count">—</strong></div>
+                    <div class="report-metric"><span>POI hiển thị</span><strong id="report-poi-visible">—</strong></div>
+                    <div class="report-metric"><span>Lượt nghe</span><strong id="report-listens">—</strong></div>
+                    <div class="report-metric"><span>Phiên có nghe</span><strong id="report-sessions">—</strong></div>
+                  </div>
+                  <p class="report-disclaimer">Số POI là số lượng tại thời điểm xem báo cáo; bộ lọc ngày/ngôn ngữ chỉ áp dụng cho lượt nghe. “Phiên có nghe” là số phiên ẩn danh, không phải số người duy nhất.</p>
+                  <h3 class="report-subheading">Chi tiết hoạt động thuyết minh</h3>
+                  <div class="table-wrap"><table class="data-table">
+                    <thead><tr><th>Ngày</th><th>Địa điểm</th><th>Ngôn ngữ</th><th>Lượt nghe</th><th>Phiên có nghe</th></tr></thead>
+                    <tbody id="report-rows"><tr><td colspan="5">Chưa tải báo cáo.</td></tr></tbody>
+                  </table></div>
+                </div>
+                </section>
+                <script src="/assets/sgu-reports.js" defer></script>
+                """);
+        return b.toString();
+    }
+
         public String users(
             List<Map<String, Object>> pois,
             List<Map<String, Object>> languages
     ) {
         StringBuilder b = new StringBuilder(users());
+        b.append(poiCountSection(pois));
 
         b.append("""
                 <section class="panel" id="listening-history">
@@ -249,21 +361,19 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
                 <script src="/assets/listening-stats.js" defer></script>
                 """);
 
+        b.append(summaryReportSection(pois, languages));
         return b.toString();
     }
 
-    /** Backend reports aggregate visitor and listener counts, not named accounts. */
+    /** Anonymous live counts. Omit the old empty panel; show errors only when present. */
     public String users() {
-        return "<div class=\"section-header\"><div><h2>Người dùng · Khách tham quan</h2>"
-            + "<p></p></div></div>"
+        return "<div class=\"section-header\"><div><h2>Thống kê và báo cáo</h2>"
+            + "<p>Thống kê POI, phiên tham quan và hoạt động nghe thuyết minh.</p></div></div>"
             + "<section class=\"visitor-users-summary\">"
             + "<div class=\"visitor-users-tile\"><span>Đang truy cập</span><strong data-online-count>—</strong></div>"
             + "<div class=\"visitor-users-tile listening\"><span>Đang nghe</span>"
             + "<strong data-listening-count>—</strong></div></section>"
-            + "<section class=\"panel\"><div class=\"visitor-users-title\">"
-            //+ "<h3>Trạng thái kết nối visitor-service</h3>"
-            + "<p data-visitor-note>Đang lấy thống kê từ API…</p></div>"
-            + "<p class=\"help\"></p></section>";
+            + "<p class=\"visitor-status-note\" data-visitor-note role=\"status\" aria-live=\"polite\"></p>";
     }
 
     public String pois(ClientSessionDTO ss,List<Map<String,Object>> pois,String q) {
