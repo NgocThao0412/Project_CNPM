@@ -22,11 +22,62 @@
 #summary-report .report-print-title h3 {font-size:18px; margin:0 0 9px; color:#153b5e;}
 #summary-report .report-print-title p {margin:4px 0; font-size:13px; color:#4c6885;}
 #summary-report .report-disclaimer {color:#65788a; font-size:12px; line-height:1.5; margin:5px 0 15px;}
+/* UC-20: Make the listening-history filters match the UC-21 report layout.
+   Keep the existing form fields/names and listening-stats.js behavior untouched.
+   The two IDs ensure these rules override legacy app.css grid-row styling
+   without changing any other forms or the summary report. */
+#listening-history #listening-filter .stats-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px 22px;
+  align-items: stretch;
+}
+#listening-history #listening-filter .stats-filter-field {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 7px;
+  min-width: 0;
+  margin: 0;
+  color: #325476;
+  font-size: 13px;
+  font-weight: 650;
+}
+#listening-history #listening-filter .stats-filter-field > span {
+  white-space: normal;
+}
+#listening-history #listening-filter .stats-filter-field input,
+#listening-history #listening-filter .stats-filter-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 43px;
+  height: 43px;
+  padding: 9px 13px;
+  border: 1px solid #c9dced;
+  border-radius: 11px;
+  background-color: #fff;
+  background-image: none;
+  box-shadow: none;
+  color: #193b61;
+  font-size: 14px;
+  font-weight: 500;
+}
+#listening-history #listening-filter .stats-filter-field select {
+  appearance: auto;
+  cursor: pointer;
+  padding-right: 13px;
+}
+#listening-history #listening-filter .stats-filter-field input:focus-visible,
+#listening-history #listening-filter .stats-filter-field select:focus-visible {
+  outline: 2px solid #287bc9;
+  outline-offset: 2px;
+}
 @media (max-width:850px) {
   #poi-statistics .report-metrics, #summary-report .report-metrics {grid-template-columns:repeat(2,minmax(0,1fr));}
 }
 @media (max-width:590px) {
   #summary-report .report-filter-grid {grid-template-columns:1fr;}
+  #listening-history #listening-filter .stats-filter-grid {grid-template-columns:1fr;}
   #poi-statistics .report-metrics, #summary-report .report-metrics {gap:9px;}
   #poi-statistics .report-metric, #summary-report .report-metric {padding:12px;}
   #poi-statistics .report-metric strong, #summary-report .report-metric strong {font-size:25px;}
