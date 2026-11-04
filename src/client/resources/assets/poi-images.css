@@ -1,0 +1,21 @@
+/* Scoped to the POI edit form; does not change other admin pages. */
+.admin-area .poi-photo-section { margin-top: 8px; padding-top: 18px; border-top: 1px solid #dce9f0; }
+.admin-area .poi-photo-section h3 { margin: 0 0 6px; font-size: 17px; color: #20384b; }
+.admin-area .poi-photo-section .help { margin: 6px 0 14px; }
+.admin-area .poi-photo-picker { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center;
+    padding: 25px 16px; border: 2px dashed #a6cde6; border-radius: 12px; color: #1264a2;
+    cursor: pointer; text-align: center; background: #f4faff; }
+.admin-area .poi-photo-picker:hover, .admin-area .poi-photo-picker:focus-within { border-color: #0877b8; background: #eaf5fc; }
+.admin-area .poi-photo-picker .icon { width: 24px; height: 24px; }
+.admin-area .poi-photo-picker input { width: 100%; max-width: 260px; font: inherit; font-size: 13px; }
+.admin-area .poi-photo-preview { display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+    padding: 14px; border: 1px solid #c5dfec; border-radius: 10px; margin-top: 12px; background: white; }
+.admin-area .poi-photo-preview[hidden], .admin-area .poi-photo-error[hidden] { display: none; }
+.admin-area .poi-photo-preview img { width: 120px; height: 85px; border-radius: 8px; object-fit: cover; }
+.admin-area .poi-photo-preview span { flex: 1; min-width: 110px; overflow-wrap: anywhere; }
+.admin-area .poi-photo-error { color: #a91e2e; font-size: 13px; }
+.admin-area .poi-photo-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(146px, 1fr)); gap: 13px; margin-top: 16px; }
+.admin-area .poi-photo-card { padding: 9px; border: 1px solid #d4e4ef; border-radius: 10px; display: flex; flex-direction: column; gap: 8px; }
+.admin-area .poi-photo-card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 7px; background: #eef4f7; }
+.admin-area .poi-photo-card span { color: #496778; font-size: 12px; }
+.admin-area .poi-photo-delete-form { display: none; }

@@ -4,6 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.Digits;
+import java.math.BigDecimal;
 
 public record UpdatePOIRequestDTO(
 
@@ -19,6 +23,18 @@ public record UpdatePOIRequestDTO(
         @Size(max = 200, message = "Tên POI tối đa 200 ký tự")
         String poiName,
 
-        String description
+        String description,
+
+        // Nullable to retain compatibility with clients that only edit text fields.
+        @DecimalMin(value = "-90.0") @DecimalMax(value = "90.0")
+        @Digits(integer = 3, fraction = 7)
+        BigDecimal latitude,
+
+        @DecimalMin(value = "-180.0") @DecimalMax(value = "180.0")
+        @Digits(integer = 3, fraction = 7)
+        BigDecimal longitude,
+
+        @DecimalMin(value = "0.01") @DecimalMax(value = "999999.99")
+        BigDecimal triggerRadiusM
 ) {
 }

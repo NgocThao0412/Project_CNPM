@@ -36,6 +36,9 @@ build/
 /src/client/audio-server/data/
 /poi-01-en.mp3
 /src/backend/audio-service/data/
+/src/backend/poi-service/data/
+# Runtime image storage (never commit visitor/admin uploads)
+/data/poi-images/
 # Local-only files
 **/local.properties
 **/.run/

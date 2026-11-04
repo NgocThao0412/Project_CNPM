@@ -178,7 +178,10 @@ ORDER BY p.poi_name, p.id
             SET area_id = ?,
                 poi_code = ?,
                 poi_name = ?,
-                description = ?
+                description = ?,
+                latitude = COALESCE(?, latitude),
+                longitude = COALESCE(?, longitude),
+                trigger_radius_m = COALESCE(?, trigger_radius_m)
             WHERE id = ?
             """;
 
@@ -188,6 +191,9 @@ ORDER BY p.poi_name, p.id
                 request.poiCode().trim(),
                 request.poiName().trim(),
                 request.description(),
+                request.latitude(),
+                request.longitude(),
+                request.triggerRadiusM(),
                 id
         );
     }

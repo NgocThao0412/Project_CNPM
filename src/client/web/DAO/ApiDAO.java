@@ -77,6 +77,22 @@ public final class ApiDAO {
         Object v=call(ss,id==0?"POST":"PUT","/api/admin/pois"+(id==0?"":"/"+id),dto);
         return id==0?Data.id(Data.map(v),"id"):id;
     }
+    public List<Map<String,Object>> poiImages(ClientSessionDTO ss,long poiId)throws Exception {
+        return Data.list(call(ss,"GET","/api/admin/pois/"+poiId+"/images",null));
+    }
+    public void uploadPoiImage(ClientSessionDTO ss,long poiId,String filename,String mime,byte[] file)throws Exception {
+        Http.request("POST",s.gateway()+"/api/admin/pois/"+poiId+"/images?filename="+Http.enc(filename),
+                ss.upstreamCookie,mime,file,Map.of()).require();
+    }
+    public void deletePoiImage(ClientSessionDTO ss,long poiId,long imageId)throws Exception {
+        // DELETE returns 204 without a JSON body.
+        Http.request("DELETE",s.gateway()+"/api/admin/pois/"+poiId+"/images/"+imageId,
+                ss.upstreamCookie,null,null,Map.of()).require();
+    }
+    public Http.Reply adminPoiImage(ClientSessionDTO ss,long poiId,long imageId)throws Exception {
+        return Http.request("GET",s.gateway()+"/api/admin/pois/"+poiId+"/images/"+imageId+"/file",
+                ss.upstreamCookie,null,null,Map.of()).require();
+    }
     public void visible(ClientSessionDTO ss,long id,boolean visible)throws Exception {
         call(ss,"PATCH","/api/admin/pois/"+id+"/visibility",Data.row("visible",visible));
     }
