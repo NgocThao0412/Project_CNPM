@@ -1,0 +1,55 @@
+/* UC-19 and UC-21 only. No selectors change other admin forms. */
+.visitor-status-note:empty { display:none; }
+.visitor-status-note:not(:empty) { margin:-8px 0 18px; color:#9b3e1e; font-size:13px; }
+#poi-statistics, #summary-report { margin-top:20px; }
+#poi-statistics .report-heading, #summary-report .report-heading { display:flex; justify-content:space-between; gap:16px; margin-bottom:18px; }
+#poi-statistics .report-heading h2, #summary-report .report-heading h2 {margin:0 0 6px; font-size:22px; color:#163b58;}
+#poi-statistics .report-heading p, #summary-report .report-heading p {margin:0; color:#647c98; font-size:14px;}
+#poi-statistics .report-metrics, #summary-report .report-metrics {display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin:14px 0 20px;}
+#poi-statistics .report-metric, #summary-report .report-metric {border:1px solid #c9e0f5; border-radius:14px; background:linear-gradient(135deg,#eef7ff,#fff); padding:17px 19px; min-width:0;}
+#poi-statistics .report-metric span, #summary-report .report-metric span {display:block; font-size:13px; font-weight:700; color:#476d8f;}
+#poi-statistics .report-metric strong, #summary-report .report-metric strong {display:block; margin-top:6px; font-size:30px; color:#1263b2; font-variant-numeric:tabular-nums;}
+#poi-statistics .report-subheading, #summary-report .report-subheading {font-size:17px; margin:20px 0 13px; color:#193d58;}
+#summary-report .report-filter-grid {display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px 22px;}
+#summary-report .report-field {display:flex; flex-direction:column; gap:7px; min-width:0; font-weight:650; color:#325476; font-size:13px;}
+#summary-report .report-field input, #summary-report .report-field select {min-height:43px; width:100%; border-radius:11px; border:1px solid #c9dced; background:#fff; color:#193b61; padding:9px 13px; font-size:14px;}
+#summary-report .report-field input:focus-visible, #summary-report .report-field select:focus-visible {outline:2px solid #287bc9;outline-offset:2px;}
+#summary-report .report-actions {display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:19px 0 10px;}
+#summary-report .report-actions button {min-height:43px;}
+#summary-report .report-actions button:disabled {opacity:.48; cursor:not-allowed;}
+#summary-report .report-feedback {min-height:20px; font-size:13px; color:#55718e; margin:10px 0 22px;}
+#summary-report .report-print-title {border-bottom:1px solid #d7e5f3;padding-bottom:13px;}
+#summary-report .report-print-title h3 {font-size:18px; margin:0 0 9px; color:#153b5e;}
+#summary-report .report-print-title p {margin:4px 0; font-size:13px; color:#4c6885;}
+#summary-report .report-disclaimer {color:#65788a; font-size:12px; line-height:1.5; margin:5px 0 15px;}
+@media (max-width:850px) {
+  #poi-statistics .report-metrics, #summary-report .report-metrics {grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media (max-width:590px) {
+  #summary-report .report-filter-grid {grid-template-columns:1fr;}
+  #poi-statistics .report-metrics, #summary-report .report-metrics {gap:9px;}
+  #poi-statistics .report-metric, #summary-report .report-metric {padding:12px;}
+  #poi-statistics .report-metric strong, #summary-report .report-metric strong {font-size:25px;}
+  #summary-report .report-actions .btn {width:100%;justify-content:center;}
+}
+@media print {
+  body.printing-sgu-report {background:#fff !important;color:#111 !important;}
+  body.printing-sgu-report .site-header,
+  body.printing-sgu-report .admin-sidebar,
+  body.printing-sgu-report .admin-topbar,
+  body.printing-sgu-report .page-back-wrap {display:none !important;}
+  body.printing-sgu-report .admin-area .page.admin-shell,
+  body.printing-sgu-report .page.admin-shell {display:block !important;max-width:none !important;min-height:0 !important;}
+  body.printing-sgu-report .admin-workspace-body {padding:0 !important; margin:0 !important;max-width:none !important;}
+  body.printing-sgu-report .admin-workspace-body > :not(#summary-report) {display:none !important;}
+  body.printing-sgu-report #summary-report {display:block !important; margin:0 !important; border:0 !important; box-shadow:none !important; padding:0 !important;}
+  body.printing-sgu-report #summary-report .report-heading,
+  body.printing-sgu-report #summary-report .report-filter,
+  body.printing-sgu-report #summary-report .report-feedback {display:none !important;}
+  body.printing-sgu-report #summary-report .report-metric {background:#fff !important;border:1px solid #ccc !important;break-inside:avoid;}
+  body.printing-sgu-report #summary-report .report-metric strong {color:#111 !important;}
+  body.printing-sgu-report #summary-report .table-wrap {overflow:visible !important;}
+  body.printing-sgu-report #summary-report table {font-size:10px; width:100%;}
+  body.printing-sgu-report #summary-report thead {display:table-header-group;}
+  body.printing-sgu-report #summary-report tr {break-inside:avoid;}
+}

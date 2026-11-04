@@ -81,7 +81,7 @@ public final class Layout {
             String current = "overview";
             if ("status".equals(tab)) current = "status";
             else if (title.contains("POI")) current = "pois";
-            else if ("Người dùng".equals(title)) current = "users";
+            else if ("Người dùng".equals(title) || "Thống kê và báo cáo".equals(title)) current = "users";
             else if ("Quản lý audio".equals(title)) current = "audio";
             else if (title.contains("thuyết minh") || title.contains("Nội dung")) current = "contents";
             String person = adminName(session);
@@ -94,7 +94,7 @@ public final class Layout {
                     + sidebar("/admin/pois", "Quản lý địa điểm", "pin", "pois", current)
                     + sidebar("/admin/contents", "Nội dung thuyết minh", "book", "contents", current)
                     + sidebar("/admin/audio", "Quản lý audio", "audio", "audio", current)
-                    + sidebar("/admin/users", "Thống kê", "user", "users", current)
+                    + sidebar("/admin/users", "Thống kê và báo cáo", "user", "users", current)
                     + sidebar("/status", "Trạng thái kết nối", "cloud", "status", current)
                     + "</nav>"
                     + "<div class=\"sidebar-signature\">Saigon Audio Guide<small>Trường Đại học Sài Gòn</small></div>"
@@ -128,6 +128,7 @@ public final class Layout {
                 + "<link rel=\"icon\" href=\"/assets/logo-sgu.png\" type=\"image/png\">"
                 + "<link rel=\"stylesheet\" href=\"/assets/app.css?v=flagwave-20261029\">"
                 + (adminArea ? "<link rel=\"stylesheet\" href=\"/assets/admin-theme.css?v=restore-20261030\">" : "")
+                + (adminArea && "Thống kê và báo cáo".equals(title) ? "<link rel=\"stylesheet\" href=\"/assets/sgu-reports.css\">" : "")
                 + (adminArea ? "<script defer src=\"/assets/admin-shell.js?v=restore-20261030\"></script>" : "")
                 + (adminArea ? "<link rel=\"stylesheet\" href=\"/assets/poi-images.css?v=1\">"
                         + "<script defer src=\"/assets/poi-images.js?v=1\"></script>" : "")

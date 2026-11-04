@@ -334,7 +334,7 @@ public final class ClientController {
             success(x,"/admin/pois","Đã cập nhật trạng thái POI.");
             return;
         } if(p.equals("/admin/users")&&method.equals("GET")) {
-            page(x,ss,"Người dùng","admin",admin.users(api.pois(ss, true), api.languages(ss)));
+            page(x,ss,"Thống kê và báo cáo","admin",admin.users(api.pois(ss, true), api.languages(ss)));
             return;
         } if(p.equals("/admin/audio")&&method.equals("GET")) {
             page(x,ss,"Quản lý audio","admin",
