@@ -25,10 +25,6 @@
     nav.setAttribute('aria-label', `Phân trang ${label}`);
     nav.hidden = true;
 
-    const info = document.createElement('span');
-    info.className = 'sgu-page-info';
-    info.setAttribute('aria-live', 'polite');
-
     const controls = document.createElement('div');
     controls.className = 'sgu-page-controls';
     const prev = createButton('‹', 'Trang trước', () => goto(page - 1));
@@ -36,7 +32,7 @@
     numbers.className = 'sgu-page-numbers';
     const next = createButton('›', 'Trang tiếp theo', () => goto(page + 1));
     controls.append(prev, numbers, next);
-    nav.append(info, controls);
+    nav.append(controls);
     tbody.closest('.table-wrap').insertAdjacentElement('afterend', nav);
 
     let page = 1;
@@ -65,7 +61,6 @@
         row.hidden = !printing && (index < start || index >= end);
       });
       nav.hidden = printing || total <= 1;
-      info.textContent = `Hiển thị ${start + 1}–${end} trên ${count} dòng`;
       prev.disabled = page === 1;
       next.disabled = page === total;
       numbers.replaceChildren();
