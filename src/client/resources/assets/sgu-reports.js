@@ -10,6 +10,7 @@
   const printButton = find('report-print');
   const feedback = find('report-feedback');
   const tbody = find('report-rows');
+  const pager = window.SguTablePagination.create(tbody, 'chi tiết hoạt động thuyết minh', {printAll: true});
   let currentReport = null;
   let requesting = false;
 
@@ -49,6 +50,7 @@
   }
   function setMetric(id, value) { find(id).textContent = number(value); }
   function invalidate() {
+    pager.clear();
     currentReport = null;
     csvButton.disabled = true;
     printButton.disabled = true;
@@ -144,6 +146,7 @@
       }
       tbody.replaceChildren(fragment);
       if (!rows.length) placeholder('Không có lượt nghe phù hợp với bộ lọc.');
+      pager.update(rows.length);
       currentReport = {from, to, chosenPoi, chosenLanguage, poiTotal, poiVisible,
                        totalListens: data.totalListens, uniqueSessions: data.uniqueSessions, rows};
       feedback.textContent = rows.length

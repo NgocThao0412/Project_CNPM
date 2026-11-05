@@ -6,6 +6,7 @@
 
   const message = document.querySelector('#listening-message');
   const rows = document.querySelector('#listening-rows');
+  const pager = window.SguTablePagination.create(rows, 'lịch sử lượt nghe');
   const listens = document.querySelector('#history-listens');
   const sessions = document.querySelector('#history-sessions');
   const button = form.querySelector('button[type="submit"]');
@@ -62,6 +63,7 @@
     listens.textContent = '—';
     sessions.textContent = '—';
     message.textContent = 'Đang tải thống kê…';
+    pager.clear();
     showTableMessage('Đang tải…');
 
     const query = new URLSearchParams();
@@ -125,6 +127,7 @@
       if (data.rows.length === 0) {
         showTableMessage('Không có lượt nghe phù hợp với bộ lọc.');
       }
+      pager.update(data.rows.length);
 
       listens.textContent = totalListens;
       sessions.textContent = totalSessions;

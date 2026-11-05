@@ -72,6 +72,53 @@
   outline: 2px solid #287bc9;
   outline-offset: 2px;
 }
+/* Pagination is scoped to the listening and report tables; other lists are untouched. */
+#listening-history .sgu-table-pagination,
+#summary-report .sgu-table-pagination {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:12px;
+  text-align:center;
+  padding:16px 2px 2px;
+}
+#listening-history .sgu-table-pagination[hidden],
+#summary-report .sgu-table-pagination[hidden] { display:none !important; }
+#listening-history .sgu-page-info,
+#summary-report .sgu-page-info { color:#607991; font-size:13px; font-weight:600; }
+#listening-history .sgu-page-controls,
+#summary-report .sgu-page-controls,
+#listening-history .sgu-page-numbers,
+#summary-report .sgu-page-numbers { display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+#listening-history .sgu-page-button,
+#summary-report .sgu-page-button {
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:38px; min-height:38px; padding:6px 10px;
+  border:1px solid #c9dced; border-radius:9px;
+  color:#175b96; background:#fff; cursor:pointer;
+  font-family:inherit; font-size:14px; font-weight:600; line-height:1.2;
+}
+#listening-history .sgu-page-button:hover:not(:disabled),
+#summary-report .sgu-page-button:hover:not(:disabled) { background:#eaf5ff; border-color:#80b6ea; }
+#listening-history .sgu-page-button.is-current,
+#summary-report .sgu-page-button.is-current { background:#1269c5; border-color:#1269c5; color:#fff; }
+#listening-history .sgu-page-button:focus-visible,
+#summary-report .sgu-page-button:focus-visible { outline:2px solid #287bc9; outline-offset:2px; }
+#listening-history .sgu-page-button:disabled,
+#summary-report .sgu-page-button:disabled { opacity:.4; cursor:not-allowed; }
+#listening-history .sgu-page-ellipsis,
+#summary-report .sgu-page-ellipsis { color:#647c98; padding:0 3px; }
+@media (max-width:590px) {
+  #listening-history .sgu-table-pagination,
+  #summary-report .sgu-table-pagination { justify-content:center; text-align:center; }
+}
+@media print {
+  #listening-history .sgu-table-pagination,
+  #summary-report .sgu-table-pagination { display:none !important; }
+}
+
 @media (max-width:850px) {
   #poi-statistics .report-metrics, #summary-report .report-metrics {grid-template-columns:repeat(2,minmax(0,1fr));}
 }

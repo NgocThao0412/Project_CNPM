@@ -358,6 +358,7 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
                     </table>
                   </div>
                 </section>
+                <script src="/assets/sgu-table-pagination.js" defer></script>
                 <script src="/assets/listening-stats.js" defer></script>
                 """);
 
