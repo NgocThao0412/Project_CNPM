@@ -12,7 +12,15 @@ public final class UpstreamDAO {
         String p=x.getRequestURI().getPath();
         String base;
         if(p.startsWith("/api/auth/"))base=s.get("auth.url","http://127.0.0.1:8081");
-        else if(p.equals("/api/pois")||p.startsWith("/api/admin/pois")||p.equals("/api/campus-areas"))base=s.get("poi.url","http://127.0.0.1:8082");
+       else if (
+        p.equals("/api/pois")
+        || p.matches("/api/pois/[0-9]+")
+        || p.equals("/api/admin/pois")
+        || p.startsWith("/api/admin/pois/")
+        || p.equals("/api/campus-areas")
+) {
+    base = s.get("poi.url", "http://127.0.0.1:8082");
+}
         else if(p.equals("/api/languages")||p.startsWith("/api/narrations")||p.startsWith("/api/admin/narrations"))base=s.narration();
         else if(p.startsWith("/api/audio")||p.startsWith("/api/admin/audio"))base=s.audio();
         else throw new Http.Error(404,"Endpoint không tồn tại.");
