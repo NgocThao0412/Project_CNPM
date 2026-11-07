@@ -31,28 +31,15 @@ public final class Layout {
                 + "<strong class=\"brand-school\">Trường Đại học Sài Gòn</strong>"
                 + "</span>", "brand brand-left");
 
-        // The flag follows the existing selected UI language (VI / EN / ZH / KO).
-        // This changes only the decoration below the centered title.
-        String flagName = switch (selectedLanguage) {
-            case "en" -> "Anh";
-            case "zh" -> "Trung Quốc";
-            case "ko" -> "Hàn Quốc";
-            default -> "Việt Nam";
-        };
         String waveBars = "<i></i><i></i><i></i><i></i><i></i>";
-        String flagDecoration = "<div class=\"header-flag-decor\" role=\"img\" aria-label=\"Cờ "
-                + flagName + " giữa hai dải sóng âm\">"
-                + "<span class=\"header-wave header-wave--left\" aria-hidden=\"true\">"
-                + waveBars + "</span>"
-                + "<img class=\"header-waving-flag\" src=\"/assets/flag-"
-                + selectedLanguage + ".svg\" alt=\"\" width=\"58\" height=\"38\">"
-                + "<span class=\"header-wave header-wave--right\" aria-hidden=\"true\">"
-                + waveBars + "</span></div>";
+        String waveDecoration = "<div class=\"header-wave-decor\" aria-hidden=\"true\">"
+                + "<span class=\"header-wave header-wave--left\">" + waveBars + "</span>"
+                + "<span class=\"header-wave header-wave--right\">" + waveBars + "</span></div>";
 
         String center = management ? ""
                 : "<div class=\"header-center\">"
                 + link("/", "Saigon Audio Guide", "header-title")
-                + flagDecoration + "</div>"
+                + waveDecoration + "</div>"
                 + "<nav class=\"desktop-nav header-right\" aria-label=\"Điều hướng chính\">"
                 + nav("/", "Khám phá", "home", tab)
                 + nav("/places", "Địa điểm", "places", tab)
@@ -158,7 +145,9 @@ public final class Layout {
         StringBuilder b = new StringBuilder("<form method=\"get\" action=\"/language\" class=\"header-language ");
         b.append(mobile ? "header-language-mobile" : "header-language-desktop");
         b.append("\" aria-label=\"Chọn ngôn ngữ / Select language\">");
-        b.append("<label class=\"language-select-label\">").append(icon("globe"));
+        b.append("<label class=\"language-select-label\">");
+        b.append("<img class=\"header-language-flag\" src=\"/assets/flag-")
+                .append(code).append(".svg\" alt=\"\" width=\"28\" height=\"21\">");
         b.append("<select name=\"lang\" class=\"header-language-select\" aria-label=\"Ngôn ngữ / Language\">");
         String[][] choices = {{"vi", "Tiếng Việt"}, {"en", "English"}, {"zh", "中文"}, {"ko", "한국어"}};
         for (String[] choice : choices) {

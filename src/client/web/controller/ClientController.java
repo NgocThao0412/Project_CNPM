@@ -211,7 +211,7 @@ public final class ClientController {
             page(x,ss,"Khám phá","home",visitor.home(api.pois(ss,false),api.languages(ss)));
             return;
         } if(p.equals("/places")&&method.equals("GET")) {
-            page(x,ss,"Địa điểm","places",visitor.places(api.pois(ss,false),q.getOrDefault("q","")));
+            page(x,ss,"Địa điểm","places",visitor.places(api.pois(ss,false),q.getOrDefault("q",""),q.getOrDefault("page","1")));
             return;
         } if(p.equals("/place")&&method.equals("GET")) {
             boolean preview="1".equals(q.get("preview"));

@@ -527,74 +527,37 @@ body.login-page .error-box { margin: 0 0 18px; }
 }
 
 
-/* SGU header: waving language flag between two symmetric audio waveforms.
-   Only the decoration under Saigon Audio Guide is changed. */
-.header-flag-decor {
+/* Sóng âm thanh dưới tiêu đề. */
+.header-wave-decor {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    min-height: 38px;
-    white-space: nowrap;
+    gap: 25px;
+    min-height: 32px;
     margin-top: -1px;
 }
-.header-waving-flag {
-    display: block;
-    width: 58px;
-    height: 38px;
-    object-fit: contain;
-    flex: 0 0 auto;
-    filter: drop-shadow(0 3px 3px rgba(12, 56, 115, .19));
-    animation: sgu-flag-float 3.6s ease-in-out infinite;
-}
-.header-wave {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    height: 30px;
-}
-.header-wave::before,
-.header-wave::after {
-    content: "";
-    width: 32px;
-    height: 2px;
-    border-radius: 8px;
+.header-wave { display: inline-flex; align-items: center; justify-content: center; gap: 3px; height: 30px; }
+.header-wave::before, .header-wave::after {
+    content: ""; width: 32px; height: 2px; border-radius: 8px;
     background: linear-gradient(90deg, #e2f3ff, #9fd4ff);
 }
-.header-wave--left::after,
-.header-wave--right::before { display: none; }
-.header-wave--right::after {
-    background: linear-gradient(90deg, #9fd4ff, #e2f3ff);
-}
+.header-wave--left::after, .header-wave--right::before { display: none; }
+.header-wave--right::after { background: linear-gradient(90deg, #9fd4ff, #e2f3ff); }
 .header-wave i {
-    display: block;
-    width: 4px;
-    height: 6px;
-    border-radius: 8px;
+    display: block; width: 4px; height: 6px; border-radius: 8px;
     background: linear-gradient(180deg, #5ec5ff, #0877e0);
-    box-shadow: 0 0 0 1px rgba(15, 122, 218, .02);
 }
-.header-wave i:nth-child(2),
-.header-wave i:nth-child(4) { height: 15px; }
+.header-wave i:nth-child(2), .header-wave i:nth-child(4) { height: 15px; }
 .header-wave i:nth-child(3) { height: 25px; }
-@keyframes sgu-flag-float {
-    0%, 100% { transform: translateY(0) rotate(-1deg); }
-    50% { transform: translateY(-2px) rotate(1deg); }
-}
+.header-language-flag { display: block; width: 28px; height: 21px; object-fit: contain; flex-shrink: 0; }
 @media (max-width: 620px) {
-    .header-flag-decor { gap: 6px; min-height: 32px; margin-top: 0; }
-    .header-waving-flag { width: 48px; height: 32px; }
+    .header-wave-decor { gap: 16px; min-height: 26px; margin-top: 0; }
     .header-wave { gap: 2px; }
     .header-wave::before, .header-wave::after { width: 20px; }
     .header-wave i { width: 3px; }
     .header-wave i:nth-child(2), .header-wave i:nth-child(4) { height: 11px; }
     .header-wave i:nth-child(3) { height: 17px; }
 }
-@media (prefers-reduced-motion: reduce) {
-    .header-waving-flag { animation: none; }
-}
-
 
 /* ========== Trang Thống kê: bộ lọc lịch sử lượt nghe ========== */
 /* Chỉ tác động khu vực #listening-history, không thay đổi các form khác. */
@@ -765,3 +728,18 @@ body.login-page .error-box { margin: 0 0 18px; }
         padding: 4px 6px;
     }
 }
+
+/* Phân trang địa điểm. */
+.places-pagination {
+    display: flex; align-items: center; justify-content: center;
+    flex-wrap: wrap; gap: 8px; margin: 28px 0 0;
+}
+.places-page-control {
+    min-width: 40px; min-height: 40px; padding: 7px 12px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid #cfe1f5; border-radius: 11px;
+    background: white; color: #125cac; font-size: 14px; font-weight: 750;
+}
+a.places-page-control:hover { background: #eaf4ff; border-color: #8abdf4; }
+.places-page-control.active { background: #1262cb; color: white; border-color: #1262cb; }
+.places-page-ellipsis { padding: 0 3px; color: #61758d; }

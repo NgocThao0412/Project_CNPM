@@ -50,10 +50,40 @@ public final class VisitorView {
             + "</div>" + link("/map", "Trải nghiệm mô phỏng " + icon("arrow"), "btn btn-light")
             + "</div>";
     }
-    public String places(List<Map<String,Object>> pois,String q) {
+    public String places(List<Map<String,Object>> pois,String q,String requestedPage) {
+        // Phân trang địa điểm: 6 POI mỗi trang.
         String term=q.toLowerCase(Locale.ROOT).trim();
         var shown=pois.stream().filter(m->(Data.text(m,"poiName")+" "+Data.text(m,"poiCode")+" "+Data.text(m,"areaName")).toLowerCase(Locale.ROOT).contains(term)).toList();
-        return "<div class=\"page-intro\"><div><span class=\"eyebrow\"></span><h1>Địa điểm tham quan</h1><p></p></div>"+link("/map",icon("map")+"Xem trên bản đồ","btn btn-light")+"</div>"+search("/places",q,"Tìm tên địa điểm, mã POI hoặc khu vực...")+"<div class=\"count\">"+shown.size()+" địa điểm đang hiển thị</div><div class=\"cards\">"+cards(shown)+"</div>";
+        int page=1;
+        try { page=Integer.parseInt(requestedPage); } catch(NumberFormatException ignored) { }
+        int totalPages=Math.max(1,(shown.size()+5)/6);
+        page=Math.max(1,Math.min(page,totalPages));
+        int from=(page-1)*6;
+        var rows=shown.subList(from,Math.min(from+6,shown.size()));
+        StringBuilder pagination=new StringBuilder();
+        if(totalPages>1) {
+            String base="/places?page=";
+            String query=q.isBlank()?"":"&q="+Http.enc(q);
+            pagination.append("<nav class=\"places-pagination\" aria-label=\"Phân trang địa điểm\"> ");
+            if(page>1) pagination.append("<a class=\"places-page-control\" aria-label=\"Trang tr\u01b0\u1edbc\" href=\"")
+                    .append(e(base+(page-1)+query)).append("\">&larr;</a>");
+            for(int i=1;i<=totalPages;i++) {
+                if(i==1||i==totalPages||Math.abs(i-page)<=2) {
+                    if(i==page) pagination.append("<span class=\"places-page-control active\" aria-current=\"page\">").append(i).append("</span>");
+                    else pagination.append(link(base+i+query,String.valueOf(i),"places-page-control"));
+                } else if(i==2||i==totalPages-1) {
+                    pagination.append("<span class=\"places-page-ellipsis\" aria-hidden=\"true\">&hellip;</span>");
+                }
+            }
+            if(page<totalPages) pagination.append("<a class=\"places-page-control\" aria-label=\"Trang sau\" href=\"")
+                    .append(e(base+(page+1)+query)).append("\">&rarr;</a>");
+            pagination.append("</nav>");
+        }
+        return "<div class=\"page-intro\"><div><span class=\"eyebrow\"></span><h1>Địa điểm tham quan</h1><p></p></div>"
+                +link("/map",icon("map")+"Xem trên bản đồ","btn btn-light")+"</div>"
+                +search("/places",q,"Tìm tên địa điểm, mã POI hoặc khu vực...")
+                +"<div class=\"count\">"+shown.size()+" địa điểm đang hiển thị</div>"
+                +"<div class=\"cards\">"+cards(rows)+"</div>"+pagination;
     }
     public static String search(String action,String q,String placeholder) {
         return "<form class=\"search-bar\" method=\"get\" action=\""+e(action)+"\">"+icon("search")+"<input name=\"q\" aria-label=\"Tìm kiếm\" value=\""+e(q)+"\" placeholder=\""+e(placeholder)+"\"><button class=\"btn\">Tìm kiếm</button></form>";

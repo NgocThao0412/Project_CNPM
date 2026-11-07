@@ -147,7 +147,8 @@ public final class UiLanguage {
         "Chọn điểm dừng","Choose a stop", "Tìm POI phù hợp","Find nearby POI",
         "Địa điểm được chọn ở chế độ mô phỏng. Không yêu cầu truy cập vị trí của bạn.","This is a simulated location. Your real location is not requested.",
         "Chưa có POI trên bản đồ","No POIs on the map",
-        "Chọn ngôn ngữ / Select language","Choose language", "Ngôn ngữ / Language","Language"
+        "Chọn ngôn ngữ / Select language","Choose language", "Ngôn ngữ / Language","Language",
+        "Phân trang địa điểm","Place pagination", "Trang trước","Previous page", "Trang sau","Next page"
     );
     private static final Map<String,String> ZH=texts(
         "Trường Đại học Sài Gòn","西贡大学",
@@ -178,7 +179,8 @@ public final class UiLanguage {
         "Vĩ độ","纬度","Kinh độ","经度", "Chọn điểm dừng","选择站点", "Tìm POI phù hợp","查找附近地点",
         "Địa điểm được chọn ở chế độ mô phỏng. Không yêu cầu truy cập vị trí của bạn.","当前使用模拟位置，不会请求您的实际位置。",
         "Chưa có POI trên bản đồ","地图上暂无地点",
-        "Chọn ngôn ngữ / Select language","选择语言", "Ngôn ngữ / Language","语言"
+        "Chọn ngôn ngữ / Select language","选择语言", "Ngôn ngữ / Language","语言",
+        "Phân trang địa điểm","地点分页", "Trang trước","上一页", "Trang sau","下一页"
     );
     private static final Map<String,String> KO=texts(
         "Trường Đại học Sài Gòn","사이공 대학교",
@@ -209,6 +211,7 @@ public final class UiLanguage {
         "Vĩ độ","위도","Kinh độ","경도", "Chọn điểm dừng","방문지 선택", "Tìm POI phù hợp","근처 장소 찾기",
         "Địa điểm được chọn ở chế độ mô phỏng. Không yêu cầu truy cập vị trí của bạn.","현재 위치는 시뮬레이션이며 실제 위치를 요청하지 않습니다.",
         "Chưa có POI trên bản đồ","지도에 장소가 없습니다",
-        "Chọn ngôn ngữ / Select language","언어 선택", "Ngôn ngữ / Language","언어"
+        "Chọn ngôn ngữ / Select language","언어 선택", "Ngôn ngữ / Language","언어",
+        "Phân trang địa điểm","장소 페이지", "Trang trước","이전 페이지", "Trang sau","다음 페이지"
     );
 }
