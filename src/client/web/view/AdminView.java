@@ -71,6 +71,7 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
      .append(link("/admin/poi", icon("pin") + "Thêm địa điểm", "dash-action action-blue"))
      .append(link("/admin/content", icon("book") + "Thêm thuyết minh", "dash-action action-green"))
      .append(link("/admin/contents", icon("audio") + "Quản lý audio", "dash-action action-violet"))
+     .append(link("/admin/event-routes", icon("map") + "Đường đi tân sinh viên", "dash-action action-blue"))
      .append(link("/status", icon("cloud") + "Kiểm tra API", "dash-action action-light"))
      .append("</div></section>");
 

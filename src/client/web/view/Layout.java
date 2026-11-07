@@ -69,6 +69,7 @@ public final class Layout {
             else if (title.contains("POI")) current = "pois";
             else if ("Người dùng".equals(title) || "Thống kê và báo cáo".equals(title)) current = "users";
             else if ("Quản lý audio".equals(title)) current = "audio";
+            else if (title.contains("đường đi")) current = "routes";
             else if (title.contains("thuyết minh") || title.contains("Nội dung")) current = "contents";
             String person = adminName(session);
             pageContent = "<main id=\"main\" class=\"page admin-shell\">"
@@ -78,6 +79,7 @@ public final class Layout {
                     + "<nav class=\"sidebar-links\">"
                     + sidebar("/admin", "Tổng quan", "home", "overview", current)
                     + sidebar("/admin/pois", "Quản lý địa điểm", "pin", "pois", current)
+                    + sidebar("/admin/event-routes", "Đường đi sự kiện", "map", "routes", current)
                     + sidebar("/admin/contents", "Nội dung thuyết minh", "book", "contents", current)
                     + sidebar("/admin/audio", "Quản lý audio", "audio", "audio", current)
                     + sidebar("/admin/users", "Thống kê và báo cáo", "user", "users", current)
@@ -112,7 +114,7 @@ public final class Layout {
                 + "<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">"
                 + "<title>" + e(title) + " | Saigon Audio Guide</title>"
                 + "<link rel=\"icon\" href=\"/assets/logo-sgu.png\" type=\"image/png\">"
-                + "<link rel=\"stylesheet\" href=\"/assets/app.css?v=flagwave-20261029\">"
+                + "<link rel=\"stylesheet\" href=\"/assets/app.css?v=home-shortcuts-20261108\">"
                 + (adminArea ? "<link rel=\"stylesheet\" href=\"/assets/admin-theme.css?v=restore-20261030\">" : "")
                 + (adminArea && "Thống kê và báo cáo".equals(title) ? "<link rel=\"stylesheet\" href=\"/assets/sgu-reports.css\">" : "")
                 + (adminArea ? "<script defer src=\"/assets/admin-shell.js?v=restore-20261030\"></script>" : "")

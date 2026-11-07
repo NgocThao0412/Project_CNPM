@@ -1,0 +1,12 @@
+/* MapTiler 2D/3D switch. Controls are inside the original map panel. */
+.sgu-map-stage { position: relative; isolation: isolate; }
+.sgu-map-mode { position:absolute; top:16px; left:16px; z-index:10; display:flex; gap:3px; padding:4px; border:1px solid #d6e4f6; border-radius:14px; background:rgba(255,255,255,.95); box-shadow:0 4px 14px rgba(9,45,88,.15); }
+.sgu-map-mode button { min-width:52px; min-height:34px; border:0; border-radius:10px; background:transparent; color:#16426a; font-size:13px; font-weight:750; }
+.sgu-map-mode button.active, .sgu-map-mode button[aria-pressed="true"] { color:#fff; background:#1267d7; box-shadow:0 2px 7px #115aba33; }
+.sgu-map-view-status { position:absolute; left:14px; bottom:16px; z-index:5; max-width:calc(100% - 100px); background:rgba(255,255,255,.94); border:1px solid #d5e4f4; color:#254765; border-radius:10px; padding:7px 10px; font-size:11px; line-height:1.5; pointer-events:none; }
+.sgu-map-view-status[data-error="true"] { color:#ae2b36; background:#fff2f1; border-color:#f3d0cf; }
+@media (max-width:620px) {
+  .sgu-map-mode { top:10px; left:10px; padding:3px; }
+  .sgu-map-mode button { min-width:42px; min-height:30px; font-size:12px; }
+  .sgu-map-view-status { max-width:calc(100% - 78px); font-size:10px; bottom:9px; left:9px; }
+}

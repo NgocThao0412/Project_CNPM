@@ -15,6 +15,20 @@ public final class ApiDAO {
     public List<Map<String,Object>> pois(ClientSessionDTO ss,boolean admin)throws Exception {
         return Data.list(call(ss,"GET",admin?"/api/admin/pois":"/api/pois",null));
     }
+    public List<Map<String,Object>> eventRoutes(ClientSessionDTO ss,boolean admin)throws Exception {
+        return Data.list(call(ss,"GET",admin?"/api/admin/event-routes":"/api/event-routes",null));
+    }
+    public Map<String,Object> eventRoute(ClientSessionDTO ss,long id,boolean admin)throws Exception {
+        return Data.map(call(ss,"GET",(admin?"/api/admin/event-routes/":"/api/event-routes/")+id,null));
+    }
+    public long saveEventRoute(ClientSessionDTO ss,long id,Map<String,Object> form)throws Exception {
+        var result=Data.map(call(ss,id==0?"POST":"PUT","/api/admin/event-routes"+(id==0?"":"/"+id),form));
+        return Data.id(result,"id");
+    }
+    public void deleteEventRoute(ClientSessionDTO ss,long id)throws Exception {
+        Http.request("DELETE",s.gateway()+"/api/admin/event-routes/"+id,
+                ss.upstreamCookie,null,null,Map.of()).require();
+    }
     public List<Map<String,Object>> areas(ClientSessionDTO ss)throws Exception {
         return Data.list(call(ss,"GET","/api/campus-areas",null));
     }

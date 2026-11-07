@@ -26,6 +26,14 @@ public final class VisitorView {
         }
         return b.toString();
     }
+    /** Small shortcuts under the hero. Keep event route IDs dynamic in the controller. */
+    private static String homeShortcut(String href,String symbol,String label) {
+        return link(href,
+            "<span class=\"home-shortcut-icon\">" + icon(symbol) + "</span>"
+            + "<strong class=\"home-shortcut-name\">" + e(label) + "</strong>"
+            + "<span class=\"home-shortcut-arrow\">" + icon("arrow") + "</span>",
+            "home-shortcut");
+    }
     public String home(List<Map<String,Object>> pois,List<Map<String,Object>> langs) {
         // The campus is a real background image, not a screenshot with text baked in.
         // Live Java-generated links, buttons, and headings stay accessible on phones.
@@ -40,8 +48,14 @@ public final class VisitorView {
             + link("/map", icon("map") + "Xem bản đồ", "btn btn-light hero-secondary")
             + "</div></div></section>";
         return hero
-            + "<section><div class=\"section-header\"><div>"
-            + "<h2>Điểm dừng chân tiếp theo</h2><p>Mỗi địa điểm là một câu chuyện đang chờ bạn.</p>"
+            + "<nav class=\"home-shortcuts\" aria-label=\"Các mục đường đi và khám phá\">"
+            + homeShortcut("/event-routes?code=NHAP_HOC_TRUC_TIEP", "user", "Nhập học trực tiếp")
+            + homeShortcut("/event-routes?code=KHAM_SUC_KHOE_DAU_KHOA", "check", "Khám sức khỏe")
+            + homeShortcut("/event-routes?code=NOP_HO_SO", "book", "Nộp hồ sơ")
+            + homeShortcut("/places", "map", "Tham quan khuôn viên")
+            + "</nav>"
+            + "<section class=\"home-location-section\"><div class=\"section-header\"><div>"
+            + "<h2>Khám phá địa điểm</h2><p>Tìm hiểu các địa điểm trong khuôn viên Trường Đại học Sài Gòn qua thuyết minh âm thanh.</p>"
             + "</div>" + link("/places", "Tất cả địa điểm " + icon("arrow"), "btn btn-ghost")
             + "</div><div class=\"cards\">" + cards(pois.stream().limit(6).toList()) + "</div></section>"
             + "<div class=\"guide-strip\"><div class=\"icon-tile\">" + icon("map")
@@ -120,6 +134,18 @@ public final class VisitorView {
             list.append(link("/map?id="+Data.id(p,"id")+(osm?"&basemap=osm":""),"<span>"+(i+1)+"</span><div><strong>"+e(p.get("poiName"))+"</strong><small>"+e(p.get("poiCode"))+" · Bán kính "+e(p.get("triggerRadiusM"))+" m</small></div>",Data.id(p,"id")==id?"active":""));
         }
         list.append("</div>");
+        // Reuse the same public POI coordinates and activation radii for live GPS.
+        // This hidden metadata never contains the visitor's position.
+        StringBuilder gpsPois=new StringBuilder("<div id=\"sgu-gps-pois\" hidden>");
+        for (var p:pois) {
+            gpsPois.append("<span class=\"sgu-gps-poi\" data-id=\"").append(Data.id(p,"id"))
+                .append("\" data-name=\"").append(e(p.get("poiName")))
+                .append("\" data-lat=\"").append(Data.number(p,"latitude"))
+                .append("\" data-lon=\"").append(Data.number(p,"longitude"))
+                .append("\" data-radius=\"").append(Data.number(p,"triggerRadiusM"))
+                .append("\"></span>");
+        }
+        gpsPois.append("</div>");
         double lat=Data.number(active,"latitude"),lon=Data.number(active,"longitude");
         String drawing;
         
@@ -127,7 +153,9 @@ if (osm) {
     String mapKey = System.getenv("MAPTILER_API_KEY");
 
     if (mapKey == null || mapKey.isBlank()) {
-        drawing = "<div class=\"map-error\">Chưa cấu hình MapTiler.</div>";
+        drawing = "<div class=\"map-error\" role=\"status\">"
+                + "Chưa cấu hình MapTiler. Đặt MAPTILER_API_KEY để dùng bản đồ 2D/3D; "
+                + "bạn vẫn có thể dùng Sơ đồ tọa độ.</div>";
     } else {
         StringBuilder points = new StringBuilder();
 
@@ -146,10 +174,17 @@ if (osm) {
         drawing =
             "<link rel=\"stylesheet\" "
             + "href=\"https://cdn.maptiler.com/maptiler-sdk-js/v4.2.0/maptiler-sdk.css\">"
+            + "<link rel=\"stylesheet\" href=\"/assets/map-3d.css\">"
+            + "<div class=\"sgu-map-stage\">"
+            + "<div class=\"sgu-map-mode\" role=\"group\" aria-label=\"Chế độ bản đồ\">"
+            + "<button type=\"button\" id=\"sgu-map-2d\" aria-pressed=\"false\">2D</button>"
+            + "<button type=\"button\" id=\"sgu-map-3d\" aria-pressed=\"true\">3D</button>"
+            + "</div>"
+            + "<div id=\"sgu-map-view-status\" class=\"sgu-map-view-status\" role=\"status\" aria-live=\"polite\">Đang tải bản đồ…</div>"
             + "<div id=\"sgu-map\" class=\"sgu-map-canvas\""
             + " data-key=\"" + e(mapKey) + "\""
             + " data-lat=\"" + lat + "\""
-            + " data-lon=\"" + lon + "\"></div>"
+            + " data-lon=\"" + lon + "\"></div></div>"
             + "<div id=\"sgu-map-points\" hidden>"
             + points
             + "</div>"
@@ -158,7 +193,10 @@ if (osm) {
     }
 } else {
             double minLat=pois.stream().mapToDouble(m->Data.number(m,"latitude")).min().orElse(lat)-.0004,maxLat=pois.stream().mapToDouble(m->Data.number(m,"latitude")).max().orElse(lat)+.0004,minLon=pois.stream().mapToDouble(m->Data.number(m,"longitude")).min().orElse(lon)-.0004,maxLon=pois.stream().mapToDouble(m->Data.number(m,"longitude")).max().orElse(lon)+.0004;
-            StringBuilder svg=new StringBuilder("<svg viewBox=\"0 0 760 460\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"Sơ đồ tọa độ POI. Bấm từng điểm để mô phỏng.\"><defs><pattern id=\"grid\" width=\"48\" height=\"48\" patternUnits=\"userSpaceOnUse\"><path d=\"M48 0H0V48\" fill=\"none\" stroke=\"#c5dcea\" stroke-width=\"1\"/></pattern></defs><rect width=\"760\" height=\"460\" fill=\"url(#grid)\"/><rect x=\"25\" y=\"22\" width=\"225\" height=\"48\" rx=\"13\" fill=\"white\"/><text x=\"42\" y=\"51\" font-size=\"12\" font-family=\"Arial\" fill=\"#2c628b\">Sơ đồ tọa độ · Mô phỏng</text>");
+            // Equal POI coordinates must still yield a nonzero diagram scale.
+            if(maxLat-minLat<0.00001) { minLat-=0.0004; maxLat+=0.0004; }
+            if(maxLon-minLon<0.00001) { minLon-=0.0004; maxLon+=0.0004; }
+            StringBuilder svg=new StringBuilder("<svg id=\"sgu-coordinate-diagram\" data-min-lat=\""+minLat+"\" data-max-lat=\""+maxLat+"\" data-min-lon=\""+minLon+"\" data-max-lon=\""+maxLon+"\" viewBox=\"0 0 760 460\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"Sơ đồ tọa độ POI. Bấm từng điểm để mô phỏng.\"><defs><pattern id=\"grid\" width=\"48\" height=\"48\" patternUnits=\"userSpaceOnUse\"><path d=\"M48 0H0V48\" fill=\"none\" stroke=\"#c5dcea\" stroke-width=\"1\"/></pattern></defs><rect width=\"760\" height=\"460\" fill=\"url(#grid)\"/><rect x=\"25\" y=\"22\" width=\"225\" height=\"48\" rx=\"13\" fill=\"white\"/><text x=\"42\" y=\"51\" font-size=\"12\" font-family=\"Arial\" fill=\"#2c628b\">Sơ đồ tọa độ · Mô phỏng</text>");
             for(var p:pois) {
                 double x=70+(Data.number(p,"longitude")-minLon)/(maxLon-minLon)*620,y=390-(Data.number(p,"latitude")-minLat)/(maxLat-minLat)*290;
                 String px=String.format(Locale.ROOT,"%.2f",x),py=String.format(Locale.ROOT,"%.2f",y);
@@ -167,7 +205,20 @@ if (osm) {
                 if(on)svg.append("<circle cx=\"").append(px).append("\" cy=\"").append(py).append("\" r=\"33\" fill=\"#149aea22\"/>");
                 svg.append("<circle class=\"map-pin ").append(on?"active":"").append("\" cx=\"").append(px).append("\" cy=\"").append(py).append("\" r=\"14\"/><text class=\"map-label\" text-anchor=\"middle\" x=\"").append(px).append("\" y=\"").append(String.format(Locale.ROOT,"%.2f",y+35)).append("\">").append(e(p.get("poiName"))).append("</text></a>");
             }
-            drawing=svg.append("</svg>").toString();
-        } return "<div class=\"page-intro\"><div><span class=\"eyebrow\"></span><h1>Bản đồ khám phá</h1><p></p></div>"+link("/map?id="+id+(osm?"":"&basemap=osm"),icon("map")+(osm?"Sơ đồ tọa độ":"Bản đồ OpenStreetMap"),"btn btn-light")+"</div><div class=\"map-grid\"><div><div class=\"map-board\">"+drawing+"<div class=\"map-legend\"><span>"+(osm?"© OpenStreetMap contributors":"Sơ đồ tọa độ, không phải bản đồ đường đi")+"</span><span>"+e(lat)+", "+e(lon)+"</span></div></div><p class=\"map-disclaimer\">Bản đồ nền OpenStreetMap cần Internet. Sơ đồ tọa độ vẫn hoạt động khi không tải được bản đồ nền.</p><section class=\"panel\"><h3>Mô phỏng GPS bằng tọa độ</h3><p class=\"help\"></p><form method=\"post\" action=\"/simulate\">"+hidden("csrf",ss.csrf)+"<div class=\"form-grid\">"+input("Vĩ độ","latitude",lat,"number","required min=\"-90\" max=\"90\" step=\"0.0000001\"")+input("Kinh độ","longitude",lon,"number","required min=\"-180\" max=\"180\" step=\"0.0000001\"")+"</div><div class=\"form-actions\"><button class=\"btn\">"+icon("pin")+"Tìm POI phù hợp</button></div></form></section></div><aside class=\"panel\"><h2>Chọn điểm dừng</h2><p class=\"help\">"+pois.size()+" địa điểm trong danh sách</p>"+list+"<div class=\"tip\">"+icon("pin")+"<span>Đang mô phỏng tại <strong>"+e(active.get("poiName"))+"</strong>.</span></div><div class=\"form-actions\">"+link("/place?id="+id,icon("audio")+"Nghe thuyết minh","btn")+"</div></aside></div>";
+            drawing=svg.append("<g id=\"sgu-gps-layer\" pointer-events=\"none\"></g></svg>").toString();
+        } return "<div class=\"page-intro\"><div><span class=\"eyebrow\"></span><h1>Bản đồ khám phá</h1><p></p></div>"+link("/map?id="+id+(osm?"":"&basemap=osm"),icon("map")+(osm?"Sơ đồ tọa độ":"Bản đồ OpenStreetMap"),"btn btn-light")+"</div><div class=\"map-grid\"><div><div class=\"map-board\">"+drawing+"<div class=\"map-legend\"><span>"+(osm?"© OpenStreetMap contributors":"Sơ đồ tọa độ, không phải bản đồ đường đi")+"</span><span>"+e(lat)+", "+e(lon)+"</span></div></div><p class=\"map-disclaimer\">Bản đồ nền OpenStreetMap cần Internet. Sơ đồ tọa độ vẫn hoạt động khi không tải được bản đồ nền.</p>"
+            + gpsPois
+            + "<section class=\"panel sgu-gps-panel\" aria-labelledby=\"sgu-gps-heading\">"
+            + "<h3 id=\"sgu-gps-heading\">Định vị GPS thực tế</h3>"
+            + "<p class=\"help\">Sử dụng vị trí thật của điện thoại (cần HTTPS và cho phép truy cập vị trí). Không gửi tọa độ về máy chủ.</p>"
+            + "<div class=\"sgu-gps-actions\"><button type=\"button\" id=\"sgu-gps-start\" class=\"btn\">Bật GPS thực tế</button>"
+            + "<button type=\"button\" id=\"sgu-gps-center\" class=\"btn btn-light\" disabled>Vị trí của tôi</button>"
+            + "<button type=\"button\" id=\"sgu-gps-stop\" class=\"btn btn-light\" disabled>Dừng GPS</button></div>"
+            + "<p id=\"sgu-gps-status\" class=\"sgu-gps-status\" role=\"status\" aria-live=\"polite\">Chưa bật GPS. Chạm nút để yêu cầu quyền định vị.</p>"
+            + "<p id=\"sgu-gps-coordinates\" class=\"sgu-gps-info\" hidden></p>"
+            + "<div id=\"sgu-gps-nearest\" class=\"sgu-gps-nearest\" hidden><p id=\"sgu-gps-nearest-text\"></p>"
+            + "<a id=\"sgu-gps-nearest-link\" class=\"btn btn-light btn-small\" href=\"/places\" hidden>Xem POI gần nhất</a></div>"
+            + "</section><script defer src=\"/assets/visitor-gps.js\"></script>"
+            + "<section class=\"panel\"><h3>Mô phỏng GPS bằng tọa độ</h3><p class=\"help\"></p><form method=\"post\" action=\"/simulate\">"+hidden("csrf",ss.csrf)+"<div class=\"form-grid\">"+input("Vĩ độ","latitude",lat,"number","required min=\"-90\" max=\"90\" step=\"0.0000001\"")+input("Kinh độ","longitude",lon,"number","required min=\"-180\" max=\"180\" step=\"0.0000001\"")+"</div><div class=\"form-actions\"><button class=\"btn\">"+icon("pin")+"Tìm POI phù hợp</button></div></form></section></div><aside class=\"panel\"><h2>Chọn điểm dừng</h2><p class=\"help\">"+pois.size()+" địa điểm trong danh sách</p>"+list+"<div class=\"tip\">"+icon("pin")+"<span>Đang mô phỏng tại <strong>"+e(active.get("poiName"))+"</strong>.</span></div><div class=\"form-actions\">"+link("/place?id="+id,icon("audio")+"Nghe thuyết minh","btn")+"</div></aside></div>";
     }
 }

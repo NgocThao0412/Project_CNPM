@@ -20,6 +20,7 @@ public final class ClientController {
     private final GatewayController gateway;
     private final Layout layout;
     private final VisitorView visitor;
+    private final EventRouteView eventRoutes;
     private final AdminView admin;
     private final Map<String,ClientSessionDTO> sessions=new ConcurrentHashMap<>();
     public ClientController(Settings s) throws Exception {
@@ -29,6 +30,7 @@ public final class ClientController {
         activity=new VisitorActivityDAO(s);
         layout=new Layout(s);
         visitor=new VisitorView(s);
+        eventRoutes=new EventRouteView();
         admin=new AdminView(s);
     } private void setCookie(HttpExchange x,ClientSessionDTO ss) {
         String secure=Boolean.parseBoolean(s.get("web.secure.cookie","false"))?"; Secure":"";
@@ -246,6 +248,84 @@ public final class ClientController {
                 error=ex.getMessage();
             }
             page(x,ss,Data.text(poi,"poiName"),"places",visitor.detail(poi,languages,n,audio,lang,preview,error));
+            return;
+        } if(p.equals("/event-routes")&&method.equals("GET")) {
+            List<Map<String,Object>> publishedRoutes=api.eventRoutes(ss,false);
+            String requestedCode=q.getOrDefault("code", "");
+            if (!requestedCode.isBlank()) {
+                Map<String,Object> destination=null;
+                for (Map<String,Object> route:publishedRoutes) {
+                    if (requestedCode.equals(Data.text(route,"routeCode"))) {
+                        destination=route;
+                        break;
+                    }
+                }
+                // 'Nộp hồ sơ' is step 3 in the existing in-person admission workflow.
+                boolean jumpToPaperwork=false;
+                if (destination==null && "NOP_HO_SO".equals(requestedCode)) {
+                    for (Map<String,Object> route:publishedRoutes) {
+                        if ("NHAP_HOC_TRUC_TIEP".equals(Data.text(route,"routeCode"))) {
+                            destination=route;
+                            jumpToPaperwork=true;
+                            break;
+                        }
+                    }
+                }
+                if (destination!=null) {
+                    Http.redirect(x,"/event-route?id="+Data.id(destination,"id")
+                            +(jumpToPaperwork?"#event-step-3":""));
+                    return;
+                }
+            }
+            page(x,ss,"Đường đi tân sinh viên","routes",eventRoutes.publicList(publishedRoutes));
+            return;
+        } if(p.equals("/event-route")&&method.equals("GET")) {
+            long routeId=id(q);
+            if(routeId<=0)throw new Http.Error(400,"Vui lòng chọn lộ trình.");
+            page(x,ss,"Hướng dẫn đường đi","routes",eventRoutes.publicDetail(api.eventRoute(ss,routeId,false)));
+            return;
+        } if(p.equals("/admin/event-routes")&&method.equals("GET")) {
+            page(x,ss,"Quản lý đường đi sự kiện","admin",eventRoutes.adminList(api.eventRoutes(ss,true)));
+            return;
+        } if(p.equals("/admin/event-route")&&method.equals("GET")) {
+            long routeId=id(q);
+            Map<String,Object> route=routeId==0?new LinkedHashMap<>():api.eventRoute(ss,routeId,true);
+            page(x,ss,"Biên tập đường đi","admin",eventRoutes.adminForm(ss,route,api.pois(ss,true),""));
+            return;
+        } if(p.equals("/admin/event-route/save")&&method.equals("POST")) {
+            long routeId=id(f);
+            List<Map<String,Object>> stops=new ArrayList<>();
+            for(int n=1;n<=12;n++){
+                String title=f.getOrDefault("stopTitle"+n,"").trim();
+                if(title.isEmpty())continue;
+                stops.add(Data.row("title",title,"instructions",f.getOrDefault("stopInstructions"+n,""),
+                    "locationLabel",f.getOrDefault("stopLocation"+n,""),
+                    "poiId",f.getOrDefault("stopPoi"+n,"0"),
+                    "durationMinutes",f.getOrDefault("stopMinutes"+n,"0")));
+            }
+            Map<String,Object> form=new LinkedHashMap<>();
+            form.put("routeCode",f.getOrDefault("routeCode",""));
+            form.put("title",f.getOrDefault("title",""));
+            form.put("summary",f.getOrDefault("summary",""));
+            form.put("audience",f.getOrDefault("audience","Tân sinh viên"));
+            form.put("published","true".equals(f.get("published")));
+            form.put("template","true".equals(f.get("template")));
+            form.put("stops",stops);
+            try {
+                api.saveEventRoute(ss,routeId,form);
+                success(x,"/admin/event-routes","Đã lưu lộ trình.");
+            } catch(Http.Error ex){
+                if(ex.status==401)throw ex;
+                Map<String,Object> draft=new LinkedHashMap<>(form);
+                draft.put("id",routeId);
+                page(x,ss,"Biên tập đường đi","admin",eventRoutes.adminForm(ss,draft,api.pois(ss,true),ex.getMessage()));
+            }
+            return;
+        } if(p.equals("/admin/event-route/delete")&&method.equals("POST")) {
+            long routeId=id(f);
+            if(routeId<=0)throw new Http.Error(400,"Mã lộ trình không hợp lệ.");
+            api.deleteEventRoute(ss,routeId);
+            success(x,"/admin/event-routes","Đã xóa lộ trình.");
             return;
         } if(p.equals("/map")&&method.equals("GET")) {
             page(x,ss,"Bản đồ","map",visitor.map(ss,api.pois(ss,false),id(q),"osm".equals(q.get("basemap"))));

@@ -743,3 +743,140 @@ body.login-page .error-box { margin: 0 0 18px; }
 a.places-page-control:hover { background: #eaf4ff; border-color: #8abdf4; }
 .places-page-control.active { background: #1262cb; color: white; border-color: #1262cb; }
 .places-page-ellipsis { padding: 0 3px; color: #61758d; }
+
+/* SGU event routes - additive styles; original POI map and header layout unchanged. */
+.event-note{padding:15px 20px;background:#eef6ff;border:1px solid #cde1fa;border-radius:16px;color:#244c77;font-size:13px;line-height:1.65;margin:18px 0 24px}
+.event-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px;margin:24px 0 40px}
+.event-card{background:#fff;border:1px solid #dbe8f8;border-radius:21px;padding:25px;box-shadow:0 10px 35px #215da50d;display:flex;flex-direction:column;gap:13px}
+.event-card h2{font-size:21px;color:#0b3266;margin:3px 0}.event-card p{color:#58708b;font-size:13px;line-height:1.7;flex:1}
+.event-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.event-card-bottom small{font-size:12px;color:#7188a4}
+.event-tag{display:inline-flex;align-self:flex-start;border-radius:999px;padding:7px 11px;background:#def6e9;color:#116a46;font-size:11px;font-weight:750}
+.event-tag.sample{background:#fff5de;color:#875a0e}
+.event-detail-head{padding:10px 0 22px}.event-detail-head h1{font-size:clamp(28px,3.5vw,43px);color:#0c315f;margin:15px 0}.event-detail-head p{color:#5d718b;max-width:760px;line-height:1.7}
+.event-steps{max-width:940px;padding:8px 0 10px}.event-step{display:grid;grid-template-columns:50px minmax(0,1fr);gap:15px;position:relative;min-height:130px}
+.event-step:not(:last-child):before{content:"";position:absolute;top:44px;bottom:-5px;left:22px;width:3px;border-radius:4px;background:#d8e9fc}
+.event-step-index{border:2px solid #c6dfff;position:relative;z-index:1;background:#e9f5ff;color:#1262cb;border-radius:50%;width:47px;height:47px;display:grid;place-items:center;font-size:17px;font-weight:850}
+.event-step-body{border:1px solid #dce8f6;background:#fff;border-radius:19px;padding:21px 23px;margin-bottom:18px;min-width:0}
+.event-step-body h2{font-size:19px;margin:0 0 12px;color:#123d75}.event-step-body p{margin:0 0 15px;color:#425a75;line-height:1.7;font-size:14px;white-space:pre-line}
+.event-step-footer{display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;color:#66809d;font-size:12px}.event-step-footer .icon{width:16px;height:16px;vertical-align:middle}
+.event-waiting{padding:6px 10px;border-radius:9px;background:#fff5de;color:#916419}.event-end-actions{padding:20px 0 40px}
+.event-editor{max-width:1100px}.event-editor .form-grid{margin:18px 0}.event-editor-flags{display:flex;flex-wrap:wrap;gap:18px;margin:20px 0}.event-editor-flags label{display:flex;gap:9px;align-items:center;font-size:13px;font-weight:650}
+.event-editor-step{border:1px solid #dce8f6;border-radius:16px;margin:11px 0;overflow:hidden;background:#fbfdff}.event-editor-step summary{cursor:pointer;padding:15px 18px;font-weight:750;color:#174678}.event-editor-step[open] summary{border-bottom:1px solid #e1edfa}
+.event-editor-step>.form-grid,.event-editor-step>.field{margin:15px 17px}.event-delete{margin-top:15px}.event-delete button{color:#9e2b32}
+@media(max-width:620px){.event-cards{grid-template-columns:1fr}.event-card{padding:20px}.event-step{grid-template-columns:38px minmax(0,1fr);gap:9px}.event-step-index{width:37px;height:37px;font-size:14px}.event-step:not(:last-child):before{top:34px;left:17px}.event-step-body{padding:16px}.event-step-body h2{font-size:16px}.event-step-body p{font-size:13px}.event-editor-step>.form-grid{margin:11px}.event-editor-step>.field{margin:11px}.bottom-nav{justify-content:space-around}.bottom-nav a{min-width:0}}
+
+
+/* Home quick links – simple four-card row beneath the original SGU hero. */
+.hero.hero--immersive { margin-bottom: 25px; }
+.home-shortcuts {
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px; margin:0 0 34px;
+}
+.home-shortcut {
+  display:flex; align-items:center; gap:12px; min-width:0; min-height:72px;
+  padding:12px 13px; background:#fff; border:1px solid #dce9f9;
+  border-radius:15px; box-shadow:0 4px 14px rgba(18,77,142,.035);
+  color:#103b72; transition:border-color .18s,background .18s,transform .18s;
+}
+.home-shortcut:hover,.home-shortcut:focus-visible {
+  border-color:#89bdfd; background:#f3f9ff; transform:translateY(-2px);
+}
+.home-shortcut:focus-visible { outline:3px solid #7ab7ff; outline-offset:2px; }
+.home-shortcut-icon {
+  display:grid; place-items:center; width:39px; height:39px; flex-shrink:0;
+  border-radius:11px; background:#e8f3ff; color:#0868d7;
+}
+.home-shortcut-icon .icon { width:20px; height:20px; }
+.home-shortcut-name { font-size:13px; line-height:1.25; font-weight:800; min-width:0; }
+.home-shortcut-arrow { margin-left:auto; display:grid; place-items:center; color:#1773de; flex-shrink:0; }
+.home-shortcut-arrow .icon { width:17px; height:17px; }
+.home-location-section .section-header h2 { color:#103e79; }
+.home-location-section .cards { grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+.home-location-section .poi-card {
+  display:grid; grid-template-columns:minmax(0,46%) minmax(0,1fr);
+  min-width:0; min-height:188px; overflow:hidden;
+}
+.home-location-section .card-image { width:100%; height:100%; min-height:188px; }
+.home-location-section .card-image img { width:100%; height:100%; object-fit:cover; }
+.home-location-section .card-body { min-width:0; padding:14px 16px; }
+.home-location-section .card-body p { min-height:0; }
+.event-step { scroll-margin-top:125px; }
+@media(max-width:1050px) {
+  .home-shortcuts { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(max-width:720px) {
+  .home-location-section .cards { grid-template-columns:1fr; }
+}
+@media(max-width:620px) {
+  .home-shortcuts { gap:9px; margin:0 0 28px; }
+  .home-shortcut { min-height:68px; padding:10px; gap:9px; }
+  .home-shortcut-icon { width:36px; height:36px; }
+  .home-shortcut-name { font-size:12px; }
+  .home-location-section .poi-card { display:flex; flex-direction:row; min-height:135px; }
+  .home-location-section .card-image { width:112px; height:auto; min-height:112px; flex:0 0 112px; }
+  .home-location-section .card-body { padding:4px 5px 4px 0; }
+  .event-step { scroll-margin-top:170px; }
+}
+@media(max-width:390px) {
+  .home-shortcuts { grid-template-columns:1fr; }
+  .home-shortcut { min-height:55px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .home-shortcut { transition:none; }
+  .home-shortcut:hover { transform:none; }
+}
+
+
+/* Real GPS: additive controls on the existing visitor map page only. */
+.sgu-gps-panel { margin-bottom: 18px; }
+.sgu-gps-actions { display:flex; flex-wrap:wrap; gap:9px; margin: 12px 0; }
+.sgu-gps-actions .btn { font-size:12px; min-height:38px; }
+.sgu-gps-actions .btn:disabled { opacity:.48; cursor:not-allowed; }
+.sgu-gps-status, .sgu-gps-info, .sgu-gps-nearest { font-size:12px; line-height:1.65; margin:9px 0 0; overflow-wrap:anywhere; }
+.sgu-gps-status { color:#244465; }
+.sgu-gps-status[data-state="error"] { color:#a72b32; }
+.sgu-gps-nearest { border-top:1px solid var(--line); padding-top:10px; }
+.sgu-gps-nearest p { margin:0 0 9px; }
+.sgu-gps-marker { position:relative; width:17px; height:17px; pointer-events:none; }
+.sgu-gps-accuracy { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(13,125,235,.14); border:1px solid rgba(13,125,235,.5); border-radius:50%; pointer-events:none; }
+.sgu-gps-dot { position:absolute; width:17px; height:17px; top:0; left:0; border-radius:50%; background:#0d7deb; border:3px solid white; box-shadow:0 0 0 2px rgba(13,125,235,.32),0 2px 6px #0003; }
+#sgu-gps-layer .sgu-gps-circle { fill:rgba(13,125,235,.14); stroke:rgba(13,125,235,.58); stroke-width:1.5; }
+#sgu-gps-layer .sgu-gps-position { fill:#0d7deb; stroke:white; stroke-width:3; }
+@media (max-width:620px) { .sgu-gps-actions .btn { flex:1 1 auto; padding:9px 10px; } }
+
+/* Responsive safety for the map and GPS restoration (keeps the current home layout). */
+@media (max-width: 860px) {
+  .map-grid > * { min-width: 0; }
+  .sgu-gps-panel { max-width: 100%; }
+}
+@media (max-width: 620px) {
+  .sgu-map-stage, .sgu-map-canvas { max-width: 100%; }
+  .sgu-gps-actions { display: flex; flex-wrap: wrap; }
+  .sgu-gps-actions .btn { min-width: 0; }
+}
+
+/* SGU_STICKY_MAP_STOP_PANEL_BEGIN */
+/* Only the right-hand "Chon diem dung" panel on /map.
+   Wheel outside: scrolls the page; wheel inside: scrolls this panel if needed. */
+@media (min-width: 921px) {
+  .map-grid > aside.panel {
+    position: sticky;
+    top: 112px; /* below the fixed/sticky header */
+    align-self: start;
+    max-height: calc(100vh - 132px);
+    max-height: calc(100dvh - 132px);
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #b6d7f5 transparent;
+  }
+}
+/* On small screens keep the card in the natural page flow. */
+@media (max-width: 920px) {
+  .map-grid > aside.panel {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+}
+/* SGU_STICKY_MAP_STOP_PANEL_END */
