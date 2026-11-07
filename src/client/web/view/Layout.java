@@ -33,8 +33,7 @@ public final class Layout {
 
         String waveBars = "<i></i><i></i><i></i><i></i><i></i>";
         String waveDecoration = "<div class=\"header-wave-decor\" aria-hidden=\"true\">"
-                + "<span class=\"header-wave header-wave--left\">" + waveBars + "</span>"
-                + "<span class=\"header-wave header-wave--right\">" + waveBars + "</span></div>";
+                + "<span class=\"header-wave\">" + waveBars + "</span></div>";
 
         String center = management ? ""
                 : "<div class=\"header-center\">"
