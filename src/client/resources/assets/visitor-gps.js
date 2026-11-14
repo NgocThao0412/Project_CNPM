@@ -152,49 +152,55 @@
         }
 
         // Tim bai thuyet minh theo POI va ngon ngu.
-        const narrationResponse = await fetch(
-          '/api/narrations?poiId=' +
+
+        // Lay dung MP3 ma trang nghe thu cong dang su dung.
+        const detailUrl = '/place?id=' +
           encodeURIComponent(point.id) +
-          '&languageCode=' +
-          encodeURIComponent(language)
+          '&lang=' + encodeURIComponent(language);
+
+        const response = await fetch(detailUrl, {
+          credentials: 'same-origin',
+          cache: 'no-store'
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            'Không tải được trang thuyết minh: HTTP ' + response.status
+          );
+        }
+
+        const html = await response.text();
+        const detailDocument = new DOMParser()
+          .parseFromString(html, 'text/html');
+
+        const manualPlayer = detailDocument.querySelector(
+          'audio[data-visitor-audio="1"]'
         );
 
-        if (!narrationResponse.ok) {
-          throw new Error('Không tải được bài thuyết minh.');
+        if (!manualPlayer) {
+          throw new Error(
+            'POI chưa có MP3 công khai cho ngôn ngữ đã chọn.'
+          );
         }
 
-        const narrations = await narrationResponse.json();
-        const narration = narrations[0];
+        const audioSrc = manualPlayer.getAttribute('src');
+        const audioId = manualPlayer.dataset.audioId;
 
-        if (!narration) {
-          throw new Error('POI chưa có bài thuyết minh.');
+        if (!audioSrc || !audioId) {
+          throw new Error('Không tìm thấy nguồn MP3 hợp lệ.');
         }
 
-        // Tim file MP3 cua bai thuyet minh.
-        const audioResponse = await fetch(
-          '/api/audio?contentId=' +
-          encodeURIComponent(narration.id)
-        );
-
-        if (!audioResponse.ok) {
-          throw new Error('Không tải được thông tin audio.');
-        }
-
-        const audios = await audioResponse.json();
-        const audio = audios[0];
-
-        if (!audio) {
-          throw new Error('Chưa có audio cho ngôn ngữ này.');
-        }
 
         // Neu nguoi dung da tat che do khi dang tai,
         // khong phat audio nua.
         if (!autoEnabled) return;
 
         autoPlayer.pause();
-        autoPlayer.dataset.audioId = String(audio.id);
-        autoPlayer.src = '/media/audio/' +
-          encodeURIComponent(audio.id);
+        autoPlayer.dataset.audioId = audioId;
+        autoPlayer.src = new URL(
+          audioSrc,
+          window.location.origin
+        ).href;
         autoPlayer.hidden = false;
 
         await autoPlayer.play();
@@ -233,7 +239,9 @@
         + (uncertain ? ' ' + t.uncertainty : '');
       nearestBox.hidden = false;
       nearestLink.hidden = !inside;
-      if (inside) nearestLink.href = '/place?id=' + encodeURIComponent(point.id);
+      if (inside) {
+        nearestLink.href = '/map?id=' + encodeURIComponent(point.id);
+      }
       if (inside && !uncertain) {
         void tryAutoNarration(point, distance, accuracy);
       }
@@ -572,6 +580,16 @@
         }
       });
     }
+    nearestLink.addEventListener('click', function (event) {
+      const id = new URL(this.href, window.location.href)
+        .searchParams.get('id');
+
+      if (id && typeof window.sguSelectPoi === 'function') {
+        if (window.sguSelectPoi(id)) {
+          event.preventDefault();
+        }
+      }
+    });
     startButton.addEventListener('click', start);
     stopButton.addEventListener('click', () => stop());
     centerButton.addEventListener('click', recenter);
