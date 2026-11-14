@@ -218,7 +218,16 @@ if (osm) {
             + "<p id=\"sgu-gps-coordinates\" class=\"sgu-gps-info\" hidden></p>"
             + "<div id=\"sgu-gps-nearest\" class=\"sgu-gps-nearest\" hidden><p id=\"sgu-gps-nearest-text\"></p>"
             + "<a id=\"sgu-gps-nearest-link\" class=\"btn btn-light btn-small\" href=\"/places\" hidden>Xem POI gần nhất</a></div>"
+            + "<div class=\"sgu-gps-auto\">"
+            + "<button type=\"button\" id=\"sgu-auto-audio-toggle\" "
+            + "class=\"btn btn-light\">Bật thuyết minh tự động</button>"
+            + "<p id=\"sgu-auto-audio-status\" role=\"status\" "
+            +"aria-live=\"polite\">Chế độ tự động đang tắt.</p>"
+            + "<audio id=\"sgu-auto-audio-player\" controls "
+            + "preload=\"none\" data-visitor-audio=\"1\" hidden></audio>"
+            + "</div>"
             + "</section><script defer src=\"/assets/visitor-gps.js\"></script>"
+
             + "<section class=\"panel\"><h3>Mô phỏng GPS bằng tọa độ</h3><p class=\"help\"></p><form method=\"post\" action=\"/simulate\">"+hidden("csrf",ss.csrf)+"<div class=\"form-grid\">"+input("Vĩ độ","latitude",lat,"number","required min=\"-90\" max=\"90\" step=\"0.0000001\"")+input("Kinh độ","longitude",lon,"number","required min=\"-180\" max=\"180\" step=\"0.0000001\"")+"</div><div class=\"form-actions\"><button class=\"btn\">"+icon("pin")+"Tìm POI phù hợp</button></div></form></section></div><aside class=\"panel\"><h2>Chọn điểm dừng</h2><p class=\"help\">"+pois.size()+" địa điểm trong danh sách</p>"+list+"<div class=\"tip\">"+icon("pin")+"<span>Đang mô phỏng tại <strong>"+e(active.get("poiName"))+"</strong>.</span></div><div class=\"form-actions\">"+link("/place?id="+id,icon("audio")+"Nghe thuyết minh","btn")+"</div></aside></div>";
     }
 }

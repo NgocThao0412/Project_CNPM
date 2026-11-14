@@ -98,6 +98,12 @@
     let markerRing = null;
     let latestMapFix = null;
     let firstFix = true;
+    const autoButton = $('sgu-auto-audio-toggle');
+    const autoStatus = $('sgu-auto-audio-status');
+    const autoPlayer = $('sgu-auto-audio-player');
+
+    let autoEnabled = false;
+    const playedPois = new Set();
 
     function setStatus(text, state) {
       status.textContent = text;
@@ -115,6 +121,102 @@
         + Math.cos(radians(lat)) * Math.cos(radians(otherLat)) * Math.sin(dLon / 2) ** 2;
       return 6371000 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(Math.max(0, 1 - a)));
     }
+
+    async function tryAutoNarration(point, distance, accuracy) {
+      if (!autoEnabled || !autoPlayer || !point) return;
+
+      // Chi phat khi nam trong ban kinh va GPS du chinh xac.
+      if (distance > point.radius) return;
+
+      if (!Number.isFinite(accuracy) ||
+        accuracy < 0 ||
+        accuracy > point.radius) {
+        if (autoStatus) {
+          autoStatus.textContent =
+            'Đang chờ tín hiệu GPS chính xác hơn.';
+        }
+        return;
+      }
+
+      const key = language + ':' + point.id;
+      if (playedPois.has(key)) return;
+
+      // Ghi nhan ngay de cac lan GPS cap nhat khong tao
+      // nhieu yeu cau phat am thanh cung luc.
+      playedPois.add(key);
+
+      try {
+        if (autoStatus) {
+          autoStatus.textContent =
+            'Đang tải thuyết minh: ' + point.name;
+        }
+
+        // Tim bai thuyet minh theo POI va ngon ngu.
+        const narrationResponse = await fetch(
+          '/api/narrations?poiId=' +
+          encodeURIComponent(point.id) +
+          '&languageCode=' +
+          encodeURIComponent(language)
+        );
+
+        if (!narrationResponse.ok) {
+          throw new Error('Không tải được bài thuyết minh.');
+        }
+
+        const narrations = await narrationResponse.json();
+        const narration = narrations[0];
+
+        if (!narration) {
+          throw new Error('POI chưa có bài thuyết minh.');
+        }
+
+        // Tim file MP3 cua bai thuyet minh.
+        const audioResponse = await fetch(
+          '/api/audio?contentId=' +
+          encodeURIComponent(narration.id)
+        );
+
+        if (!audioResponse.ok) {
+          throw new Error('Không tải được thông tin audio.');
+        }
+
+        const audios = await audioResponse.json();
+        const audio = audios[0];
+
+        if (!audio) {
+          throw new Error('Chưa có audio cho ngôn ngữ này.');
+        }
+
+        // Neu nguoi dung da tat che do khi dang tai,
+        // khong phat audio nua.
+        if (!autoEnabled) return;
+
+        autoPlayer.pause();
+        autoPlayer.dataset.audioId = String(audio.id);
+        autoPlayer.src = '/media/audio/' +
+          encodeURIComponent(audio.id);
+        autoPlayer.hidden = false;
+
+        await autoPlayer.play();
+
+        if (autoStatus) {
+          autoStatus.textContent =
+            'Đang thuyết minh: ' + point.name;
+        }
+
+      } catch (error) {
+        console.warn('GPS auto narration:', error);
+
+        if (autoStatus) {
+          autoStatus.textContent =
+            'Không thể tự phát audio: ' + error.message +
+            ' Bạn có thể nhấn Play thủ công.';
+        }
+
+        // Không tự thử lại liên tục khi GPS cập nhật.
+      }
+    }
+
     function showClosest(lat, lon, accuracy) {
       if (!points.length || !nearestBox || !nearestText || !nearestLink) return;
       let best = null;
@@ -132,6 +234,9 @@
       nearestBox.hidden = false;
       nearestLink.hidden = !inside;
       if (inside) nearestLink.href = '/place?id=' + encodeURIComponent(point.id);
+      if (inside && !uncertain) {
+        void tryAutoNarration(point, distance, accuracy);
+      }
     }
     function drawDiagram(lat, lon, accuracy) {
       if (!diagram || !diagramLayer) return false;
@@ -444,6 +549,29 @@
 
       if (id) selectPoi(id, false);
     });
+    if (autoButton && autoPlayer) {
+      autoButton.addEventListener('click', () => {
+        autoEnabled = !autoEnabled;
+
+        if (autoEnabled) {
+          autoButton.textContent = 'Tắt thuyết minh tự động';
+          autoStatus.textContent =
+            'Đã bật. Đang chờ GPS nhận diện POI.';
+
+          playedPois.clear();
+
+          // Neu GPS dang co vi tri thi kiem tra ngay.
+          if (latest) {
+            showClosest(latest.lat, latest.lon, latest.accuracy);
+          }
+        } else {
+          autoButton.textContent = 'Bật thuyết minh tự động';
+          autoPlayer.pause();
+          autoStatus.textContent =
+            'Đã tắt thuyết minh tự động.';
+        }
+      });
+    }
     startButton.addEventListener('click', start);
     stopButton.addEventListener('click', () => stop());
     centerButton.addEventListener('click', recenter);
