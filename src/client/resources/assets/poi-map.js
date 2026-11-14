@@ -137,6 +137,7 @@
       const name = point.dataset.name || 'POI';
       const el = document.createElement('a');
       el.className = 'sgu-poi-marker' + (point.dataset.active === 'true' ? ' selected' : '');
+      el.dataset.poiId = point.dataset.id;
       el.href = '/map?id=' + encodeURIComponent(point.dataset.id)
         + '&basemap=osm&view=' + (is3d ? '3d' : '2d');
       el.title = 'Xem địa điểm: ' + name;
@@ -150,6 +151,15 @@
       el.append(pin, label);
       // Keep link semantics for keyboards and touch interaction.
       el.addEventListener('click', function (event) {
+        if (event.button > 0 || event.ctrlKey || event.metaKey ||
+          event.shiftKey || event.altKey) return;
+
+        if (typeof window.sguSelectPoi === 'function' &&
+          window.sguSelectPoi(point.dataset.id)) {
+          event.preventDefault();
+          return;
+        }
+
         event.preventDefault();
         window.location.href = '/map?id=' + encodeURIComponent(point.dataset.id)
           + '&basemap=osm&view=' + (is3d ? '3d' : '2d');

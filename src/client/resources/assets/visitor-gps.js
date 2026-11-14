@@ -144,7 +144,7 @@
       // This diagram has fixed campus bounds; do not show a false clamped GPS position.
       diagramLayer.replaceChildren();
       if (!Number.isFinite(x) || !Number.isFinite(y)
-          || x < 0 || x > 760 || y < 0 || y > 460) return false;
+        || x < 0 || x > 760 || y < 0 || y > 460) return false;
       const ns = 'http://www.w3.org/2000/svg';
       if (Number.isFinite(accuracy) && accuracy > 0) {
         const ellipse = document.createElementNS(ns, 'ellipse');
@@ -188,7 +188,7 @@
         const dot = document.createElement('div');
         dot.className = 'sgu-gps-dot';
         element.append(markerRing, dot);
-        marker = new window.maptilersdk.Marker({ element, anchor:'center' })
+        marker = new window.maptilersdk.Marker({ element, anchor: 'center' })
           .setLngLat([lon, lat]).addTo(map);
         map.on('zoom', accuracyPixels);
       } else marker.setLngLat([lon, lat]);
@@ -272,9 +272,9 @@
     }
     function recenter() {
       if (!latest) return;
-      if (map) map.easeTo({ center:[latest.lon, latest.lat], zoom:Math.max(17, map.getZoom()) });
+      if (map) map.easeTo({ center: [latest.lon, latest.lat], zoom: Math.max(17, map.getZoom()) });
       else if (diagram) {
-        diagram.scrollIntoView({ behavior:'smooth', block:'nearest' });
+        diagram.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         if (!drawDiagram(latest.lat, latest.lon, latest.accuracy)) setStatus(t.outside);
       }
     }
@@ -283,6 +283,167 @@
       map = event.detail.map;
       if (latest) drawMap(latest.lat, latest.lon, latest.accuracy);
     }
+    // Chon POI ma khong tai lai trang, giu GPS that.
+    function selectPoi(poiId, updateHistory = true) {
+      const point = points.find(
+        (item) => String(item.id) === String(poiId)
+      );
+
+      if (!point) return false;
+
+      // Cap nhat POI dang chon trong danh sach.
+      document.querySelectorAll('.map-list a[href*="/map?id="]')
+        .forEach((link) => {
+          try {
+            const id = new URL(link.href, window.location.href)
+              .searchParams.get('id');
+
+            link.classList.toggle('active', id === String(point.id));
+          } catch (_) { }
+        });
+
+      // Cap nhat ghim POI tren ban do MapTiler.
+      document.querySelectorAll('.sgu-poi-marker')
+        .forEach((el) => {
+          el.classList.toggle(
+            'selected',
+            el.dataset.poiId === String(point.id)
+          );
+        });
+
+      // Cap nhat POI tren so do toa do neu co.
+      if (diagram) {
+        diagram.querySelectorAll('a[href*="/map?id="]')
+          .forEach((link) => {
+            const selected = new URL(
+              link.getAttribute('href'),
+              window.location.href
+            ).searchParams.get('id') === String(point.id);
+
+            const pin = link.querySelector('.map-pin');
+
+            if (pin) pin.classList.toggle('active', selected);
+
+            const halo = link.querySelector(
+              'circle[data-selection-halo="true"]'
+            );
+
+            if (halo) halo.remove();
+
+            if (selected && pin) {
+              const ring = document.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'circle'
+              );
+
+              ring.setAttribute('data-selection-halo', 'true');
+              ring.setAttribute('cx', pin.getAttribute('cx'));
+              ring.setAttribute('cy', pin.getAttribute('cy'));
+              ring.setAttribute('r', '33');
+              ring.setAttribute('fill', '#149aea22');
+
+              link.insertBefore(ring, pin);
+            }
+          });
+      }
+
+      // Cap nhat thong tin POI va nut nghe thuyet minh.
+      const sidebar = document.querySelector('.map-grid aside.panel');
+
+      if (sidebar) {
+        const selectedName = sidebar.querySelector('.tip strong');
+
+        if (selectedName) {
+          selectedName.textContent = point.name;
+        }
+
+        const narrationLink = sidebar.querySelector(
+          '.form-actions a[href*="/place?id="]'
+        );
+
+        if (narrationLink) {
+          narrationLink.href = '/place?id=' +
+            encodeURIComponent(point.id);
+        }
+      }
+
+      // Dong bo toa do trong form mo phong.
+      const latInput = document.querySelector(
+        'form[action="/simulate"] input[name="latitude"]'
+      );
+
+      const lonInput = document.querySelector(
+        'form[action="/simulate"] input[name="longitude"]'
+      );
+
+      if (latInput) latInput.value = String(point.lat);
+      if (lonInput) lonInput.value = String(point.lon);
+
+      const legend = document.querySelector(
+        '.map-legend span:last-child'
+      );
+
+      if (legend) {
+        legend.textContent = point.lat + ', ' + point.lon;
+      }
+
+      // Cap nhat URL, khong tai lai trang.
+      if (updateHistory && window.history &&
+        window.history.pushState) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('id', String(point.id));
+
+        window.history.pushState(
+          window.history.state,
+          '',
+          url.pathname + url.search + url.hash
+        );
+      }
+
+      // Di chuyen tam nhin ban do den POI.
+      // Khong xoa marker GPS va khong dung watchPosition.
+      if (map && typeof map.easeTo === 'function') {
+        map.easeTo({
+          center: [point.lon, point.lat],
+          duration: 450
+        });
+      }
+
+      return true;
+    }
+
+    window.sguSelectPoi = selectPoi;
+
+    // Xu ly khi chon POI tu danh sach ben phai.
+    document.addEventListener('click', (event) => {
+      if (event.defaultPrevented || event.button > 0 ||
+        event.ctrlKey || event.metaKey ||
+        event.shiftKey || event.altKey) return;
+
+      const link = event.target.closest &&
+        event.target.closest(
+          '.map-list a[href*="/map?id="], ' +
+          '#sgu-coordinate-diagram a[href*="/map?id="]'
+        );
+
+      if (!link || link.target === '_blank' ||
+        link.hasAttribute('download')) return;
+
+      const id = new URL(link.href, window.location.href)
+        .searchParams.get('id');
+
+      if (id && selectPoi(id)) {
+        event.preventDefault();
+      }
+    });
+
+    // Ho tro nut Back cua trinh duyet.
+    window.addEventListener('popstate', () => {
+      const id = new URL(window.location.href)
+        .searchParams.get('id');
+
+      if (id) selectPoi(id, false);
+    });
     startButton.addEventListener('click', start);
     stopButton.addEventListener('click', () => stop());
     centerButton.addEventListener('click', recenter);
