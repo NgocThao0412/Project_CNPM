@@ -23,11 +23,14 @@ public class POIImageBUS {
     private static final int MAX_IMAGES = 10;
     private final POIImageDAO dao;
     private final Path root;
+    private final Path legacyRoot;
 
     public POIImageBUS(POIImageDAO dao,
-            @Value("${poi.images.directory:./data/poi-images}") String directory) {
+            @Value("${poi.images.directory:./data/AnhPOI}") String directory,
+            @Value("${poi.images.legacy-directory:./data/poi-images}") String legacyDirectory) {
         this.dao = dao;
         this.root = Path.of(directory).toAbsolutePath().normalize();
+        this.legacyRoot = Path.of(legacyDirectory).toAbsolutePath().normalize();
     }
 
     private void positive(long id) {
@@ -112,7 +115,11 @@ public class POIImageBUS {
         String name = url.substring(prefix.length());
         if (!name.matches("[0-9a-f]{32}\\.(jpg|png|webp)")) return null;
         Path file = root.resolve(String.valueOf(poiId)).resolve(name).normalize();
-        return file.startsWith(root) ? file : null;
+        if (!file.startsWith(root)) return null;
+        if (Files.isRegularFile(file)) return file;
+        Path old = legacyRoot.resolve(String.valueOf(poiId)).resolve(name).normalize();
+        if (!old.startsWith(legacyRoot)) return null;
+        return Files.isRegularFile(old) ? old : file;
     }
 
     public record ImageData(String mime, byte[] bytes) { }

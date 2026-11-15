@@ -39,6 +39,7 @@ build/
 /src/backend/poi-service/data/
 # Runtime image storage (never commit visitor/admin uploads)
 /data/poi-images/
+/data/AnhPOI/*/
 # Local-only files
 **/local.properties
 **/.run/
