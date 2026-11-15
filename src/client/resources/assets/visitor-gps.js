@@ -98,12 +98,12 @@
     let markerRing = null;
     let latestMapFix = null;
     let firstFix = true;
-    const autoButton = $('sgu-auto-audio-toggle');
+    let simulatedPosition = null;
     const autoStatus = $('sgu-auto-audio-status');
     const autoPlayer = $('sgu-auto-audio-player');
 
-    let autoEnabled = false;
     const playedPois = new Set();
+    const loadingPois = new Set();
 
     function setStatus(text, state) {
       status.textContent = text;
@@ -123,7 +123,7 @@
     }
 
     async function tryAutoNarration(point, distance, accuracy) {
-      if (!autoEnabled || !autoPlayer || !point) return;
+      if (!autoPlayer || !point) return;
 
       // Chi phat khi nam trong ban kinh va GPS du chinh xac.
       if (distance > point.radius) return;
@@ -139,11 +139,10 @@
       }
 
       const key = language + ':' + point.id;
-      if (playedPois.has(key)) return;
 
-      // Ghi nhan ngay de cac lan GPS cap nhat khong tao
-      // nhieu yeu cau phat am thanh cung luc.
-      playedPois.add(key);
+      if (playedPois.has(key) || loadingPois.has(key)) return;
+
+      loadingPois.add(key);
 
       try {
         if (autoStatus) {
@@ -190,11 +189,6 @@
           throw new Error('Không tìm thấy nguồn MP3 hợp lệ.');
         }
 
-
-        // Neu nguoi dung da tat che do khi dang tai,
-        // khong phat audio nua.
-        if (!autoEnabled) return;
-
         autoPlayer.pause();
         autoPlayer.dataset.audioId = audioId;
         autoPlayer.src = new URL(
@@ -204,6 +198,7 @@
         autoPlayer.hidden = false;
 
         await autoPlayer.play();
+        playedPois.add(key);
 
         if (autoStatus) {
           autoStatus.textContent =
@@ -215,11 +210,10 @@
 
         if (autoStatus) {
           autoStatus.textContent =
-            'Không thể tự phát audio: ' + error.message +
-            ' Bạn có thể nhấn Play thủ công.';
+            'Không thể tự phát audio: ' + error.message;
         }
-
-        // Không tự thử lại liên tục khi GPS cập nhật.
+      } finally {
+        loadingPois.delete(key);
       }
     }
 
@@ -327,7 +321,9 @@
       const onDiagram = drawDiagram(lat, lon, accuracy);
       drawMap(lat, lon, accuracy);
       setStatus(diagram && !onDiagram ? t.active + ' ' + t.outside : t.active);
-      showClosest(lat, lon, accuracy);
+      if (!simulatedPosition) {
+        showClosest(lat, lon, accuracy);
+      }
     }
     function stop(message) {
       generation++;
@@ -480,18 +476,6 @@
         }
       }
 
-      // Dong bo toa do trong form mo phong.
-      const latInput = document.querySelector(
-        'form[action="/simulate"] input[name="latitude"]'
-      );
-
-      const lonInput = document.querySelector(
-        'form[action="/simulate"] input[name="longitude"]'
-      );
-
-      if (latInput) latInput.value = String(point.lat);
-      if (lonInput) lonInput.value = String(point.lon);
-
       const legend = document.querySelector(
         '.map-legend span:last-child'
       );
@@ -557,29 +541,6 @@
 
       if (id) selectPoi(id, false);
     });
-    if (autoButton && autoPlayer) {
-      autoButton.addEventListener('click', () => {
-        autoEnabled = !autoEnabled;
-
-        if (autoEnabled) {
-          autoButton.textContent = 'Tắt thuyết minh tự động';
-          autoStatus.textContent =
-            'Đã bật. Đang chờ GPS nhận diện POI.';
-
-          playedPois.clear();
-
-          // Neu GPS dang co vi tri thi kiem tra ngay.
-          if (latest) {
-            showClosest(latest.lat, latest.lon, latest.accuracy);
-          }
-        } else {
-          autoButton.textContent = 'Bật thuyết minh tự động';
-          autoPlayer.pause();
-          autoStatus.textContent =
-            'Đã tắt thuyết minh tự động.';
-        }
-      });
-    }
     nearestLink.addEventListener('click', function (event) {
       const id = new URL(this.href, window.location.href)
         .searchParams.get('id');
@@ -590,54 +551,80 @@
         }
       }
     });
-    // GPS MO PHONG - NHAP TOA DO BAT KY
-    const simBox = document.createElement('div');
-    simBox.innerHTML = `
-  <h3>GPS mô phỏng</h3>
-  <input id="sim-lat" type="number" step="any"
-         placeholder="Vĩ độ (Latitude)">
-  <input id="sim-lon" type="number" step="any"
-         placeholder="Kinh độ (Longitude)">
-  <button id="sim-apply" type="button">
-    Đặt vị trí mô phỏng
-  </button>
-  <p id="sim-result"></p>
-`;
+    // GPS mo phong: su dung form co san cua nhom
+    const simulationForm = document.querySelector(
+      'form[action="/simulate"]'
+    );
 
-    pointsBox.parentElement.appendChild(simBox);
+    if (simulationForm) {
+      simulationForm.addEventListener('submit', (event) => {
+        const latInput = simulationForm.querySelector(
+          'input[name="latitude"]'
+        );
 
-    document.getElementById('sim-apply').onclick = () => {
-      const lat = Number(document.getElementById('sim-lat').value);
-      const lon = Number(document.getElementById('sim-lon').value);
+        const lonInput = simulationForm.querySelector(
+          'input[name="longitude"]'
+        );
 
-      if (!Number.isFinite(lat) || !Number.isFinite(lon) ||
-        lat < -90 || lat > 90 ||
-        lon < -180 || lon > 180 ||
-        !document.getElementById('sim-lat').value ||
-        !document.getElementById('sim-lon').value) {
-        alert('Tọa độ không hợp lệ');
-        return;
-      }
+        if (!latInput || !lonInput) return;
 
-      // Tinh khoang cach den tung POI
-      const distances = points.map(p => ({
-        ...p,
-        distance: haversine(lat, lon, p.lat, p.lon)
-      })).sort((a, b) => a.distance - b.distance);
+        const lat = Number(latInput.value);
+        const lon = Number(lonInput.value);
 
-      document.getElementById('sim-result').innerHTML =
-        distances.map(p =>
-          `<div>${p.name}: ${formatDistance(p.distance)}</div>`
-        ).join('');
+        if (
+          !latInput.value.trim() ||
+          !lonInput.value.trim() ||
+          !Number.isFinite(lat) ||
+          !Number.isFinite(lon) ||
+          lat < -90 || lat > 90 ||
+          lon < -180 || lon > 180
+        ) {
+          event.preventDefault();
+          alert('Tọa độ GPS mô phỏng không hợp lệ.');
+          return;
+        }
 
-      // Di chuyen ban do den vi tri mo phong
-      if (map) {
-        map.easeTo({ center: [lon, lat], zoom: 18 });
-      }
+        event.preventDefault();
 
-      // Kiem tra POI gan nhat va kich hoat audio neu du dieu kien
-      showClosest(lat, lon, 0);
-    };
+        simulatedPosition = { lat, lon };
+
+        const distances = points.map((point) => ({
+          point,
+          distance: haversine(
+            lat, lon, point.lat, point.lon
+          )
+        })).sort((a, b) => a.distance - b.distance);
+
+        let result = document.getElementById(
+          'sgu-simulation-distances'
+        );
+
+        if (!result) {
+          result = document.createElement('div');
+          result.id = 'sgu-simulation-distances';
+          simulationForm.after(result);
+        }
+
+        result.replaceChildren();
+
+        distances.forEach(({ point, distance }) => {
+          const row = document.createElement('p');
+          row.textContent =
+            point.name + ': ' + formatDistance(distance);
+          result.appendChild(row);
+        });
+
+        if (map) {
+          map.easeTo({
+            center: [lon, lat],
+            zoom: 18
+          });
+        }
+
+        // GPS mo phong co sai so gia dinh bang 0
+        showClosest(lat, lon, 0);
+      });
+    }
     startButton.addEventListener('click', start);
     stopButton.addEventListener('click', () => stop());
     centerButton.addEventListener('click', recenter);
