@@ -41,6 +41,9 @@ jobs:
       SGU_DB_URL: jdbc:mysql://127.0.0.1:3306/SGU_audio_guide?connectionTimeZone=UTC
       SGU_DB_USER: root
       SGU_DB_PASSWORD: ci_test_password
+      SGU_MAIL_USERNAME: ci-test@example.com
+      SGU_MAIL_APP_PASSWORD: ci-dummy-password
+      SGU_PASSWORD_RESET_SECRET: ci-only-hmac-secret-not-for-production-2026
 
     steps:
       - name: Checkout source
