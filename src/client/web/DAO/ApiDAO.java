@@ -41,6 +41,54 @@ public final class ApiDAO {
     public List<Map<String,Object>> audio(ClientSessionDTO ss,long id,boolean admin)throws Exception {
         return Data.list(call(ss,"GET","/api/audio?contentId="+id+(admin?"&admin=1":""),null));
     }
+
+    public Map<String, Object> forgotPassword(
+        ClientSessionDTO ss,
+        String email) throws Exception {
+
+    return Data.map(call(
+            ss,
+            "POST",
+            "/api/auth/forgot-password",
+            Data.row("email", email)
+    ));
+}
+public Map<String, Object> verifyOtp(
+        ClientSessionDTO ss,
+        String requestToken,
+        String otp) throws Exception {
+
+    return Data.map(call(
+            ss,
+            "POST",
+            "/api/auth/verify-otp",
+            Data.row(
+                    "requestToken", requestToken,
+                    "otp", otp
+            )
+    ));
+}
+
+
+public Map<String, Object> resetPassword(
+        ClientSessionDTO ss,
+        String requestToken,
+        String newPassword,
+        String confirmPassword) throws Exception {
+
+    return Data.map(call(
+            ss,
+            "POST",
+            "/api/auth/reset-password",
+            Data.row(
+                    "requestToken", requestToken,
+                    "newPassword", newPassword,
+                    "confirmPassword", confirmPassword
+            )
+    ));
+}
+
+
     public void login(ClientSessionDTO ss, String username, String password) throws Exception {
     Http.Reply r = Http.call(
         "POST",

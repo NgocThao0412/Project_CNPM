@@ -23,6 +23,22 @@ public final class ClientController {
     private final EventRouteView eventRoutes;
     private final AdminView admin;
     private final Map<String,ClientSessionDTO> sessions=new ConcurrentHashMap<>();
+    private record ResetSession(String token, Instant expiresAt) {}
+    private final Map<String,ResetSession> resetTokens = new ConcurrentHashMap<>();
+    private String getResetToken(ClientSessionDTO ss) {
+    ResetSession reset = resetTokens.get(ss.id);
+    if (reset == null) {
+        return null;
+    }
+
+    if (!Instant.now().isBefore(reset.expiresAt())) {
+        resetTokens.remove(ss.id, reset);
+        return null;
+    }
+
+    return reset.token();
+}
+
     public ClientController(Settings s) throws Exception {
         this.s=s;
         gateway=new GatewayController(s);
@@ -38,6 +54,8 @@ public final class ClientController {
     } private ClientSessionDTO session(HttpExchange x) {
         Instant now=Instant.now();
         sessions.entrySet().removeIf(e->e.getValue().touched.isBefore(now.minusSeconds(1800)));
+        // Xoa cac yeu cau khoi phuc da het han.
+        resetTokens.entrySet().removeIf(e -> !now.isBefore(e.getValue().expiresAt()) || !sessions.containsKey(e.getKey()));
         ClientSessionDTO ss=sessions.get(Http.cookie(x,"SGU_CLIENT"));
         if(ss==null) {
             if(sessions.size()>10000)throw new Http.Error(503,"Too many sessions");
@@ -177,6 +195,125 @@ public final class ClientController {
             Http.redirect(x,UiLanguage.returnPath(q.get("next"),locale));
             return;
         }
+
+        // Hien thi trang quen mat khau.
+        if(p.equals("/forgot-password") && method.equals("GET")) {
+            page(x, ss, "Quên mật khẩu", "login",
+                    admin.forgotPassword(ss, ""));
+            return;
+        }
+
+        // Xu ly yeu cau gui OTP.
+        if(p.equals("/forgot-password") && method.equals("POST")) {
+            String email = f.getOrDefault("email", "").trim();
+
+            try {
+                Map<String, Object> result =
+                        api.forgotPassword(ss, email);
+
+                String requestToken =
+                        Data.text(result, "requestToken");
+
+                if(requestToken.isBlank()) {
+                    throw new Http.Error(
+                            502, "Hệ thống chưa trả mã yêu cầu khôi phục.");
+                }
+
+                resetTokens.put( ss.id, new ResetSession(requestToken, Instant.now().plusSeconds(300)));
+                    Http.redirect(x, "/verify-otp");
+
+            } catch(Http.Error ex) {
+                page(x, ss, "Quên mật khẩu", "login",
+                        admin.forgotPassword(ss, ex.getMessage()));
+            }
+
+            return;
+        }
+
+        // Hien thi trang nhap OTP.
+        if(p.equals("/verify-otp") && method.equals("GET")) {
+            String requestToken = getResetToken(ss);
+
+            if(requestToken == null) {
+                Http.redirect(x, "/forgot-password");
+                return;
+            }
+
+            page(x, ss, "Xác thực OTP", "login",
+                    admin.verifyOtp(ss, ""));
+            return;
+        }
+
+        // Kiem tra OTP qua auth-service.
+        if(p.equals("/verify-otp") && method.equals("POST")) {
+            String requestToken = getResetToken(ss);
+
+            if(requestToken == null) {
+                Http.redirect(x, "/forgot-password");
+                return;
+            }
+
+            try {
+                api.verifyOtp(
+                        ss,
+                        requestToken,
+                        f.getOrDefault("otp", "")
+                );
+
+                Http.redirect(x, "/reset-password");
+
+            } catch(Http.Error ex) {
+                page(x, ss, "Xác thực OTP", "login",
+                        admin.verifyOtp(ss, ex.getMessage()));
+            }
+
+            return;
+        }
+
+        // Hien thi trang dat mat khau moi.
+        if(p.equals("/reset-password") && method.equals("GET")) {
+            if(getResetToken(ss) == null) {
+                Http.redirect(x, "/forgot-password");
+                return;
+            }
+
+            page(x, ss, "Đặt mật khẩu mới", "login",
+                    admin.resetPassword(ss, ""));
+            return;
+        }
+
+        // Xu ly doi mat khau sau khi xac thuc OTP.
+        if(p.equals("/reset-password") && method.equals("POST")) {
+            String requestToken = getResetToken(ss);
+
+            if(requestToken == null) {
+                Http.redirect(x, "/forgot-password");
+                return;
+            }
+
+            try {
+                api.resetPassword(
+                        ss,
+                        requestToken,
+                        f.getOrDefault("newPassword", ""),
+                        f.getOrDefault("confirmPassword", "")
+                );
+
+                // Xoa request token sau khi doi mat khau thanh cong.
+                resetTokens.remove(ss.id);
+
+                Http.redirect(x, "/login?notice="
+                        + Http.enc("Đổi mật khẩu thành công. Vui lòng đăng nhập lại."));
+
+            } catch(Http.Error ex) {
+                page(x, ss, "Đặt mật khẩu mới", "login",
+                        admin.resetPassword(ss, ex.getMessage()));
+            }
+
+            return;
+        }
+
+        // Hien thi trang xac thuc OTP.
         if(p.equals("/login")&&method.equals("GET")) {
             if(ss.loggedIn()) {
                 Http.redirect(x,"/admin");
@@ -191,6 +328,7 @@ public final class ClientController {
                 ClientSessionDTO next=new ClientSessionDTO();
                 next.admin=ss.admin;
                 next.upstreamCookie=ss.upstreamCookie;
+                resetTokens.remove(ss.id);
                 sessions.remove(ss.id);
                 sessions.put(next.id,next);
                 setCookie(x,next);
@@ -205,7 +343,8 @@ public final class ClientController {
                 api.logout(ss);
             }
             finally {
-                sessions.remove(ss.id);
+                 resetTokens.remove(ss.id);
+                 sessions.remove(ss.id);
             }
             success(x,"/login","Đã đăng xuất.");
             return;

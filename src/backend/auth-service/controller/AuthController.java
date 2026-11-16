@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
-
+import DTO.ForgotPasswordRequestDTO;
+import DTO.VerifyOtpRequestDTO;
+import DTO.ResetPasswordRequestDTO;
+import BUS.PasswordResetTransactionBUS;
 import java.util.Map;
 
 @RestController
@@ -110,5 +113,88 @@ public class AuthController {
 
         return ResponseEntity.ok(Map.of(
                 "message", "Đăng xuất thành công"));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(
+            @RequestBody ForgotPasswordRequestDTO request) {
+
+        if (request == null || request.email() == null
+                || request.email().isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Vui lòng nhập email"));
+        }
+
+        try {
+            String requestToken = authBUS.requestPasswordReset(request.email());
+
+            return ResponseEntity.ok(Map.of(
+                    "message",
+                    "Nếu email đã đăng ký, hệ thống sẽ gửi mã OTP.",
+                    "requestToken", requestToken));
+        } catch (Exception exception) {
+            return ResponseEntity.status(
+                    HttpStatus.INTERNAL_SERVER_ERROR).body(
+                            Map.of(
+                                    "message", "Không thể xử lý yêu cầu lúc này"));
+        }
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<?> verifyOtp(
+            @RequestBody VerifyOtpRequestDTO request) {
+
+        if (request == null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Dữ liệu không hợp lệ"));
+        }
+
+        try {
+            var result = authBUS.verifyPasswordResetOtp(
+                    request.requestToken(),
+                    request.otp());
+
+            if (result == PasswordResetTransactionBUS.VerifyResult.SUCCESS) {
+                return ResponseEntity.ok(Map.of(
+                        "message", "Xác thực OTP thành công"));
+            }
+
+            if (result == PasswordResetTransactionBUS.VerifyResult.ALREADY_VERIFIED) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "OTP đã được xác thực"));
+            }
+
+            return ResponseEntity.badRequest()
+                    .body(Map.of(
+                            "message", "OTP không hợp lệ, hết hạn hoặc đã bị khóa"));
+
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", exception.getMessage()));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(
+            @RequestBody ResetPasswordRequestDTO request) {
+
+        if (request == null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Dữ liệu không hợp lệ"));
+        }
+
+        try {
+            authBUS.resetPassword(
+                    request.requestToken(),
+                    request.newPassword(),
+                    request.confirmPassword());
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Đổi mật khẩu thành công. Vui lòng đăng nhập lại."));
+
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", exception.getMessage()));
+        }
     }
 }

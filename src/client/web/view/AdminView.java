@@ -27,7 +27,12 @@ public String login(ClientSessionDTO ss, String error, String username) {
                 "required maxlength=\"50\" autocomplete=\"username\" placeholder=\"Nhập tên đăng nhập\"")
         + input("Mật khẩu", "password", "", "password",
                 "required autocomplete=\"current-password\" placeholder=\"Nhập mật khẩu\"")
-        + "<button class=\"btn login-submit\" type=\"submit\">"
+        + "<div style=\"text-align:right; margin-bottom:12px;\">"
+        + "<a href=\"/forgot-password\" "
+        + "style=\"color:#2563eb; text-decoration:none; font-weight:500;\">"
+        + "Quên mật khẩu?</a>"
+        + "</div>"
+        + "<button class=\"btn login-submit\" type=\"submit\"> "
         + icon("lock") + "Đăng nhập</button>"
         + "</form>"
         + "</section>";
@@ -40,6 +45,27 @@ private static String dashboardMetric(String style, String label, long number,
             + "<span>" + e(description) + "</span></div>"
             + "<strong>" + number + "</strong><span class=\"dash-stat-label\">"
             + e(label) + "</span></div>";
+}
+
+public String forgotPassword(ClientSessionDTO ss, String error) {
+    return "<section class=\"login-grid\" aria-label=\"Khôi phục mật khẩu\">"
+        + "<div class=\"login-brand\">"
+        + "<img src=\"/assets/logo-sgu.png\" alt=\"Logo Trường Đại học Sài Gòn\" width=\"68\" height=\"68\">"
+        + "<strong>Trường Đại học Sài Gòn</strong>"
+        + "</div>"
+        + "<h1>Quên mật khẩu</h1>"
+        + "<p class=\"login-description\">Nhập email đã đăng ký tài khoản quản trị để nhận mã OTP.</p>"
+        + (error == null || error.isBlank() ? "" : layout.error(error))
+        + "<form method=\"post\" action=\"/forgot-password\" class=\"login-auth-form\">"
+        + hidden("csrf", ss.csrf)
+        + input("Email quản trị", "email", "", "email",
+                "required maxlength=\"254\" autocomplete=\"email\" placeholder=\"Nhập địa chỉ Gmail\"")
+        + "<button class=\"btn login-submit\" type=\"submit\">Gửi mã OTP</button>"
+        + "</form>"
+        + "<div style=\"text-align:center; margin-top:16px;\">"
+        + link("/login", "Quay lại đăng nhập", "")
+        + "</div>"
+        + "</section>";
 }
 
 public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
@@ -612,4 +638,52 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
         for(var r:health)b.append("<div class=\"status-row\"><div><strong>").append(e(r.get("service"))).append("</strong><small class=\"api-details\">").append(e(r.get("url"))).append("</small></div><span class=\"tag ").append("OK".equals(r.get("status"))?"tag-green":"tag-muted").append("\">").append(e(r.get("status"))).append("</span></div>");
         return b.append("</div><p class=\"help section-space\"></p></section>").toString();
     }
+
+public String verifyOtp(
+        ClientSessionDTO ss,
+        String error) {
+
+    return "<section class=\"login-grid\" aria-label=\"Xác thực OTP\">"
+        + "<div class=\"login-brand\">"
+        + "<img src=\"/assets/logo-sgu.png\" alt=\"Logo Trường Đại học Sài Gòn\" width=\"68\" height=\"68\">"
+        + "<strong>Trường Đại học Sài Gòn</strong>"
+        + "</div>"
+        + "<h1>Xác thực OTP</h1>"
+        + "<p class=\"login-description\">Nếu email đã đăng ký, mã OTP sẽ được gửi đến hộp thư. Mã có hiệu lực trong 5 phút.</p>"
+        + (error == null || error.isBlank() ? "" : layout.error(error))
+        + "<form method=\"post\" action=\"/verify-otp\" class=\"login-auth-form\">"
+        + hidden("csrf", ss.csrf)
+        + input("Mã OTP", "otp", "", "text",
+                "required minlength=\"6\" maxlength=\"6\" inputmode=\"numeric\" pattern=\"[0-9]{6}\" autocomplete=\"one-time-code\" placeholder=\"Nhập mã OTP 6 chữ số\"")
+        + "<button class=\"btn login-submit\" type=\"submit\">Xác thực OTP</button>"
+        + "</form>"
+        + "<div style=\"text-align:center; margin-top:16px;\">"
+        + link("/forgot-password", "Gửi yêu cầu mới", "")
+        + "</div>"
+        + "</section>";
+}
+
+public String resetPassword(ClientSessionDTO ss, String error) {
+    return "<section class=\"login-grid\" aria-label=\"Đặt lại mật khẩu\">"
+        + "<div class=\"login-brand\">"
+        + "<img src=\"/assets/logo-sgu.png\" alt=\"Logo Trường Đại học Sài Gòn\" width=\"68\" height=\"68\">"
+        + "<strong>Trường Đại học Sài Gòn</strong>"
+        + "</div>"
+        + "<h1>Đặt mật khẩu mới</h1>"
+        + "<p class=\"login-description\">Nhập mật khẩu mới cho tài khoản quản trị.</p>"
+        + (error == null || error.isBlank() ? "" : layout.error(error))
+        + "<form method=\"post\" action=\"/reset-password\" class=\"login-auth-form\">"
+        + hidden("csrf", ss.csrf)
+        + input("Mật khẩu mới", "newPassword", "", "password",
+                "required minlength=\"8\" maxlength=\"72\" autocomplete=\"new-password\" placeholder=\"Nhập mật khẩu mới\"")
+        + input("Xác nhận mật khẩu", "confirmPassword", "", "password",
+                "required minlength=\"8\" maxlength=\"72\" autocomplete=\"new-password\" placeholder=\"Nhập lại mật khẩu mới\"")
+        + "<button class=\"btn login-submit\" type=\"submit\">Đổi mật khẩu</button>"
+        + "</form>"
+        + "<div style=\"text-align:center; margin-top:16px;\">"
+        + link("/login", "Quay lại đăng nhập", "")
+        + "</div>"
+        + "</section>";
+}
+
 }
