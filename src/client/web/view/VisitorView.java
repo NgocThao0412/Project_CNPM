@@ -206,11 +206,10 @@ if (osm) {
                 svg.append("<circle class=\"map-pin ").append(on?"active":"").append("\" cx=\"").append(px).append("\" cy=\"").append(py).append("\" r=\"14\"/><text class=\"map-label\" text-anchor=\"middle\" x=\"").append(px).append("\" y=\"").append(String.format(Locale.ROOT,"%.2f",y+35)).append("\">").append(e(p.get("poiName"))).append("</text></a>");
             }
             drawing=svg.append("<g id=\"sgu-gps-layer\" pointer-events=\"none\"></g></svg>").toString();
-        } return "<div class=\"page-intro\"><div><span class=\"eyebrow\"></span><h1>Bản đồ khám phá</h1><p></p></div>"+link("/map?id="+id+(osm?"":"&basemap=osm"),icon("map")+(osm?"Sơ đồ tọa độ":"Bản đồ OpenStreetMap"),"btn btn-light")+"</div><div class=\"map-grid\"><div><div class=\"map-board\">"+drawing+"<div class=\"map-legend\"><span>"+(osm?"© OpenStreetMap contributors":"Sơ đồ tọa độ, không phải bản đồ đường đi")+"</span><span>"+e(lat)+", "+e(lon)+"</span></div></div><p class=\"map-disclaimer\">Bản đồ nền OpenStreetMap cần Internet. Sơ đồ tọa độ vẫn hoạt động khi không tải được bản đồ nền.</p>"
+        } return "<div class=\"page-intro\"><div><span class=\"eyebrow\"></span><h1>Bản đồ khám phá</h1><p></p></div>"+link("/map?id="+id+(osm?"":"&basemap=osm"),icon("map")+(osm?"Sơ đồ tọa độ":"Bản đồ OpenStreetMap"),"btn btn-light")+"</div><div class=\"map-grid\"><div><div class=\"map-board\">"+drawing+"<div class=\"map-legend\"><span>"+(osm?"© OpenStreetMap contributors":"Sơ đồ tọa độ, không phải bản đồ đường đi")+"</span><span>"+e(lat)+", "+e(lon)+"</span></div></div>"
             + gpsPois
             + "<section class=\"panel sgu-gps-panel\" aria-labelledby=\"sgu-gps-heading\">"
             + "<h3 id=\"sgu-gps-heading\">Định vị GPS thực tế</h3>"
-            + "<p class=\"help\">Sử dụng vị trí thật của điện thoại (cần HTTPS và cho phép truy cập vị trí). Không gửi tọa độ về máy chủ.</p>"
             + "<div class=\"sgu-gps-actions\"><button type=\"button\" id=\"sgu-gps-start\" class=\"btn\">Bật GPS thực tế</button>"
             + "<button type=\"button\" id=\"sgu-gps-center\" class=\"btn btn-light\" disabled>Vị trí của tôi</button>"
             + "<button type=\"button\" id=\"sgu-gps-stop\" class=\"btn btn-light\" disabled>Dừng GPS</button></div>"
