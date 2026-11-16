@@ -107,7 +107,7 @@ public final class VisitorView {
         StringBuilder pills=new StringBuilder("<form class=\"language-pills\" action=\"/place\" method=\"get\">"+hidden("id",id)+(preview?hidden("preview","1"):""));
         for(var l:languages) {
             String code=Data.text(l,"languageCode");
-            pills.append("<button type=\"submit\" name=\"lang\" value=\"").append(e(code)).append("\" class=\"").append(code.equals(lang)?"active":"").append("\">").append(code.equals(lang)?icon("check"):icon("globe")).append(e(l.get("languageName"))).append("</button>");
+            pills.append("<button type=\"submit\" name=\"audio_lang\" value=\"").append(e(code)).append("\" class=\"").append(code.equals(lang)?"active":"").append("\">").append(code.equals(lang)?icon("check"):icon("globe")).append(e(l.get("languageName"))).append("</button>");
         }
         pills.append("</form>");
         String title=narration==null?"Chưa có bài thuyết minh":Data.text(narration,"title");

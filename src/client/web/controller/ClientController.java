@@ -220,13 +220,14 @@ public final class ClientController {
             long id=ClientBUS.positive(q.get("id"));
             var poi=ClientBUS.byId(api.pois(ss,preview),id);
             var languages=api.languages(ss);
-            // Use the header language (cookie) or an explicit ?lang= selection.
-            String preferred=UiLanguage.selected(x);
+            // Narration language is independent of the header's SGU_LANG UI cookie.
+            // Accept old ?lang= detail links without changing the interface language.
+            String requestedAudio=q.getOrDefault("audio_lang",q.get("lang"));
+            String preferred=UiLanguage.supported(requestedAudio)
+                    ? UiLanguage.normalize(requestedAudio) : UiLanguage.selected(x);
             String lang=languages.stream().map(l->Data.text(l,"languageCode"))
                     .filter(code->UiLanguage.normalize(code).equals(preferred))
                     .findFirst().orElse(preferred);
-            if(q.containsKey("lang") && UiLanguage.supported(q.get("lang")))
-                setLanguageCookie(x,preferred);
             Map<String,Object> n=api.contents(ss,preview).stream()
                     .filter(m->Data.id(m,"poiId")==id
                             && UiLanguage.normalize(Data.text(m,"languageCode")).equals(preferred))

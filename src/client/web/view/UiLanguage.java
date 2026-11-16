@@ -26,15 +26,13 @@ public final class UiLanguage {
         return "vi";
     }
 
-    /** Explicit detail-page ?lang= choice takes precedence over the saved cookie. */
+    /** Interface language changes only through the header's /language route. */
     public static String selected(HttpExchange x) {
-        String requested = Http.query(x).get("lang");
-        if (supported(requested)) return normalize(requested);
         String cookie = Http.cookie(x,"SGU_LANG");
         return supported(cookie) ? normalize(cookie) : "vi";
     }
 
-    /** Allow only relative same-origin redirects, with the new detail-page narration language. */
+    /** Safe same-origin return path; preserve the separately selected narration language. */
     public static String returnPath(String raw, String lang) {
         if (raw == null || raw.length() > 2048 || !raw.startsWith("/") || raw.startsWith("//")
                 || raw.indexOf('\\') >= 0 || raw.indexOf('\r') >= 0 || raw.indexOf('\n') >= 0)
@@ -45,7 +43,11 @@ public final class UiLanguage {
                 return "/";
             if (!"/place".equals(u.getPath())) return raw;
             Map<String,String> q = new LinkedHashMap<>(Http.params(u.getRawQuery()));
-            q.put("lang", normalize(lang));
+            // Migrate old /place?lang=... links without tying narration to the UI.
+            String legacyAudio=q.remove("lang");
+            if (!q.containsKey("audio_lang") && supported(legacyAudio))
+                q.put("audio_lang", normalize(legacyAudio));
+            if (q.isEmpty()) return "/place";
             StringJoiner params=new StringJoiner("&");
             q.forEach((k,v)->params.add(URLEncoder.encode(k,StandardCharsets.UTF_8)
                     +"="+URLEncoder.encode(v,StandardCharsets.UTF_8)));
