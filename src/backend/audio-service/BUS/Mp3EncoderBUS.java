@@ -45,6 +45,12 @@ public class Mp3EncoderBUS {
                 ByteArrayOutputStream output = new ByteArrayOutputStream()
         ) {
             AudioFormat format = input.getFormat();
+            long frames = input.getFrameLength();
+            float sampleRate = format.getSampleRate();
+            double wavDuration = (frames > 0 && sampleRate > 0)
+                    ? (frames / sampleRate)
+                    : -1;
+            System.out.printf("[TTS WAV] bytes=%d, frames=%d, sampleRate=%.0f, duration=%.2fs", wav.length, frames, sampleRate, wavDuration);
 
             if (!AudioFormat.Encoding.PCM_SIGNED.equals(format.getEncoding())
                     || format.getSampleSizeInBits() != 16
