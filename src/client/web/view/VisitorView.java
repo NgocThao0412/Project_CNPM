@@ -57,12 +57,7 @@ public final class VisitorView {
             + "<section class=\"home-location-section\"><div class=\"section-header\"><div>"
             + "<h2>Khám phá địa điểm</h2><p>Tìm hiểu các địa điểm trong khuôn viên Trường Đại học Sài Gòn qua thuyết minh âm thanh.</p>"
             + "</div>" + link("/places", "Tất cả địa điểm " + icon("arrow"), "btn btn-ghost")
-            + "</div><div class=\"cards\">" + cards(pois.stream().limit(6).toList()) + "</div></section>"
-            + "<div class=\"guide-strip\"><div class=\"icon-tile\">" + icon("map")
-            + "</div><div class=\"copy\"><h3>Chưa đến trường? Vẫn có thể khám phá.</h3>"
-            + "<p>Chọn một POI trên bản đồ để mô phỏng vị trí và nghe thuyết minh.</p>"
-            + "</div>" + link("/map", "Trải nghiệm mô phỏng " + icon("arrow"), "btn btn-light")
-            + "</div>";
+            + "</div><div class=\"cards\">" + cards(pois.stream().limit(6).toList()) + "</div></section>";
     }
     public String places(List<Map<String,Object>> pois,String q,String requestedPage) {
         // Phân trang địa điểm: 6 POI mỗi trang.
