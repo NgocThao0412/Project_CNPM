@@ -314,8 +314,8 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
                     <p>Thống kê theo phiên truy cập ẩn danh, không phải số người duy nhất.</p>
                   </div></div>
                   <form action="/admin/users#visitor-history" method="get" class="visitor-history-form">
-                    <div class="visitor-history-grid">
-                      <label class="visitor-history-field">Thống kê theo
+                    <div class="form-grid stats-filter-grid visitor-history-grid">
+                      <label class="stats-filter-field visitor-history-field"><span>Thống kê theo</span>
                         <select name="period">
                 """);
         for (String[] option : new String[][]{
@@ -325,19 +325,19 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
              .append(option[0].equals(period) ? " selected" : "")
              .append(">").append(option[1]).append("</option>");
         }
-        b.append("</select></label><label class=\"visitor-history-field\">Ngày<select name=\"day\">");
+        b.append("</select></label><label class=\"stats-filter-field visitor-history-field\"><span>Ngày</span><select name=\"day\">");
         for (int value = 1; value <= 31; value++) {
             b.append("<option value=\"").append(value).append("\"")
              .append(value == day ? " selected" : "")
              .append(">").append(value).append("</option>");
         }
-        b.append("</select></label><label class=\"visitor-history-field\">Tháng<select name=\"month\">");
+        b.append("</select></label><label class=\"stats-filter-field visitor-history-field\"><span>Tháng</span><select name=\"month\">");
         for (int value = 1; value <= 12; value++) {
             b.append("<option value=\"").append(value).append("\"")
              .append(value == month ? " selected" : "")
              .append(">").append(value).append("</option>");
         }
-        b.append("</select></label><label class=\"visitor-history-field\">Năm<select name=\"year\">");
+        b.append("</select></label><label class=\"stats-filter-field visitor-history-field\"><span>Năm</span><select name=\"year\">");
         for (int value = today.getYear() + 1; value >= 2020; value--) {
             b.append("<option value=\"").append(value).append("\"")
              .append(value == year ? " selected" : "")
@@ -346,8 +346,9 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
         b.append("""
                      </select></label>
                     </div>
-                    <p class="visitor-history-help">Theo tháng chỉ dùng tháng/năm; theo năm chỉ dùng năm.</p>
-                    <button class="btn" type="submit">Xem thống kê truy cập</button>
+                    <div class="report-actions visitor-history-actions">
+                      <button class="btn" type="submit">Xem thống kê truy cập</button>
+                    </div>
                   </form>
                 """);
 
