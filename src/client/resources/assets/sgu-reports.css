@@ -73,7 +73,8 @@
   outline: 2px solid #287bc9;
   outline-offset: 2px;
 }
-/* Pagination is scoped to the listening and report tables; other lists are untouched. */
+/* Phân trang ba bảng thống kê. */
+#visitor-history .sgu-table-pagination,
 #listening-history .sgu-table-pagination,
 #summary-report .sgu-table-pagination {
   display:flex;
@@ -85,14 +86,19 @@
   text-align:center;
   padding:16px 2px 2px;
 }
+#visitor-history .sgu-table-pagination[hidden],
 #listening-history .sgu-table-pagination[hidden],
 #summary-report .sgu-table-pagination[hidden] { display:none !important; }
+#visitor-history .sgu-page-info,
 #listening-history .sgu-page-info,
 #summary-report .sgu-page-info { color:#607991; font-size:13px; font-weight:600; }
+#visitor-history .sgu-page-controls,
 #listening-history .sgu-page-controls,
 #summary-report .sgu-page-controls,
+#visitor-history .sgu-page-numbers,
 #listening-history .sgu-page-numbers,
 #summary-report .sgu-page-numbers { display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+#visitor-history .sgu-page-button,
 #listening-history .sgu-page-button,
 #summary-report .sgu-page-button {
   display:inline-flex; align-items:center; justify-content:center;
@@ -101,21 +107,31 @@
   color:#175b96; background:#fff; cursor:pointer;
   font-family:inherit; font-size:14px; font-weight:600; line-height:1.2;
 }
+#visitor-history .sgu-page-button:hover:not(:disabled),
 #listening-history .sgu-page-button:hover:not(:disabled),
 #summary-report .sgu-page-button:hover:not(:disabled) { background:#eaf5ff; border-color:#80b6ea; }
+#visitor-history .sgu-page-button.is-current,
 #listening-history .sgu-page-button.is-current,
 #summary-report .sgu-page-button.is-current { background:#1269c5; border-color:#1269c5; color:#fff; }
+#visitor-history .sgu-page-button:focus-visible,
 #listening-history .sgu-page-button:focus-visible,
 #summary-report .sgu-page-button:focus-visible { outline:2px solid #287bc9; outline-offset:2px; }
+#visitor-history .sgu-page-button:disabled,
 #listening-history .sgu-page-button:disabled,
 #summary-report .sgu-page-button:disabled { opacity:.4; cursor:not-allowed; }
+#visitor-history .sgu-page-ellipsis,
 #listening-history .sgu-page-ellipsis,
 #summary-report .sgu-page-ellipsis { color:#647c98; padding:0 3px; }
+#visitor-history tbody tr[hidden],
+#listening-history tbody tr[hidden],
+#summary-report tbody tr[hidden] { display:none !important; }
 @media (max-width:590px) {
+  #visitor-history .sgu-table-pagination,
   #listening-history .sgu-table-pagination,
   #summary-report .sgu-table-pagination { justify-content:center; text-align:center; }
 }
 @media print {
+  #visitor-history .sgu-table-pagination,
   #listening-history .sgu-table-pagination,
   #summary-report .sgu-table-pagination { display:none !important; }
 }

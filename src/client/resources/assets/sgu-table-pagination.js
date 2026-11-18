@@ -1,9 +1,8 @@
-/* Shared client-side pagination for the two statistics tables only.
- * Data, totals, filters, API requests and CSV export remain unchanged. */
+/* Phân trang thống kê và báo cáo. */
 (() => {
   'use strict';
 
-  const PAGE_SIZE = 8;
+  const PAGE_SIZE = 6;
 
   function createButton(text, label, onClick, className = '') {
     const button = document.createElement('button');
@@ -16,7 +15,8 @@
   }
 
   function create(tbody, label, {printAll = false} = {}) {
-    if (!tbody || !tbody.closest('.table-wrap')) {
+    const tableWrap = tbody?.closest('.table-wrap, .visitor-history-scroll');
+    if (!tableWrap) {
       throw new Error('Không tìm thấy bảng cần phân trang.');
     }
 
@@ -33,7 +33,7 @@
     const next = createButton('›', 'Trang tiếp theo', () => goto(page + 1));
     controls.append(prev, numbers, next);
     nav.append(controls);
-    tbody.closest('.table-wrap').insertAdjacentElement('afterend', nav);
+    tableWrap.insertAdjacentElement('afterend', nav);
 
     let page = 1;
     let count = 0;
@@ -117,4 +117,13 @@
   }
 
   window.SguTablePagination = Object.freeze({ create });
+
+  const visitorRows = document.querySelector('#visitor-history .visitor-history-scroll tbody');
+  if (visitorRows) {
+    const pager = create(visitorRows, 'lượt truy cập');
+    const empty = visitorRows.rows.length === 1
+      && visitorRows.rows[0].cells.length === 1
+      && visitorRows.rows[0].cells[0].colSpan > 1;
+    pager.update(empty ? 0 : visitorRows.rows.length);
+  }
 })();
