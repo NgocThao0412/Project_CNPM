@@ -115,6 +115,14 @@ public final class ClientController {
             Http.json(x,200,activity.stats(adminSession));
             return;
         }
+        if (p.equals("/api/admin/visitor-report")) {
+            if (!method.equals("GET")) throw new Http.Error(405, "Method not allowed");
+            x.getResponseHeaders().set("Cache-Control", "no-store");
+            ClientSessionDTO adminSession = session(x);
+            api.me(adminSession);
+            Http.json(x, 200, activity.visitorReport(adminSession, Http.query(x)));
+            return;
+        }
         if (p.equals("/api/admin/listening-stats")) {
             x.getResponseHeaders().set("Cache-Control", "no-store");
 

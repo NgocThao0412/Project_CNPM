@@ -20,6 +20,14 @@ public record VisitorStatsDTO(
     ) {
     }
 
+    public record Report(
+            LocalDate from,
+            LocalDate to,
+            String timezone,
+            long totalVisits
+    ) {
+    }
+
     public record HistoryRow(
             String label,
             long visits

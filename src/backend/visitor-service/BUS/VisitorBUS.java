@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.DateTimeException;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HexFormat;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -154,6 +155,27 @@ public class VisitorBUS {
         long total = rows.stream().mapToLong(VisitorStatsDTO.HistoryRow::visits).sum();
         return new VisitorStatsDTO.History(
                 selected, from, until.minusDays(1), "UTC+07:00", total, rows
+        );
+    }
+
+    public VisitorStatsDTO.Report report(LocalDate from, LocalDate to) {
+        if (from == null || to == null
+                || from.getYear() < 1001 || from.getYear() > 9998
+                || to.getYear() < 1001 || to.getYear() > 9998
+                || from.isAfter(to)
+                || ChronoUnit.DAYS.between(from, to) + 1 > 366) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Khoảng ngày thống kê không hợp lệ (tối đa 366 ngày)"
+            );
+        }
+
+        String fromUtc = from.atStartOfDay().atOffset(VIETNAM)
+                .withOffsetSameInstant(ZoneOffset.UTC).format(SQL_TIME);
+        String untilUtc = to.plusDays(1).atStartOfDay().atOffset(VIETNAM)
+                .withOffsetSameInstant(ZoneOffset.UTC).format(SQL_TIME);
+
+        return new VisitorStatsDTO.Report(
+                from, to, "UTC+07:00", dao.countVisits(fromUtc, untilUtc)
         );
     }
 

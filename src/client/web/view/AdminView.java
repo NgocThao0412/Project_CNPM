@@ -282,8 +282,9 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
                     <div class="report-metric"><span>POI hiển thị</span><strong id="report-poi-visible">—</strong></div>
                     <div class="report-metric"><span>Lượt nghe</span><strong id="report-listens">—</strong></div>
                     <div class="report-metric"><span>Phiên có nghe</span><strong id="report-sessions">—</strong></div>
+                    <div class="report-metric"><span>Lượt truy cập</span><strong id="report-visitors">—</strong></div>
                   </div>
-                  <p class="report-disclaimer">Số POI là số lượng tại thời điểm xem báo cáo; bộ lọc ngày/ngôn ngữ chỉ áp dụng cho lượt nghe. “Phiên có nghe” là số phiên ẩn danh, không phải số người duy nhất.</p>
+                  <p class="report-disclaimer">Số POI là dữ liệu hiện tại. Lượt truy cập là số phiên ẩn danh trong khoảng ngày chọn, không lọc theo POI/ngôn ngữ và không phải số người duy nhất. Lượt nghe và phiên có nghe áp dụng cả ba bộ lọc thời gian, POI và ngôn ngữ.</p>
                   <h3 class="report-subheading">Chi tiết hoạt động thuyết minh</h3>
                   <div class="table-wrap"><table class="data-table">
                     <thead><tr><th>Ngày</th><th>Địa điểm</th><th>Ngôn ngữ</th><th>Lượt nghe</th><th>Phiên có nghe</th></tr></thead>

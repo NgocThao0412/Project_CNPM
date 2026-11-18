@@ -9,6 +9,7 @@
 #poi-statistics .report-metric, #summary-report .report-metric {border:1px solid #c9e0f5; border-radius:14px; background:linear-gradient(135deg,#eef7ff,#fff); padding:17px 19px; min-width:0;}
 #poi-statistics .report-metric span, #summary-report .report-metric span {display:block; font-size:13px; font-weight:700; color:#476d8f;}
 #poi-statistics .report-metric strong, #summary-report .report-metric strong {display:block; margin-top:6px; font-size:30px; color:#1263b2; font-variant-numeric:tabular-nums;}
+#summary-report .report-metrics {grid-template-columns:repeat(auto-fit,minmax(175px,1fr));}
 #poi-statistics .report-subheading, #summary-report .report-subheading {font-size:17px; margin:20px 0 13px; color:#193d58;}
 #summary-report .report-filter-grid {display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px 22px;}
 #summary-report .report-field {display:flex; flex-direction:column; gap:7px; min-width:0; font-weight:650; color:#325476; font-size:13px;}

@@ -117,6 +117,15 @@ public class VisitorDAO {
         );
     }
 
+    public long countVisits(String fromUtc, String untilUtc) {
+        Long total = db.queryForObject("""
+                SELECT COUNT(*)
+                FROM visitor_sessions
+                WHERE started_at >= ? AND started_at < ?
+                """, Long.class, fromUtc, untilUtc);
+        return total == null ? 0 : total;
+    }
+
     public record Counts(
             long activeVisitors,
             long activeListeners

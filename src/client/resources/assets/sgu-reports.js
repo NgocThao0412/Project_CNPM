@@ -54,7 +54,7 @@
     currentReport = null;
     csvButton.disabled = true;
     printButton.disabled = true;
-    for (const id of ['report-poi-count','report-poi-visible','report-listens','report-sessions']) {
+    for (const id of ['report-poi-count','report-poi-visible','report-listens','report-sessions','report-visitors']) {
       find(id).textContent = '—';
     }
     find('report-period').textContent = 'Chưa tải dữ liệu';
@@ -85,21 +85,28 @@
     invalidate();
     feedback.textContent = 'Đang tổng hợp báo cáo từ dữ liệu thật…';
     placeholder('Đang tải báo cáo…');
-    for (const id of ['report-poi-count','report-poi-visible','report-listens','report-sessions']) {
+    for (const id of ['report-poi-count','report-poi-visible','report-listens','report-sessions','report-visitors']) {
       find(id).textContent = '—';
     }
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 30000);
     try {
-      const response = await fetch('/api/admin/listening-stats?' + params.toString(), {
+      const requestOptions = {
         method: 'GET', credentials: 'same-origin', cache: 'no-store',
         headers: {Accept: 'application/json'}, signal: controller.signal
-      });
-      if (response.status === 401) {
+      };
+      const visitorsQuery = new URLSearchParams({from, to});
+      const [response, visitsResponse] = await Promise.all([
+        fetch('/api/admin/listening-stats?' + params.toString(), requestOptions),
+        fetch('/api/admin/visitor-report?' + visitorsQuery.toString(), requestOptions)
+      ]);
+      if (response.status === 401 || visitsResponse.status === 401) {
         throw new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
       }
-      if (!response.ok) throw new Error(`Không tải được báo cáo (HTTP ${response.status}).`);
-      const data = await response.json();
+      if (!response.ok) throw new Error(`Không tải được báo cáo lượt nghe (HTTP ${response.status}).`);
+      if (!visitsResponse.ok) throw new Error(`Không tải được số lượt truy cập (HTTP ${visitsResponse.status}).`);
+      const [data, visitsData] = await Promise.all([response.json(), visitsResponse.json()]);
+      number(visitsData?.totalVisits);
       if (!data || !Array.isArray(data.rows)) {
         throw new Error('API trả cấu trúc báo cáo không hợp lệ.');
       }
@@ -130,8 +137,9 @@
       setMetric('report-poi-visible', poiVisible);
       setMetric('report-listens', data.totalListens);
       setMetric('report-sessions', data.uniqueSessions);
+      setMetric('report-visitors', visitsData.totalVisits);
       find('report-poi-count-label').textContent = filtered ? 'POI được chọn' : 'Tổng POI hiện tại';
-      find('report-period').textContent = 'Khoảng thống kê lượt nghe: ' + period;
+      find('report-period').textContent = 'Khoảng thống kê: ' + period;
       find('report-selection').textContent = `Địa điểm: ${chosenPoi} · Ngôn ngữ: ${chosenLanguage}`;
       const fragment = document.createDocumentFragment();
       for (const item of rows) {
@@ -148,10 +156,11 @@
       if (!rows.length) placeholder('Không có lượt nghe phù hợp với bộ lọc.');
       pager.update(rows.length);
       currentReport = {from, to, chosenPoi, chosenLanguage, poiTotal, poiVisible,
-                       totalListens: data.totalListens, uniqueSessions: data.uniqueSessions, rows};
+                       totalListens: data.totalListens, uniqueSessions: data.uniqueSessions,
+                       totalVisits: visitsData.totalVisits, rows};
       feedback.textContent = rows.length
         ? `Đã tổng hợp ${rows.length} dòng thống kê. Có thể xuất CSV hoặc in/lưu PDF.`
-        : 'Không có lượt nghe trong khoảng lọc; báo cáo vẫn ghi nhận số POI hiện tại.';
+        : 'Không có lượt nghe phù hợp; báo cáo vẫn ghi nhận POI và lượt truy cập.';
       csvButton.disabled = false;
       printButton.disabled = false;
     } catch (error) {
@@ -188,6 +197,7 @@
       ['POI đang hiển thị (theo bộ lọc POI)', r.poiVisible],
       ['Tổng lượt nghe', r.totalListens],
       ['Số phiên có nghe', r.uniqueSessions],
+      ['Lượt truy cập (phiên ẩn danh theo khoảng ngày)', r.totalVisits],
       [],
       ['Ngày', 'Địa điểm', 'Ngôn ngữ', 'Lượt nghe', 'Phiên có nghe'],
       ...r.rows.map(row => [displayDate(row.date), row.poiName,

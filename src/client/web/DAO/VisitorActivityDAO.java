@@ -200,6 +200,32 @@ public final class VisitorActivityDAO {
         );
     }
 
+    public Map<String, Object> visitorReport(
+            ClientSessionDTO admin,
+            Map<String, String> filters
+    ) throws Exception {
+        if (admin == null || !admin.loggedIn()) {
+            throw new Http.Error(401, "Vui lòng đăng nhập quản trị.");
+        }
+        String from = filters.getOrDefault("from", "");
+        String to = filters.getOrDefault("to", "");
+        if (!from.matches("\\d{4}-\\d{2}-\\d{2}")
+                || !to.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            throw new Http.Error(400, "Khoảng ngày không hợp lệ.");
+        }
+        Map<String, Object> result = Data.map(Http.call(
+                "GET",
+                endpoint("/api/admin/visitor-report?from=") + Http.enc(from)
+                        + "&to=" + Http.enc(to),
+                admin.upstreamCookie,
+                null
+        ).require().json());
+        if (!(result.get("totalVisits") instanceof Number)) {
+            throw new Http.Error(502, "Dữ liệu lượt truy cập không hợp lệ.");
+        }
+        return result;
+    }
+
     public Map<String, Object> visitorHistory(
             ClientSessionDTO admin,
             Map<String, String> filters

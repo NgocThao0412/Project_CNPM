@@ -1,5 +1,8 @@
 package controller;
 
+import java.time.LocalDate;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -76,6 +79,20 @@ public class VisitorController {
         return ResponseEntity.ok()
                 .header("Cache-Control", "no-store")
                 .body(bus.history(period, day, month, year));
+    }
+
+    @GetMapping("/api/admin/visitor-report")
+    public ResponseEntity<VisitorStatsDTO.Report> report(
+            @RequestParam("from")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam("to")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            HttpServletRequest request
+    ) {
+        access.requireAdmin(request);
+        return ResponseEntity.ok()
+                .header("Cache-Control", "no-store")
+                .body(bus.report(from, to));
     }
 
     @GetMapping("/api/admin/visitor-stats")
