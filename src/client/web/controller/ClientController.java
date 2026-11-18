@@ -554,7 +554,16 @@ public final class ClientController {
             success(x,"/admin/pois","Đã cập nhật trạng thái POI.");
             return;
         } if(p.equals("/admin/users")&&method.equals("GET")) {
-            page(x,ss,"Thống kê và báo cáo","admin",admin.users(api.pois(ss, true), api.languages(ss)));
+            Map<String,Object> visitorHistory;
+            try {
+                visitorHistory = activity.visitorHistory(ss, q);
+            } catch (Http.Error error) {
+                visitorHistory = Data.row("error", "Không thể tải thống kê lượt truy cập.");
+            } catch (Exception error) {
+                visitorHistory = Data.row("error", "Visitor Service chưa sẵn sàng.");
+            }
+            page(x,ss,"Thống kê và báo cáo","admin",
+                    admin.users(api.pois(ss, true), api.languages(ss), visitorHistory, q));
             return;
         } if(p.equals("/admin/audio")&&method.equals("GET")) {
             page(x,ss,"Quản lý audio","admin",

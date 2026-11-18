@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import BUS.VisitorBUS;
@@ -61,6 +62,20 @@ public class VisitorController {
         return ResponseEntity.noContent()
                 .header("Cache-Control", "no-store")
                 .build();
+    }
+
+    @GetMapping("/api/admin/visitor-history")
+    public ResponseEntity<VisitorStatsDTO.History> history(
+            @RequestParam(name = "period", required = false) String period,
+            @RequestParam(name = "day", required = false) Integer day,
+            @RequestParam(name = "month", required = false) Integer month,
+            @RequestParam(name = "year", required = false) Integer year,
+            HttpServletRequest request
+    ) {
+        access.requireAdmin(request);
+        return ResponseEntity.ok()
+                .header("Cache-Control", "no-store")
+                .body(bus.history(period, day, month, year));
     }
 
     @GetMapping("/api/admin/visitor-stats")

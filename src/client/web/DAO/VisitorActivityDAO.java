@@ -200,6 +200,38 @@ public final class VisitorActivityDAO {
         );
     }
 
+    public Map<String, Object> visitorHistory(
+            ClientSessionDTO admin,
+            Map<String, String> filters
+    ) throws Exception {
+        if (admin == null || !admin.loggedIn()) {
+            throw new Http.Error(401, "Vui lòng đăng nhập quản trị.");
+        }
+
+        StringBuilder query = new StringBuilder();
+        for (String name : new String[]{"period", "day", "month", "year"}) {
+            String value = filters.get(name);
+            if (value == null || value.isBlank()) continue;
+            value = value.trim();
+            if (value.length() > 16) {
+                throw new Http.Error(400, "Bộ lọc truy cập không hợp lệ.");
+            }
+            query.append(query.length() == 0 ? '?' : '&')
+                    .append(name).append('=').append(Http.enc(value));
+        }
+
+        Map<String,Object> response = Data.map(Http.call(
+                "GET", endpoint("/api/admin/visitor-history") + query,
+                admin.upstreamCookie, null
+        ).require().json());
+        if (!(response.get("totalVisits") instanceof Number)
+                || !(response.get("rows") instanceof java.util.List<?>)) {
+            throw new Http.Error(502, "Dữ liệu thống kê truy cập không hợp lệ.");
+        }
+        Data.list(response.get("rows"));
+        return response;
+    }
+
     public static String checkedToken(String token) {
         if (token == null
                 || !token.matches("[A-Za-z0-9._~-]{8,512}")) {

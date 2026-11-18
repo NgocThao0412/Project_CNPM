@@ -151,3 +151,23 @@
   body.printing-sgu-report #summary-report thead {display:table-header-group;}
   body.printing-sgu-report #summary-report tr {break-inside:avoid;}
 }
+
+/* Thống kê lượt truy cập */
+#visitor-history {margin-top:20px;}
+#visitor-history .report-heading {margin-bottom:18px;}
+#visitor-history .report-heading h2 {margin:0 0 6px;font-size:22px;color:#163b58;}
+#visitor-history .report-heading p {margin:0;color:#647c98;font-size:14px;}
+#visitor-history .visitor-history-grid {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:10px;}
+#visitor-history .visitor-history-field {display:flex;flex-direction:column;gap:7px;min-width:0;color:#325476;font-size:13px;font-weight:650;}
+#visitor-history .visitor-history-field select {width:100%;min-height:43px;border:1px solid #c9dced;border-radius:11px;padding:9px 13px;background:#fff;color:#193b61;font-size:14px;}
+#visitor-history .visitor-history-field select:focus-visible {outline:2px solid #287bc9;outline-offset:2px;}
+#visitor-history .visitor-history-help {color:#647c98;font-size:13px;margin:9px 0 14px;}
+#visitor-history .visitor-history-total {display:inline-flex;flex-direction:column;gap:4px;padding:17px 22px;margin-top:18px;min-width:220px;border:1px solid #c9e0f5;border-radius:14px;background:linear-gradient(135deg,#eef7ff,#fff);}
+#visitor-history .visitor-history-total span {color:#476d8f;font-size:13px;font-weight:700;}
+#visitor-history .visitor-history-total strong {color:#1263b2;font-size:30px;font-variant-numeric:tabular-nums;}
+#visitor-history .visitor-history-scroll {max-height:340px;overflow:auto;border:1px solid #d6e5f2;border-radius:11px;}
+#visitor-history .visitor-history-scroll .data-table {margin:0;width:100%;}
+#visitor-history .visitor-history-scroll th {position:sticky;top:0;background:#eaf5fc;z-index:1;}
+#visitor-history .visitor-history-error {padding:12px 14px;background:#fff6ed;color:#904819;border-radius:9px;margin-top:15px;}
+@media(max-width:850px){#visitor-history .visitor-history-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:540px){#visitor-history .visitor-history-grid{grid-template-columns:1fr;}}

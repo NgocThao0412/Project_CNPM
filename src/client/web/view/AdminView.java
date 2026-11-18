@@ -2,6 +2,7 @@ package web.view;
 import core.*;
 import web.DTO.*;
 import java.util.*;
+import java.time.*;
 import static web.view.Html.*;
 public final class AdminView {
     private final Settings s;
@@ -295,12 +296,106 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
         return b.toString();
     }
 
+        private String visitorHistorySection(
+            Map<String,Object> history,
+            Map<String,String> filters
+    ) {
+        LocalDate today = LocalDate.now(ZoneOffset.ofHours(7));
+        String period = filters.getOrDefault("period", "month");
+        if (!Set.of("day", "month", "year").contains(period)) period = "month";
+        int day = filterNumber(filters, "day", today.getDayOfMonth(), 1, 31);
+        int month = filterNumber(filters, "month", today.getMonthValue(), 1, 12);
+        int year = filterNumber(filters, "year", today.getYear(), 2000, today.getYear() + 1);
+
+        StringBuilder b = new StringBuilder("""
+                <section class="panel" id="visitor-history">
+                  <div class="report-heading"><div>
+                    <h2>Thống kê số lượng người truy cập</h2>
+                    <p>Thống kê theo phiên truy cập ẩn danh, không phải số người duy nhất.</p>
+                  </div></div>
+                  <form action="/admin/users#visitor-history" method="get" class="visitor-history-form">
+                    <div class="visitor-history-grid">
+                      <label class="visitor-history-field">Thống kê theo
+                        <select name="period">
+                """);
+        for (String[] option : new String[][]{
+                {"day", "Ngày"}, {"month", "Tháng"}, {"year", "Năm"}
+        }) {
+            b.append("<option value=\"").append(option[0]).append("\"")
+             .append(option[0].equals(period) ? " selected" : "")
+             .append(">").append(option[1]).append("</option>");
+        }
+        b.append("</select></label><label class=\"visitor-history-field\">Ngày<select name=\"day\">");
+        for (int value = 1; value <= 31; value++) {
+            b.append("<option value=\"").append(value).append("\"")
+             .append(value == day ? " selected" : "")
+             .append(">").append(value).append("</option>");
+        }
+        b.append("</select></label><label class=\"visitor-history-field\">Tháng<select name=\"month\">");
+        for (int value = 1; value <= 12; value++) {
+            b.append("<option value=\"").append(value).append("\"")
+             .append(value == month ? " selected" : "")
+             .append(">").append(value).append("</option>");
+        }
+        b.append("</select></label><label class=\"visitor-history-field\">Năm<select name=\"year\">");
+        for (int value = today.getYear() + 1; value >= 2020; value--) {
+            b.append("<option value=\"").append(value).append("\"")
+             .append(value == year ? " selected" : "")
+             .append(">").append(value).append("</option>");
+        }
+        b.append("""
+                     </select></label>
+                    </div>
+                    <p class="visitor-history-help">Theo tháng chỉ dùng tháng/năm; theo năm chỉ dùng năm.</p>
+                    <button class="btn" type="submit">Xem thống kê truy cập</button>
+                  </form>
+                """);
+
+        if (history.containsKey("error")) {
+            b.append("<p class=\"visitor-history-error\" role=\"alert\">")
+             .append(e(history.get("error"))).append("</p>");
+        } else {
+            b.append("<div class=\"visitor-history-total\"><span>Tổng lượt truy cập trong kỳ</span><strong>")
+             .append(e(history.get("totalVisits")))
+             .append("</strong></div><p class=\"visitor-history-help\">Kỳ thống kê: ")
+             .append(e(history.get("from")))
+             .append(" đến ").append(e(history.get("to")))
+             .append(" (UTC+7). Mỗi phiên tham quan được tính một lượt.</p>")
+             .append("<h3 class=\"report-subheading\">Chi tiết lượt truy cập</h3>")
+             .append("<div class=\"visitor-history-scroll\"><table class=\"data-table\"><thead><tr>")
+             .append("<th>Thời gian</th><th>Lượt truy cập</th></tr></thead><tbody>");
+            List<Map<String,Object>> rows = Data.list(history.get("rows"));
+            for (var row : rows) {
+                b.append("<tr><td>").append(e(row.get("label")))
+                 .append("</td><td>").append(e(row.get("visits"))).append("</td></tr>");
+            }
+            if (rows.isEmpty()) {
+                b.append("<tr><td colspan=\"2\">Chưa có lượt truy cập trong kỳ đã chọn.</td></tr>");
+            }
+            b.append("</tbody></table></div>");
+        }
+        return b.append("</section>").toString();
+    }
+
+    private static int filterNumber(Map<String,String> filters, String name,
+                                    int fallback, int min, int max) {
+        try {
+            int value = Integer.parseInt(filters.getOrDefault(name, ""));
+            return value >= min && value <= max ? value : fallback;
+        } catch (NumberFormatException exception) {
+            return fallback;
+        }
+    }
+
         public String users(
             List<Map<String, Object>> pois,
-            List<Map<String, Object>> languages
+            List<Map<String, Object>> languages,
+            Map<String, Object> visitorHistory,
+            Map<String, String> filters
     ) {
         StringBuilder b = new StringBuilder(users());
         b.append(poiCountSection(pois));
+        b.append(visitorHistorySection(visitorHistory, filters));
 
         b.append("""
                 <section class="panel" id="listening-history">

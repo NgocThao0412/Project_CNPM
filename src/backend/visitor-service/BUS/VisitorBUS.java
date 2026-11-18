@@ -5,6 +5,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.DateTimeException;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.HexFormat;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +23,10 @@ import DTO.VisitorStatsDTO;
 
 @Service
 public class VisitorBUS {
+
+    private static final ZoneOffset VIETNAM = ZoneOffset.ofHours(7);
+    private static final DateTimeFormatter SQL_TIME =
+            DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
 
     private final VisitorDAO dao;
     private final int activeWindowSeconds;
@@ -87,6 +95,65 @@ public class VisitorBUS {
                 counts.activeListeners(),
                 activeWindowSeconds,
                 Instant.now()
+        );
+    }
+
+    public VisitorStatsDTO.History history(
+            String period,
+            Integer day,
+            Integer month,
+            Integer year
+    ) {
+        String selected = period == null ? "month" : period;
+        if (!selected.equals("day") && !selected.equals("month")
+                && !selected.equals("year")) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Chỉ hỗ trợ thống kê ngày, tháng hoặc năm"
+            );
+        }
+
+        LocalDate today = LocalDate.now(VIETNAM);
+        int selectedYear = year == null ? today.getYear() : year;
+        int selectedMonth = month == null ? today.getMonthValue() : month;
+        int selectedDay = day == null ? today.getDayOfMonth() : day;
+        if (selectedYear < 2000 || selectedYear > today.getYear() + 1) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Năm thống kê không hợp lệ"
+            );
+        }
+
+        LocalDate from;
+        LocalDate until;
+        try {
+            switch (selected) {
+                case "day" -> {
+                    from = LocalDate.of(selectedYear, selectedMonth, selectedDay);
+                    until = from.plusDays(1);
+                }
+                case "month" -> {
+                    from = LocalDate.of(selectedYear, selectedMonth, 1);
+                    until = from.plusMonths(1);
+                }
+                default -> {
+                    from = LocalDate.of(selectedYear, 1, 1);
+                    until = from.plusYears(1);
+                }
+            }
+        } catch (DateTimeException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Ngày hoặc tháng thống kê không hợp lệ"
+            );
+        }
+
+        String fromUtc = from.atStartOfDay().atOffset(VIETNAM)
+                .withOffsetSameInstant(ZoneOffset.UTC).format(SQL_TIME);
+        String untilUtc = until.atStartOfDay().atOffset(VIETNAM)
+                .withOffsetSameInstant(ZoneOffset.UTC).format(SQL_TIME);
+
+        var rows = dao.history(fromUtc, untilUtc, selected);
+        long total = rows.stream().mapToLong(VisitorStatsDTO.HistoryRow::visits).sum();
+        return new VisitorStatsDTO.History(
+                selected, from, until.minusDays(1), "UTC+07:00", total, rows
         );
     }
 

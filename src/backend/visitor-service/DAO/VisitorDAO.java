@@ -1,5 +1,9 @@
 package DAO;
 
+import java.util.List;
+
+import DTO.VisitorStatsDTO;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -83,6 +87,33 @@ public class VisitorDAO {
                         result.getLong("active_listeners")
                 ),
                 activeWindowSeconds
+        );
+    }
+
+    public List<VisitorStatsDTO.HistoryRow> history(
+            String fromUtc,
+            String untilUtc,
+            String period
+    ) {
+        String bucket = switch (period) {
+            case "day" -> "DATE_FORMAT(DATE_ADD(started_at, INTERVAL 7 HOUR), '%H:00')";
+            case "month" -> "DATE_FORMAT(DATE_ADD(started_at, INTERVAL 7 HOUR), '%d/%m/%Y')";
+            case "year" -> "DATE_FORMAT(DATE_ADD(started_at, INTERVAL 7 HOUR), '%m/%Y')";
+            default -> throw new IllegalArgumentException("Kỳ thống kê không hợp lệ");
+        };
+
+        String sql = "SELECT " + bucket + " AS visit_period, "
+                + "COUNT(*) AS total_visits "
+                + "FROM visitor_sessions "
+                + "WHERE started_at >= ? AND started_at < ? "
+                + "GROUP BY visit_period ORDER BY MIN(started_at)";
+
+        return db.query(sql,
+                (result, row) -> new VisitorStatsDTO.HistoryRow(
+                        result.getString("visit_period"),
+                        result.getLong("total_visits")
+                ),
+                fromUtc, untilUtc
         );
     }
 
