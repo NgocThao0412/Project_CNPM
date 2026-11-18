@@ -158,6 +158,18 @@ public class VisitorBUS {
         );
     }
 
+    public VisitorStatsDTO.History historyRange(LocalDate from, LocalDate to) {
+        VisitorStatsDTO.Report range = report(from, to);
+        String fromUtc = from.atStartOfDay().atOffset(VIETNAM)
+                .withOffsetSameInstant(ZoneOffset.UTC).format(SQL_TIME);
+        String untilUtc = to.plusDays(1).atStartOfDay().atOffset(VIETNAM)
+                .withOffsetSameInstant(ZoneOffset.UTC).format(SQL_TIME);
+        return new VisitorStatsDTO.History(
+                "range", from, to, range.timezone(), range.totalVisits(),
+                dao.history(fromUtc, untilUtc, "month")
+        );
+    }
+
     public VisitorStatsDTO.Report report(LocalDate from, LocalDate to) {
         if (from == null || to == null
                 || from.getYear() < 1001 || from.getYear() > 9998

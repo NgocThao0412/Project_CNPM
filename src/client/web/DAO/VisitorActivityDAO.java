@@ -234,17 +234,13 @@ public final class VisitorActivityDAO {
             throw new Http.Error(401, "Vui lòng đăng nhập quản trị.");
         }
 
-        StringBuilder query = new StringBuilder();
-        for (String name : new String[]{"period", "day", "month", "year"}) {
-            String value = filters.get(name);
-            if (value == null || value.isBlank()) continue;
-            value = value.trim();
-            if (value.length() > 16) {
-                throw new Http.Error(400, "Bộ lọc truy cập không hợp lệ.");
-            }
-            query.append(query.length() == 0 ? '?' : '&')
-                    .append(name).append('=').append(Http.enc(value));
+        String from = filters.getOrDefault("from", "");
+        String to = filters.getOrDefault("to", "");
+        if (!from.matches("\\d{4}-\\d{2}-\\d{2}")
+                || !to.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            throw new Http.Error(400, "Khoảng ngày thống kê không hợp lệ.");
         }
+        String query = "?from=" + Http.enc(from) + "&to=" + Http.enc(to);
 
         Map<String,Object> response = Data.map(Http.call(
                 "GET", endpoint("/api/admin/visitor-history") + query,

@@ -176,6 +176,7 @@
   font-weight:650;
 }
 #visitor-history .visitor-history-field > span {white-space:normal;}
+#visitor-history .visitor-history-field input,
 #visitor-history .visitor-history-field select {
   width:100%;
   min-width:0;
@@ -191,6 +192,7 @@
   appearance:auto;
   cursor:pointer;
 }
+#visitor-history .visitor-history-field input:focus-visible,
 #visitor-history .visitor-history-field select:focus-visible {outline:2px solid #287bc9;outline-offset:2px;}
 #visitor-history .visitor-history-actions {display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:19px 0 10px;}
 #visitor-history .visitor-history-actions .btn {min-height:43px;}

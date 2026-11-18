@@ -562,16 +562,22 @@ public final class ClientController {
             success(x,"/admin/pois","Đã cập nhật trạng thái POI.");
             return;
         } if(p.equals("/admin/users")&&method.equals("GET")) {
+            LocalDate today = LocalDate.now(ZoneOffset.ofHours(7));
+            Map<String,String> visitorFilters = new LinkedHashMap<>(q);
+            visitorFilters.putIfAbsent("from", today.minusDays(29).toString());
+            visitorFilters.putIfAbsent("to", today.toString());
             Map<String,Object> visitorHistory;
             try {
-                visitorHistory = activity.visitorHistory(ss, q);
+                visitorHistory = activity.visitorHistory(ss, visitorFilters);
             } catch (Http.Error error) {
-                visitorHistory = Data.row("error", "Không thể tải thống kê lượt truy cập.");
+                visitorHistory = Data.row("error", error.status == 400
+                        ? "Khoảng ngày không hợp lệ hoặc vượt quá 366 ngày."
+                        : "Không thể tải thống kê lượt truy cập.");
             } catch (Exception error) {
                 visitorHistory = Data.row("error", "Visitor Service chưa sẵn sàng.");
             }
             page(x,ss,"Thống kê và báo cáo","admin",
-                    admin.users(api.pois(ss, true), api.languages(ss), visitorHistory, q));
+                    admin.users(api.pois(ss, true), api.languages(ss), visitorHistory, visitorFilters));
             return;
         } if(p.equals("/admin/audio")&&method.equals("GET")) {
             page(x,ss,"Quản lý audio","admin",

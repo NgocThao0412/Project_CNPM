@@ -301,13 +301,8 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
             Map<String,Object> history,
             Map<String,String> filters
     ) {
-        LocalDate today = LocalDate.now(ZoneOffset.ofHours(7));
-        String period = filters.getOrDefault("period", "month");
-        if (!Set.of("day", "month", "year").contains(period)) period = "month";
-        int day = filterNumber(filters, "day", today.getDayOfMonth(), 1, 31);
-        int month = filterNumber(filters, "month", today.getMonthValue(), 1, 12);
-        int year = filterNumber(filters, "year", today.getYear(), 2000, today.getYear() + 1);
-
+        String from = filters.getOrDefault("from", "");
+        String to = filters.getOrDefault("to", "");
         StringBuilder b = new StringBuilder("""
                 <section class="panel" id="visitor-history">
                   <div class="report-heading"><div>
@@ -315,39 +310,17 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
                     <p>Thống kê theo phiên truy cập ẩn danh, không phải số người duy nhất.</p>
                   </div></div>
                   <form action="/admin/users#visitor-history" method="get" class="visitor-history-form">
-                    <div class="form-grid stats-filter-grid visitor-history-grid">
-                      <label class="stats-filter-field visitor-history-field"><span>Thống kê theo</span>
-                        <select name="period">
+                    <div class="visitor-history-grid">
+                      <label class="visitor-history-field"><span>Từ ngày</span>
                 """);
-        for (String[] option : new String[][]{
-                {"day", "Ngày"}, {"month", "Tháng"}, {"year", "Năm"}
-        }) {
-            b.append("<option value=\"").append(option[0]).append("\"")
-             .append(option[0].equals(period) ? " selected" : "")
-             .append(">").append(option[1]).append("</option>");
-        }
-        b.append("</select></label><label class=\"stats-filter-field visitor-history-field\"><span>Ngày</span><select name=\"day\">");
-        for (int value = 1; value <= 31; value++) {
-            b.append("<option value=\"").append(value).append("\"")
-             .append(value == day ? " selected" : "")
-             .append(">").append(value).append("</option>");
-        }
-        b.append("</select></label><label class=\"stats-filter-field visitor-history-field\"><span>Tháng</span><select name=\"month\">");
-        for (int value = 1; value <= 12; value++) {
-            b.append("<option value=\"").append(value).append("\"")
-             .append(value == month ? " selected" : "")
-             .append(">").append(value).append("</option>");
-        }
-        b.append("</select></label><label class=\"stats-filter-field visitor-history-field\"><span>Năm</span><select name=\"year\">");
-        for (int value = today.getYear() + 1; value >= 2020; value--) {
-            b.append("<option value=\"").append(value).append("\"")
-             .append(value == year ? " selected" : "")
-             .append(">").append(value).append("</option>");
-        }
-        b.append("""
-                     </select></label>
+        b.append("<input type=\"date\" name=\"from\" required value=\"")
+         .append(e(from)).append("\"></label>")
+         .append("<label class=\"visitor-history-field\"><span>Đến ngày</span>")
+         .append("<input type=\"date\" name=\"to\" required value=\"")
+         .append(e(to)).append("\"></label>")
+         .append("""
                     </div>
-                    <div class="report-actions visitor-history-actions">
+                    <div class="visitor-history-actions">
                       <button class="btn" type="submit">Xem thống kê truy cập</button>
                     </div>
                   </form>
@@ -377,16 +350,6 @@ public String overview(ClientSessionDTO ss, List<Map<String,Object>> pois,
             b.append("</tbody></table></div>");
         }
         return b.append("</section>").toString();
-    }
-
-    private static int filterNumber(Map<String,String> filters, String name,
-                                    int fallback, int min, int max) {
-        try {
-            int value = Integer.parseInt(filters.getOrDefault(name, ""));
-            return value >= min && value <= max ? value : fallback;
-        } catch (NumberFormatException exception) {
-            return fallback;
-        }
     }
 
         public String users(

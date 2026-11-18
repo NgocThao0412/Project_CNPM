@@ -73,12 +73,18 @@ public class VisitorController {
             @RequestParam(name = "day", required = false) Integer day,
             @RequestParam(name = "month", required = false) Integer month,
             @RequestParam(name = "year", required = false) Integer year,
+            @RequestParam(name = "from", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(name = "to", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             HttpServletRequest request
     ) {
         access.requireAdmin(request);
         return ResponseEntity.ok()
                 .header("Cache-Control", "no-store")
-                .body(bus.history(period, day, month, year));
+                .body(from != null || to != null
+                        ? bus.historyRange(from, to)
+                        : bus.history(period, day, month, year));
     }
 
     @GetMapping("/api/admin/visitor-report")
