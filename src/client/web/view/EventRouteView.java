@@ -62,17 +62,21 @@ public final class EventRouteView {
             long id=Data.id(r,"id");
             b.append("<tr><td><strong>").append(e(val(r,"title"))).append("</strong><br><small>").append(e(val(r,"routeCode"))).append("</small></td>"
              +"<td>").append(e(r.get("stopCount"))).append("</td><td>")
-             .append(Data.bool(r,"published",false)?"Đang công bố":"Đã ẩn")
-             .append(Data.bool(r,"template",false)?" · Mẫu":"")
+             .append(Data.bool(r,"template",false)?"Mẫu · Chưa công bố":(Data.bool(r,"published",false)?"Đang công bố":"Đã ẩn"))
              .append("</td><td><div class=\"row-actions\">")
-             .append(link("/admin/event-route?id="+id,"Chỉnh sửa","btn btn-light btn-small"))
-             .append("<form class=\"inline-form\" method=\"post\" action=\"/admin/event-route/visibility\">")
-             .append(hidden("csrf",session.csrf)).append(hidden("id",id))
-             .append("<input type=\"hidden\" name=\"published\" value=\"")
-             .append(Data.bool(r,"published",false)?"false":"true").append("\">")
-             .append("<button class=\"btn btn-light btn-small\" type=\"submit\">")
-             .append(Data.bool(r,"published",false)?"Ẩn":"Hiện")
-             .append("</button></form></div></td></tr>");
+             .append(link("/admin/event-route?id="+id,"Chỉnh sửa","btn btn-light btn-small"));
+            if(Data.bool(r,"template",false)) {
+                b.append("<span class=\"tag tag-muted\">Bỏ trạng thái mẫu để công bố</span>");
+            } else {
+                b.append("<form class=\"inline-form\" method=\"post\" action=\"/admin/event-route/visibility\">")
+                 .append(hidden("csrf",session.csrf)).append(hidden("id",id))
+                 .append("<input type=\"hidden\" name=\"published\" value=\"")
+                 .append(Data.bool(r,"published",false)?"false":"true").append("\">")
+                 .append("<button class=\"btn btn-light btn-small\" type=\"submit\">")
+                 .append(Data.bool(r,"published",false)?"Ẩn":"Hiện")
+                 .append("</button></form>");
+            }
+            b.append("</div></td></tr>");
         }
         if(routes.isEmpty())b.append("<tr><td colspan=\"4\">Chưa có lộ trình.</td></tr>");
         return b.append("</tbody></table></div></section>").toString();
@@ -85,19 +89,21 @@ public final class EventRouteView {
         StringBuilder b=new StringBuilder("<div class=\"section-header\"><div><h2>"
           +(create?"Tạo lộ trình":"Chỉnh sửa lộ trình")
           +"</h2><p>Thứ tự bên dưới là thứ tự sinh viên thực hiện các bước.</p></div>"
-          +link("/admin/event-routes","← Danh sách","btn btn-light")+"</div>");
+          +"</div>");
         if(error!=null&&!error.isBlank())b.append("<div class=\"error-box\"><p>").append(e(error)).append("</p></div>");
         b.append("<form action=\"/admin/event-route/save\" method=\"post\" class=\"panel event-editor\">"
           +hidden("csrf",session.csrf)+hidden("id",id)
           +"<div class=\"form-grid\">"
           +input("Mã lộ trình","routeCode",val(route,"routeCode"),"text","required maxlength=\"60\" pattern=\"[A-Za-z0-9_-]{3,60}\"")
           +input("Tên lộ trình","title",val(route,"title"),"text","required maxlength=\"180\"")
-          +input("Đối tượng","audience",val(route,"audience").isBlank()?"Tân sinh viên":val(route,"audience"),"text","required maxlength=\"100\"")
+          +hidden("audience",val(route,"audience").isBlank()?"Tân sinh viên":val(route,"audience"))
           +"</div><label class=\"field\"><span>Mô tả</span><textarea name=\"summary\" maxlength=\"2000\" rows=\"3\" required>"
           +value(route,"summary")+"</textarea></label>"
-          +"<div class=\"event-editor-flags\"><label><input type=\"checkbox\" name=\"published\" value=\"true\""+toggle(route,"published")+"> Công bố cho sinh viên</label>"
+          +"<div class=\"event-editor-flags\"><label><input type=\"checkbox\" name=\"published\" value=\"true\""
+          +(Data.bool(route,"published",false) && !Data.bool(route,"template",false) ? " checked" : "")
+          +" onchange=\"if(this.checked){this.form.elements['template'].checked=false;}\"> Công bố cho sinh viên</label>"
           +"<label><input type=\"checkbox\" name=\"template\" value=\"true\""+(create?" checked":toggle(route,"template"))
-          +"> Đây là lộ trình mẫu, chưa được xác minh</label></div>"
+          +" onchange=\"if(this.checked){this.form.elements['published'].checked=false;}\"> Đây là lộ trình mẫu, chưa được xác minh</label></div>"
           +"<h3>Các bước trong lộ trình</h3><p class=\"help\">Nhập liên tiếp từ bước 1, tối đa 12 bước; bỏ trống tên bước để không lưu. Chọn POI thật nếu đã xác nhận vị trí.</p>");
         List<Map<String,Object>> steps=new ArrayList<>();
         Object raw=route.get("stops");

@@ -21,7 +21,11 @@ public class EventRouteBUS {
         return text;
     }
     private boolean yes(Map<String,Object> m,String key){
-        return Boolean.TRUE.equals(m.get(key)) || "true".equalsIgnoreCase(Objects.toString(m.get(key),""));
+        Object value=m.get(key);
+        return Boolean.TRUE.equals(value)
+            || (value instanceof Number && ((Number)value).intValue()!=0)
+            || "1".equals(Objects.toString(value,""))
+            || "true".equalsIgnoreCase(Objects.toString(value,""));
     }
     public long save(long id,Map<String,Object> form){
         if(id<0)throw new IllegalArgumentException("Mã tuyến không hợp lệ.");
@@ -30,7 +34,10 @@ public class EventRouteBUS {
         Map<String,Object> route=new LinkedHashMap<>();
         route.put("routeCode",code);route.put("title",str(form,"title",180,true));
         route.put("summary",str(form,"summary",2000,true));route.put("audience",str(form,"audience",100,true));
-        route.put("published",yes(form,"published"));route.put("template",yes(form,"template"));
+        boolean published=yes(form,"published"),template=yes(form,"template");
+        if(published && template)
+            throw new IllegalArgumentException("Lộ trình mẫu không được công bố cho sinh viên.");
+        route.put("published",published);route.put("template",template);
         Object raw=form.get("stops");
         if(!(raw instanceof List<?> all)||all.isEmpty()||all.size()>12)
             throw new IllegalArgumentException("Mỗi tuyến cần từ 1 đến 12 bước.");
@@ -61,7 +68,9 @@ public class EventRouteBUS {
     }
     public void setPublished(long id,boolean published){
         if(id<=0)throw new IllegalArgumentException("Mã lộ trình không hợp lệ.");
-        one(id,true);
+        Map<String,Object> route=one(id,true);
+        if(published && yes(route,"template"))
+            throw new IllegalArgumentException("Lộ trình mẫu không được công bố. Hãy bỏ trạng thái mẫu trước.");
         dao.setPublished(id,published);
     }
 }

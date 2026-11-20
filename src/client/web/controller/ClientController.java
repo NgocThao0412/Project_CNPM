@@ -460,6 +460,8 @@ public final class ClientController {
             form.put("template","true".equals(f.get("template")));
             form.put("stops",stops);
             try {
+                if(Boolean.TRUE.equals(form.get("published")) && Boolean.TRUE.equals(form.get("template")))
+                    throw new Http.Error(400,"Lộ trình mẫu không được công bố cho sinh viên. Chỉ chọn một trạng thái.");
                 api.saveEventRoute(ss,routeId,form);
                 success(x,"/admin/event-routes","Đã lưu lộ trình.");
             } catch(Http.Error ex){

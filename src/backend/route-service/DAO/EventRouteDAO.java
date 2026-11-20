@@ -19,7 +19,7 @@ public class EventRouteDAO {
         String sql = "SELECT r.id,r.route_code AS routeCode,r.route_name AS title,"
             + "r.description AS summary,r.audience,r.is_visible AS published,r.is_template AS template,"
             + "(SELECT COUNT(*) FROM tour_route_pois s WHERE s.route_id=r.id) AS stopCount "
-            + "FROM tour_routes r " + (includeDrafts?"":"WHERE r.is_visible=1 ")
+            + "FROM tour_routes r " + (includeDrafts?"":"WHERE r.is_visible=1 AND r.is_template=0 ")
             + "ORDER BY r.id";
         return jdbc.queryForList(sql);
     }
@@ -28,7 +28,7 @@ public class EventRouteDAO {
         List<Map<String,Object>> rows=jdbc.queryForList(
             "SELECT id,route_code AS routeCode,route_name AS title,description AS summary,"
             + "audience,is_visible AS published,is_template AS template "
-            + "FROM tour_routes WHERE id=? " + (includeDrafts?"":"AND is_visible=1"),id);
+            + "FROM tour_routes WHERE id=? " + (includeDrafts?"":"AND is_visible=1 AND is_template=0"),id);
         if(rows.isEmpty())return null;
         Map<String,Object> route=new LinkedHashMap<>(rows.getFirst());
         String allowed=includeDrafts?"1=1":"p.is_visible=1 AND a.is_visible=1";
