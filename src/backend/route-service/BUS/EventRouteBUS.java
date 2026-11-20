@@ -68,9 +68,7 @@ public class EventRouteBUS {
     }
     public void setPublished(long id,boolean published){
         if(id<=0)throw new IllegalArgumentException("Mã lộ trình không hợp lệ.");
-        Map<String,Object> route=one(id,true);
-        if(published && yes(route,"template"))
-            throw new IllegalArgumentException("Lộ trình mẫu không được công bố. Hãy bỏ trạng thái mẫu trước.");
+        one(id,true);
         dao.setPublished(id,published);
     }
 }

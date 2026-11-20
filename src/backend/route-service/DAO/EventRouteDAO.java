@@ -93,6 +93,6 @@ public class EventRouteDAO {
 
     @Transactional
     public void setPublished(long id,boolean published) {
-        jdbc.update("UPDATE tour_routes SET is_visible=? WHERE id=?",published,id);
+        jdbc.update("UPDATE tour_routes SET is_visible=?, is_template=CASE WHEN ? THEN 0 ELSE is_template END WHERE id=?",published,published,id);
     }
 }

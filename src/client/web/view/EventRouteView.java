@@ -62,20 +62,16 @@ public final class EventRouteView {
             long id=Data.id(r,"id");
             b.append("<tr><td><strong>").append(e(val(r,"title"))).append("</strong><br><small>").append(e(val(r,"routeCode"))).append("</small></td>"
              +"<td>").append(e(r.get("stopCount"))).append("</td><td>")
-             .append(Data.bool(r,"template",false)?"Mẫu · Chưa công bố":(Data.bool(r,"published",false)?"Đang công bố":"Đã ẩn"))
+             .append(Data.bool(r,"published",false) && !Data.bool(r,"template",false) ? "Đang công bố" : "Đã ẩn")
              .append("</td><td><div class=\"row-actions\">")
              .append(link("/admin/event-route?id="+id,"Chỉnh sửa","btn btn-light btn-small"));
-            if(Data.bool(r,"template",false)) {
-                b.append("<span class=\"tag tag-muted\">Bỏ trạng thái mẫu để công bố</span>");
-            } else {
                 b.append("<form class=\"inline-form\" method=\"post\" action=\"/admin/event-route/visibility\">")
                  .append(hidden("csrf",session.csrf)).append(hidden("id",id))
                  .append("<input type=\"hidden\" name=\"published\" value=\"")
-                 .append(Data.bool(r,"published",false)?"false":"true").append("\">")
+                 .append((Data.bool(r,"published",false) && !Data.bool(r,"template",false))?"false":"true").append("\">")
                  .append("<button class=\"btn btn-light btn-small\" type=\"submit\">")
-                 .append(Data.bool(r,"published",false)?"Ẩn":"Hiện")
+                 .append((Data.bool(r,"published",false) && !Data.bool(r,"template",false))?"Ẩn":"Hiện")
                  .append("</button></form>");
-            }
             b.append("</div></td></tr>");
         }
         if(routes.isEmpty())b.append("<tr><td colspan=\"4\">Chưa có lộ trình.</td></tr>");
