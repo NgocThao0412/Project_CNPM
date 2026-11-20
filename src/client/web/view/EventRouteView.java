@@ -124,9 +124,6 @@ public final class EventRouteView {
         }
         b.append("<div class=\"form-actions\"><button class=\"btn\" type=\"submit\">Lưu lộ trình</button>"
           +link("/admin/event-routes","Hủy","btn btn-light")+"</div></form>");
-        if(!create)b.append("<form class=\"event-delete\" method=\"post\" action=\"/admin/event-route/delete\">"
-          +hidden("csrf",session.csrf)+hidden("id",id)
-          +"<button class=\"btn btn-light\" type=\"submit\">Xóa lộ trình</button></form>");
         return b.toString();
     }
 }
