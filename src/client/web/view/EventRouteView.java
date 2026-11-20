@@ -55,9 +55,8 @@ public final class EventRouteView {
         return b.append("</section><div class=\"event-end-actions\">"+link("/","← Về trang Khám phá","btn btn-light")+"</div>").toString();
     }
     public String adminList(ClientSessionDTO session,List<Map<String,Object>> routes){
-        StringBuilder b=new StringBuilder("<div class=\"section-header\"><div><h2>Quản lý đường đi sự kiện</h2><p>Tạo luồng nhập học, khám sức khỏe và gắn các bước vào POI.</p></div>"
+        StringBuilder b=new StringBuilder("<div class=\"section-header\"><div><h2>Quản lý đường đi sự kiện</h2></div>"
              +link("/admin/event-route",icon("plus")+"Tạo lộ trình","btn")+"</div>"
-             +"<div class=\"event-note\">Các tuyến mẫu chỉ mang tính tham khảo. Hãy cập nhật địa điểm, lịch tổ chức và xác nhận trước khi bỏ trạng thái mẫu.</div>"
              +"<section class=\"panel\"><div class=\"table-wrap\"><table class=\"data-table\"><thead><tr><th>Lộ trình</th><th>Số bước</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody>");
         for(var r:routes){
             long id=Data.id(r,"id");
