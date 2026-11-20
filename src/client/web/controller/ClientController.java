@@ -415,14 +415,25 @@ public final class ClientController {
                     return;
                 }
             }
+            if (!requestedCode.isBlank()) {
+                page(x,ss,"Lộ trình chưa được công bố","routes",eventRoutes.publicUnavailable());
+                return;
+            }
             page(x,ss,"Đường đi tân sinh viên","routes",eventRoutes.publicList(publishedRoutes));
             return;
         } if(p.equals("/event-route")&&method.equals("GET")) {
             long routeId=id(q);
             if(routeId<=0)throw new Http.Error(400,"Vui lòng chọn lộ trình.");
-            Map<String,Object> selectedRoute=api.eventRoute(ss,routeId,false);
+            Map<String,Object> selectedRoute;
+            try {
+                selectedRoute=api.eventRoute(ss,routeId,false);
+            } catch(Http.Error ex) {
+                if(ex.status!=404)throw ex;
+                page(x,ss,"Lộ trình chưa được công bố","routes",eventRoutes.publicUnavailable());
+                return;
+            }
             if ("NOP_HO_SO".equals(Data.text(selectedRoute,"routeCode"))) {
-                Http.redirect(x,"/event-routes");
+                page(x,ss,"Lộ trình chưa được công bố","routes",eventRoutes.publicUnavailable());
                 return;
             }
             page(x,ss,"Hướng dẫn đường đi","routes",eventRoutes.publicDetail(selectedRoute));

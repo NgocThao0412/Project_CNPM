@@ -880,3 +880,10 @@ a.places-page-control:hover { background: #eaf4ff; border-color: #8abdf4; }
   }
 }
 /* SGU_STICKY_MAP_STOP_PANEL_END */
+
+/* Hidden or unpublished student route: text-only state. */
+.event-unavailable{background:#fff;border:1px solid #d6e5fa;border-radius:28px;max-width:920px;margin:62px auto 96px;padding:76px 54px;text-align:center;box-shadow:0 15px 44px #1b5fa512}
+.event-unavailable h1{font-size:clamp(27px,3.3vw,43px);color:#0c3169;margin:0 auto 25px;line-height:1.24}
+.event-unavailable p{color:#506c8d;font-size:17px;line-height:1.8;max-width:730px;margin:0 auto 39px}
+.event-unavailable .btn{font-size:16px;font-weight:750;padding:14px 28px;min-height:54px;border-radius:15px}
+@media(max-width:620px){.event-unavailable{margin:34px auto 68px;padding:45px 23px;border-radius:22px}.event-unavailable h1{font-size:28px;margin-bottom:19px}.event-unavailable p{font-size:14px;line-height:1.7;margin-bottom:29px}.event-unavailable .btn{font-size:13px;min-height:46px;padding:11px 17px}}
