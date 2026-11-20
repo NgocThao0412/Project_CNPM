@@ -147,16 +147,12 @@ public final class EventRouteView {
         }
         b.append("</div><button type=\"button\" class=\"sgu-route-add-step\" id=\"sgu-route-add-step\">"
             +icon("plus")+" Thêm bước</button>"
-            +"<p class=\"sgu-route-step-help\">Tối đa 12 bước. Nhấn vào bước để chỉnh sửa; có thể lưu nháp khi chưa hoàn thiện.</p>"
             +"</section>"
             +"<div class=\"sgu-route-save-row\"><div class=\"sgu-route-save-buttons\">"
             +"<button class=\"btn btn-light sgu-route-draft-btn\" type=\"submit\" name=\"saveMode\" value=\"draft\">Lưu bản nháp</button>"
             +"<button class=\"btn\" type=\"submit\" name=\"saveMode\" value=\"publish\">Lưu và công khai</button>"
             +link("/admin/event-routes","Hủy","btn btn-light")
-            +"</div><span class=\"sgu-route-draft-note\">"
-            +(Data.bool(route,"published",false) && !Data.bool(route,"template",false)
-                ? "Đang công khai" : "Bản nháp (chưa công khai)")
-            +"</span></div></form>"
+            +"</div></div></form>"
             +"<link rel=\"stylesheet\" href=\"/assets/sgu-route-editor.css\">"
             +"<script defer src=\"/assets/sgu-route-editor.js\"></script>");
         return b.toString();
