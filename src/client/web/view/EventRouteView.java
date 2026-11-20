@@ -7,6 +7,10 @@ import static web.view.Html.*;
 
 /** Event-route list, sequential guidance and admin editor. Keeps original map/POI UI untouched. */
 public final class EventRouteView {
+    private static int stepsCount(Map<String,Object> route){
+        Object raw=route.get("stops");
+        return raw instanceof List<?> rows ? rows.size() : 0;
+    }
     private static String val(Map<String,Object> m,String k){return Data.text(m,k);}
     private static String toggle(Map<String,Object> m,String name){return Data.bool(m,name,false)?" checked":"";}
     private static String item(String name,Object value,String type,String extra){
@@ -103,21 +107,30 @@ public final class EventRouteView {
           +hidden("audience",val(route,"audience").isBlank()?"Tân sinh viên":val(route,"audience"))
           +"</div><label class=\"field\"><span>Mô tả</span><textarea name=\"summary\" maxlength=\"2000\" rows=\"3\" required>"
           +value(route,"summary")+"</textarea></label>"
-          +"<div class=\"event-editor-flags\"><label><input type=\"checkbox\" name=\"published\" value=\"true\""
-          +(Data.bool(route,"published",false) && !Data.bool(route,"template",false) ? " checked" : "")
-          +" onchange=\"if(this.checked){this.form.elements['template'].checked=false;}\"> Công bố cho sinh viên</label>"
-          +"<label><input type=\"checkbox\" name=\"template\" value=\"true\""+(create?" checked":toggle(route,"template"))
-          +" onchange=\"if(this.checked){this.form.elements['published'].checked=false;}\"> Đây là lộ trình mẫu, chưa được xác minh</label></div>"
-          +"<h3>Các bước trong lộ trình</h3><p class=\"help\">Nhập liên tiếp từ bước 1, tối đa 12 bước; bỏ trống tên bước để không lưu. Chọn POI thật nếu đã xác nhận vị trí.</p>");
+                    +"<section class=\"sgu-route-step-panel\" aria-label=\"Các bước trong lộ trình\">"
+          +"<div class=\"sgu-route-step-heading\"><h3>Các bước trong lộ trình</h3>"
+          +"<span class=\"sgu-route-step-count\" id=\"sgu-route-step-count\">Tổng số bước: "+Math.min(stepsCount(route),12)+"</span></div>"
+          +"<div class=\"sgu-route-step-list\" id=\"sgu-route-step-list\">");
         List<Map<String,Object>> steps=new ArrayList<>();
         Object raw=route.get("stops");
         if(raw instanceof List<?>)steps.addAll(Data.list(raw));
         for(int i=1;i<=12;i++){
             Map<String,Object> step=i<=steps.size()?steps.get(i-1):Map.of();
             String title=val(step,"title"), location=val(step,"locationLabel"), instructions=val(step,"instructions");
-            b.append("<details class=\"event-editor-step\" ").append(i<=Math.max(1,steps.size())?"open":"").append(">"
-               +"<summary>Bước "+i+(title.isBlank()?" · Chưa nhập":" · "+e(title))+"</summary>"
-               +"<div class=\"form-grid\">"
+            b.append("<details class=\"sgu-route-step-card\" data-sgu-route-step data-slot=\"").append(i).append("\"");
+            if(i>steps.size())b.append(" hidden");
+            b.append("><summary class=\"sgu-route-step-bar\">"
+               +"<span class=\"sgu-route-step-grip\" draggable=\"true\" title=\"Kéo để đổi thứ tự bước\" aria-hidden=\"true\">⠿</span>"
+               +"<span class=\"sgu-route-step-number\" data-sgu-route-number>").append(i).append("</span>"
+               +"<strong class=\"sgu-route-step-label\" data-sgu-route-label>")
+               .append(e(title.isBlank()?"Bước "+i+": Chưa nhập":"Bước "+i+": "+title))
+               .append("</strong><span class=\"sgu-route-step-actions\">"
+               +"<button type=\"button\" class=\"sgu-route-icon-btn\" data-sgu-route-edit title=\"Chỉnh sửa bước\" aria-label=\"Chỉnh sửa bước\">"
+               +icon("edit")+"</button>"
+               +"<button type=\"button\" class=\"sgu-route-icon-btn sgu-route-remove-btn\" data-sgu-route-remove title=\"Xóa bước\" aria-label=\"Xóa bước\">"
+               +"<svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">"
+               +"<path d=\"M3 6h18 M9 6V4h6v2 M6 6l1 15h10l1-15 M10 10v7 M14 10v7\"/></svg></button>"
+               +"</span></summary><div class=\"sgu-route-step-fields\"><div class=\"form-grid\">"
                +input("Tên bước","stopTitle"+i,title,"text","maxlength=\"180\"")
                +input("Khu vực / phòng (nếu có)","stopLocation"+i,location,"text","maxlength=\"200\"")
                +"<label class=\"field\"><span>Gắn địa điểm POI (không bắt buộc)</span><select name=\"stopPoi"+i+"\"><option value=\"0\">Chưa xác nhận POI</option>");
@@ -130,10 +143,22 @@ public final class EventRouteView {
             b.append("</select></label>"
                 +input("Thời lượng tham khảo (phút)","stopMinutes"+i,val(step,"durationMinutes").isBlank()?0:val(step,"durationMinutes"),"number","min=\"0\" max=\"240\"")
                 +"</div><label class=\"field\"><span>Hướng dẫn thực hiện</span><textarea rows=\"3\" maxlength=\"3000\" name=\"stopInstructions"+i+"\">"
-                +e(instructions)+"</textarea></label></details>");
+                +e(instructions)+"</textarea></label></div></details>");
         }
-        b.append("<div class=\"form-actions\"><button class=\"btn\" type=\"submit\">Lưu lộ trình</button>"
-          +link("/admin/event-routes","Hủy","btn btn-light")+"</div></form>");
+        b.append("</div><button type=\"button\" class=\"sgu-route-add-step\" id=\"sgu-route-add-step\">"
+            +icon("plus")+" Thêm bước</button>"
+            +"<p class=\"sgu-route-step-help\">Tối đa 12 bước. Nhấn vào bước để chỉnh sửa; có thể lưu nháp khi chưa hoàn thiện.</p>"
+            +"</section>"
+            +"<div class=\"sgu-route-save-row\"><div class=\"sgu-route-save-buttons\">"
+            +"<button class=\"btn btn-light sgu-route-draft-btn\" type=\"submit\" name=\"saveMode\" value=\"draft\">Lưu bản nháp</button>"
+            +"<button class=\"btn\" type=\"submit\" name=\"saveMode\" value=\"publish\">Lưu và công khai</button>"
+            +link("/admin/event-routes","Hủy","btn btn-light")
+            +"</div><span class=\"sgu-route-draft-note\">"
+            +(Data.bool(route,"published",false) && !Data.bool(route,"template",false)
+                ? "Đang công khai" : "Bản nháp (chưa công khai)")
+            +"</span></div></form>"
+            +"<link rel=\"stylesheet\" href=\"/assets/sgu-route-editor.css\">"
+            +"<script defer src=\"/assets/sgu-route-editor.js\"></script>");
         return b.toString();
     }
 }

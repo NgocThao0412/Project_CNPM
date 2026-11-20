@@ -39,14 +39,14 @@ public class EventRouteBUS {
             throw new IllegalArgumentException("Lộ trình mẫu không được công bố cho sinh viên.");
         route.put("published",published);route.put("template",template);
         Object raw=form.get("stops");
-        if(!(raw instanceof List<?> all)||all.isEmpty()||all.size()>12)
+        if(!(raw instanceof List<?> all)||all.size()>12||(published&&all.isEmpty()))
             throw new IllegalArgumentException("Mỗi tuyến cần từ 1 đến 12 bước.");
         List<Map<String,Object>> stops=new ArrayList<>();
         for(Object o:all){
             if(!(o instanceof Map<?,?> x))throw new IllegalArgumentException("Thông tin bước không hợp lệ.");
             Map<String,Object> m=new LinkedHashMap<>();x.forEach((k,v)->m.put(Objects.toString(k),v));
             String title=str(m,"title",180,true);
-            String instructions=str(m,"instructions",3000,true);
+            String instructions=str(m,"instructions",3000,published);
             String place=str(m,"locationLabel",200,false);
             long poi=0;
             try{poi=Long.parseLong(Objects.toString(m.get("poiId"),"0"));}

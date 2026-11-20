@@ -462,14 +462,18 @@ public final class ClientController {
             form.put("title",f.getOrDefault("title",""));
             form.put("summary",f.getOrDefault("summary",""));
             form.put("audience",f.getOrDefault("audience","Tân sinh viên"));
-            form.put("published","true".equals(f.get("published")));
-            form.put("template","true".equals(f.get("template")));
+            String saveMode=f.getOrDefault("saveMode","draft");
+            if(!Set.of("draft","publish").contains(saveMode))
+                throw new Http.Error(400,"Chế độ lưu lộ trình không hợp lệ.");
+            form.put("published","publish".equals(saveMode));
+            form.put("template",false);
             form.put("stops",stops);
             try {
                 if(Boolean.TRUE.equals(form.get("published")) && Boolean.TRUE.equals(form.get("template")))
                     throw new Http.Error(400,"Lộ trình mẫu không được công bố cho sinh viên. Chỉ chọn một trạng thái.");
                 api.saveEventRoute(ss,routeId,form);
-                success(x,"/admin/event-routes","Đã lưu lộ trình.");
+                success(x,"/admin/event-routes","publish".equals(saveMode)
+                    ? "Đã lưu và công khai lộ trình." : "Đã lưu bản nháp (chưa công khai).");
             } catch(Http.Error ex){
                 if(ex.status==401)throw ex;
                 Map<String,Object> draft=new LinkedHashMap<>(form);

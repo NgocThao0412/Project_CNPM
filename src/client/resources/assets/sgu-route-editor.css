@@ -1,0 +1,37 @@
+/* Route editor only: other admin forms and pages are not affected. */
+.sgu-route-step-panel{margin-top:22px;padding:17px 16px 18px;border:1px solid #d5e6fb;border-radius:18px;background:#fcfdff}
+.sgu-route-step-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:2px 2px 17px}
+.sgu-route-step-heading h3{margin:0;color:#0b356b;font-size:19px}
+.sgu-route-step-count{font-size:12px;font-weight:650;color:#7189a4;white-space:nowrap}
+.sgu-route-step-list{display:flex;flex-direction:column;gap:10px}
+.sgu-route-step-card{display:block;border:1px solid #d6e5f7;border-radius:14px;background:#fff;overflow:hidden}
+.sgu-route-step-card[hidden]{display:none!important}
+.sgu-route-step-card[open]{border-color:#96c6ff;box-shadow:0 5px 18px #1c63bf12}
+.sgu-route-step-bar{display:flex;align-items:center;min-height:58px;gap:13px;padding:9px 13px;cursor:pointer;list-style:none}
+.sgu-route-step-bar::-webkit-details-marker{display:none}
+.sgu-route-step-bar::marker{content:''}
+.sgu-route-step-grip{width:17px;color:#8ca4bd;flex-shrink:0;text-align:center;font-size:20px;line-height:1}
+.sgu-route-step-number{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:#1264d7;color:#fff;font-size:15px;font-weight:800;flex-shrink:0}
+.sgu-route-step-label{min-width:0;flex:1;font-weight:750;color:#0b2f61;font-size:14px;overflow-wrap:anywhere}
+.sgu-route-step-actions{display:flex;align-items:center;gap:7px;margin-left:auto;flex-shrink:0}
+.sgu-route-icon-btn{display:grid;place-items:center;width:35px;height:35px;background:#fff;color:#1267d6;border:1px solid #b9d8ff;border-radius:10px;cursor:pointer}
+.sgu-route-icon-btn .icon{width:17px;height:17px}
+.sgu-route-icon-btn:hover{background:#eff7ff}
+.sgu-route-remove-btn{color:#dc3b51;border-color:#ffe1e5;background:#fff7f8;font-size:18px;font-weight:750}
+.sgu-route-remove-btn:hover{background:#ffedef}
+.sgu-route-step-fields{padding:17px 17px 20px;border-top:1px solid #e1ebf6;background:#fff}
+.sgu-route-step-fields>.field{margin-top:15px}
+.sgu-route-add-step{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:15px;min-height:53px;border:1.5px dashed #75b1ff;background:#f8fbff;border-radius:13px;color:#0863d8;font-weight:750;cursor:pointer}
+.sgu-route-add-step .icon{width:21px;height:21px}
+.sgu-route-add-step:hover:not(:disabled){background:#edf6ff;border-color:#377fd5}
+.sgu-route-add-step:disabled{opacity:.55;cursor:not-allowed}
+.sgu-route-step-help{font-size:12px;color:#6e859e;margin:11px 2px 0}
+.sgu-route-save-row{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-top:25px;padding-top:22px;border-top:1px solid #e5ecf5}
+.sgu-route-save-buttons{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sgu-route-save-row .btn{min-height:44px}
+.sgu-route-draft-btn{color:#1260c5;border-color:#a3cbff;background:#f9fcff}
+.sgu-route-draft-note{border-radius:13px;background:#fff5e8;color:#ad590e;font-size:12px;font-weight:700;padding:11px 15px}
+@media(max-width:620px){.sgu-route-step-panel{padding:13px}.sgu-route-step-heading h3{font-size:16px}.sgu-route-step-count{font-size:10px}.sgu-route-step-bar{gap:8px;padding:8px}.sgu-route-step-grip{display:none}.sgu-route-step-label{font-size:12px}.sgu-route-step-number{width:28px;height:28px;font-size:13px}.sgu-route-icon-btn{width:30px;height:30px}.sgu-route-step-fields{padding:12px}.sgu-route-save-buttons{width:100%}.sgu-route-save-buttons .btn{flex:1 1 150px}.sgu-route-draft-note{width:100%;text-align:center}}
+
+.sgu-route-step-grip{cursor:grab;user-select:none;touch-action:pan-y}.sgu-route-step-grip:active{cursor:grabbing}
+.sgu-route-dragging{opacity:.55}.sgu-route-drop-target{outline:2px dashed #4489ed;outline-offset:2px}
