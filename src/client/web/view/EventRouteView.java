@@ -72,19 +72,21 @@ public final class EventRouteView {
              +"<section class=\"panel\"><div class=\"table-wrap\"><table class=\"data-table\"><thead><tr><th>Lộ trình</th><th>Số bước</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody>");
         for(var r:routes){
             long id=Data.id(r,"id");
+            boolean publicNow=Data.bool(r,"published",false) && !Data.bool(r,"template",false);
+            boolean draft=!publicNow && Data.bool(r,"template",false);
+            String status=publicNow?"Đang công khai":draft?"Bản nháp":"Đã ẩn";
+            String action=publicNow?"Ẩn":draft?"Công khai":"Công khai lại";
             b.append("<tr><td><strong>").append(e(val(r,"title"))).append("</strong><br><small>").append(e(val(r,"routeCode"))).append("</small></td>"
-             +"<td>").append(e(r.get("stopCount"))).append("</td><td>")
-             .append(Data.bool(r,"published",false) && !Data.bool(r,"template",false) ? "Đang công bố" : "Đã ẩn")
+             +"<td>").append(e(r.get("stopCount"))).append("</td><td>").append(status)
              .append("</td><td><div class=\"row-actions\">")
-             .append(link("/admin/event-route?id="+id,"Chỉnh sửa","btn btn-light btn-small"));
-                b.append("<form class=\"inline-form\" method=\"post\" action=\"/admin/event-route/visibility\">")
-                 .append(hidden("csrf",session.csrf)).append(hidden("id",id))
-                 .append("<input type=\"hidden\" name=\"published\" value=\"")
-                 .append((Data.bool(r,"published",false) && !Data.bool(r,"template",false))?"false":"true").append("\">")
-                 .append("<button class=\"btn btn-light btn-small\" type=\"submit\">")
-                 .append((Data.bool(r,"published",false) && !Data.bool(r,"template",false))?"Ẩn":"Hiện")
-                 .append("</button></form>");
-            b.append("</div></td></tr>");
+             .append(link("/admin/event-route?id="+id,"Chỉnh sửa","btn btn-light btn-small"))
+             .append("<form class=\"inline-form\" method=\"post\" action=\"/admin/event-route/visibility\">")
+             .append(hidden("csrf",session.csrf)).append(hidden("id",id))
+             .append("<input type=\"hidden\" name=\"published\" value=\"")
+             .append(publicNow?"false":"true").append("\">")
+             .append("<button class=\"btn ").append(publicNow?"btn-light btn-small":"btn-small")
+             .append("\" type=\"submit\">").append(action).append("</button></form>")
+             .append("</div></td></tr>");
         }
         if(routes.isEmpty())b.append("<tr><td colspan=\"4\">Chưa có lộ trình.</td></tr>");
         return b.append("</tbody></table></div></section>").toString();
@@ -94,12 +96,15 @@ public final class EventRouteView {
         long id=0;
         try{id=Long.parseLong(val(route,"id"));}catch(Exception ignored){}
         boolean create=id==0;
+        boolean publicNow=!create && Data.bool(route,"published",false) && !Data.bool(route,"template",false);
+        boolean draft=create || Data.bool(route,"template",false);
         StringBuilder b=new StringBuilder("<div class=\"section-header\"><div><h2>"
           +(create?"Tạo lộ trình":"Chỉnh sửa lộ trình")
           +"</h2><p>Thứ tự bên dưới là thứ tự sinh viên thực hiện các bước.</p></div>"
           +"</div>");
         if(error!=null&&!error.isBlank())b.append("<div class=\"error-box\"><p>").append(e(error)).append("</p></div>");
-        b.append("<form action=\"/admin/event-route/save\" method=\"post\" class=\"panel event-editor\">"
+        b.append("<form action=\"/admin/event-route/save\" method=\"post\" class=\"panel event-editor\" data-sgu-route-status=\""
+          +(publicNow?"published":draft?"draft":"hidden")+"\">"
           +hidden("csrf",session.csrf)+hidden("id",id)
           +"<div class=\"form-grid\">"
           +input("Mã lộ trình","routeCode",val(route,"routeCode"),"text","required maxlength=\"60\" pattern=\"[A-Za-z0-9_-]{3,60}\"")
@@ -145,12 +150,21 @@ public final class EventRouteView {
                 +"</div><label class=\"field\"><span>Hướng dẫn thực hiện</span><textarea rows=\"3\" maxlength=\"3000\" name=\"stopInstructions"+i+"\">"
                 +e(instructions)+"</textarea></label></div></details>");
         }
+        String saveActions;
+        if(draft){
+            saveActions="<button class=\"btn btn-light sgu-route-draft-btn\" type=\"submit\" name=\"saveMode\" value=\"draft\">Lưu bản nháp</button>"
+                +"<button class=\"btn\" type=\"submit\" name=\"saveMode\" value=\"publish\">Lưu và công khai</button>";
+        } else if(publicNow){
+            saveActions="<button class=\"btn\" type=\"submit\" name=\"saveMode\" value=\"update\">Lưu thay đổi</button>";
+        } else {
+            saveActions="<button class=\"btn btn-light\" type=\"submit\" name=\"saveMode\" value=\"update\">Lưu thay đổi</button>"
+                +"<button class=\"btn\" type=\"submit\" name=\"saveMode\" value=\"publish\">Công khai</button>";
+        }
         b.append("</div><button type=\"button\" class=\"sgu-route-add-step\" id=\"sgu-route-add-step\">"
             +icon("plus")+" Thêm bước</button>"
             +"</section>"
             +"<div class=\"sgu-route-save-row\"><div class=\"sgu-route-save-buttons\">"
-            +"<button class=\"btn btn-light sgu-route-draft-btn\" type=\"submit\" name=\"saveMode\" value=\"draft\">Lưu bản nháp</button>"
-            +"<button class=\"btn\" type=\"submit\" name=\"saveMode\" value=\"publish\">Lưu và công khai</button>"
+            +saveActions
             +link("/admin/event-routes","Hủy","btn btn-light")
             +"</div></div></form>"
             +"<link rel=\"stylesheet\" href=\"/assets/sgu-route-editor.css\">"

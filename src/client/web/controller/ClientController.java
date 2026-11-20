@@ -462,23 +462,35 @@ public final class ClientController {
             form.put("title",f.getOrDefault("title",""));
             form.put("summary",f.getOrDefault("summary",""));
             form.put("audience",f.getOrDefault("audience","Tân sinh viên"));
-            String saveMode=f.getOrDefault("saveMode","draft");
-            if(!Set.of("draft","publish").contains(saveMode))
+            String saveMode=f.getOrDefault("saveMode","");
+            if(!Set.of("draft","publish","update").contains(saveMode))
                 throw new Http.Error(400,"Chế độ lưu lộ trình không hợp lệ.");
-            form.put("published","publish".equals(saveMode));
-            form.put("template",false);
+            Map<String,Object> original=routeId==0?Map.of():api.eventRoute(ss,routeId,true);
+            boolean publicNow=Data.bool(original,"published",false) && !Data.bool(original,"template",false);
+            boolean draft=routeId==0 || Data.bool(original,"template",false);
+            if(publicNow && !"update".equals(saveMode))
+                throw new Http.Error(400,"Lộ trình đang công khai chỉ được Lưu thay đổi. Muốn ngừng công khai, hãy chọn Ẩn ở danh sách.");
+            if(draft && "update".equals(saveMode))
+                throw new Http.Error(400,"Bản nháp chỉ có thể Lưu bản nháp hoặc Lưu và công khai.");
+            if(!draft && !publicNow && "draft".equals(saveMode))
+                throw new Http.Error(400,"Lộ trình đã ẩn không thể chuyển về bản nháp.");
+            boolean publish="publish".equals(saveMode) || publicNow;
+            form.put("published",publish);
+            form.put("template",!publish && draft);
             form.put("stops",stops);
             try {
-                if(Boolean.TRUE.equals(form.get("published")) && Boolean.TRUE.equals(form.get("template")))
-                    throw new Http.Error(400,"Lộ trình mẫu không được công bố cho sinh viên. Chỉ chọn một trạng thái.");
                 api.saveEventRoute(ss,routeId,form);
-                success(x,"/admin/event-routes","publish".equals(saveMode)
-                    ? "Đã lưu và công khai lộ trình." : "Đã lưu bản nháp (chưa công khai).");
+                String notice="publish".equals(saveMode)?"Đã công khai lộ trình."
+                    : "draft".equals(saveMode)?"Đã lưu bản nháp (chưa công khai)."
+                    : "Đã lưu thay đổi lộ trình.";
+                success(x,"/admin/event-routes",notice);
             } catch(Http.Error ex){
                 if(ex.status==401)throw ex;
-                Map<String,Object> draft=new LinkedHashMap<>(form);
-                draft.put("id",routeId);
-                page(x,ss,"Biên tập đường đi","admin",eventRoutes.adminForm(ss,draft,api.pois(ss,true),ex.getMessage()));
+                Map<String,Object> attempted=new LinkedHashMap<>(form);
+                attempted.put("id",routeId);
+                attempted.put("published",Data.bool(original,"published",false));
+                attempted.put("template",draft);
+                page(x,ss,"Biên tập đường đi","admin",eventRoutes.adminForm(ss,attempted,api.pois(ss,true),ex.getMessage()));
             }
             return;
         } if(p.equals("/admin/event-route/visibility")&&method.equals("POST")) {
@@ -487,9 +499,20 @@ public final class ClientController {
             String requested=f.getOrDefault("published","");
             if(!Set.of("true","false").contains(requested))
                 throw new Http.Error(400,"Trạng thái lộ trình không hợp lệ.");
-            boolean published="true".equals(requested);
-            api.setEventRouteVisibility(ss,routeId,published);
-            success(x,"/admin/event-routes",published?"Đã hiện lộ trình.":"Đã ẩn lộ trình.");
+            boolean publish="true".equals(requested);
+            Map<String,Object> current=api.eventRoute(ss,routeId,true);
+            boolean publicNow=Data.bool(current,"published",false) && !Data.bool(current,"template",false);
+            if(publicNow==publish)
+                throw new Http.Error(400,"Lộ trình đã ở trạng thái yêu cầu. Hãy tải lại danh sách.");
+            try {
+                api.setEventRouteVisibility(ss,routeId,publish);
+                success(x,"/admin/event-routes",publish?"Đã công khai lộ trình.":"Đã ẩn lộ trình.");
+            } catch(Http.Error ex) {
+                if(ex.status!=400 || !publish)throw ex;
+                page(x,ss,"Biên tập đường đi","admin",
+                    eventRoutes.adminForm(ss,current,api.pois(ss,true),
+                        "Chưa thể công khai lộ trình: "+ex.getMessage()));
+            }
             return;
         } if(p.equals("/map")&&method.equals("GET")) {
             page(x,ss,"Bản đồ","map",visitor.map(ss,api.pois(ss,false),id(q),"osm".equals(q.get("basemap"))));

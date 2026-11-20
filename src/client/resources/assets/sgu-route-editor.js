@@ -125,7 +125,7 @@
     renumber();
     const mode = event.submitter && event.submitter.name === 'saveMode'
       ? event.submitter.value : 'draft';
-    if (mode !== 'publish') return;
+    if (mode !== 'publish' && !(mode === 'update' && form.dataset.sguRouteStatus === 'published')) return;
     if (!active().length) {
       event.preventDefault();
       window.alert('Cần thêm ít nhất một bước trước khi công khai lộ trình.');

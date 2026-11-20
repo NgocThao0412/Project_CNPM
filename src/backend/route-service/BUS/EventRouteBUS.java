@@ -36,7 +36,20 @@ public class EventRouteBUS {
         route.put("summary",str(form,"summary",2000,true));route.put("audience",str(form,"audience",100,true));
         boolean published=yes(form,"published"),template=yes(form,"template");
         if(published && template)
-            throw new IllegalArgumentException("Lộ trình mẫu không được công bố cho sinh viên.");
+            throw new IllegalArgumentException("Bản nháp không được công khai cho sinh viên.");
+        if(id==0 && !published && !template)
+            throw new IllegalArgumentException("Lộ trình mới chưa công khai phải được lưu dưới dạng bản nháp.");
+        if(id>0){
+            Map<String,Object> existing=one(id,true);
+            boolean wasPublished=yes(existing,"published") && !yes(existing,"template");
+            boolean wasDraft=yes(existing,"template");
+            if(wasPublished && (!published || template))
+                throw new IllegalArgumentException("Lộ trình đang công khai không được lưu thành bản nháp. Hãy dùng thao tác Ẩn.");
+            if(wasDraft && !published && !template)
+                throw new IllegalArgumentException("Hãy lưu bản nháp hoặc công khai lộ trình.");
+            if(!wasPublished && !wasDraft && template)
+                throw new IllegalArgumentException("Lộ trình đã ẩn không được chuyển về bản nháp.");
+        }
         route.put("published",published);route.put("template",template);
         Object raw=form.get("stops");
         if(!(raw instanceof List<?> all)||all.size()>12||(published&&all.isEmpty()))
@@ -68,7 +81,20 @@ public class EventRouteBUS {
     }
     public void setPublished(long id,boolean published){
         if(id<=0)throw new IllegalArgumentException("Mã lộ trình không hợp lệ.");
-        one(id,true);
+        Map<String,Object> route=one(id,true);
+        if(published){
+            Object raw=route.get("stops");
+            if(!(raw instanceof List<?> steps)||steps.isEmpty()||steps.size()>12)
+                throw new IllegalArgumentException("Cần ít nhất một bước hợp lệ trước khi công khai.");
+            for(Object object:steps){
+                if(!(object instanceof Map<?,?> row))
+                    throw new IllegalArgumentException("Thông tin bước không hợp lệ.");
+                Map<String,Object> step=new LinkedHashMap<>();
+                row.forEach((k,v)->step.put(Objects.toString(k),v));
+                str(step,"title",180,true);
+                str(step,"instructions",3000,true);
+            }
+        }
         dao.setPublished(id,published);
     }
 }
