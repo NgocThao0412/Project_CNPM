@@ -25,9 +25,8 @@ public final class ApiDAO {
         var result=Data.map(call(ss,id==0?"POST":"PUT","/api/admin/event-routes"+(id==0?"":"/"+id),form));
         return Data.id(result,"id");
     }
-    public void deleteEventRoute(ClientSessionDTO ss,long id)throws Exception {
-        Http.request("DELETE",s.gateway()+"/api/admin/event-routes/"+id,
-                ss.upstreamCookie,null,null,Map.of()).require();
+    public void setEventRouteVisibility(ClientSessionDTO ss,long id,boolean published)throws Exception {
+        call(ss,"PATCH","/api/admin/event-routes/"+id+"/visibility",Data.row("published",published));
     }
     public List<Map<String,Object>> areas(ClientSessionDTO ss)throws Exception {
         return Data.list(call(ss,"GET","/api/campus-areas",null));

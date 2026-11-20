@@ -22,7 +22,8 @@ public final class UpstreamDAO {
     base = s.get("poi.url", "http://127.0.0.1:8082");
 }
         else if(p.equals("/api/event-routes") || p.matches("/api/event-routes/[0-9]+")
-                || p.equals("/api/admin/event-routes") || p.matches("/api/admin/event-routes/[0-9]+"))
+                || p.equals("/api/admin/event-routes") || p.matches("/api/admin/event-routes/[0-9]+")
+                || p.matches("/api/admin/event-routes/[0-9]+/visibility"))
             base=s.get("route.url","http://127.0.0.1:8086");
         else if(p.equals("/api/languages")||p.startsWith("/api/narrations")||p.startsWith("/api/admin/narrations"))base=s.narration();
         else if(p.startsWith("/api/audio")||p.startsWith("/api/admin/audio"))base=s.audio();

@@ -54,7 +54,7 @@ public final class EventRouteView {
         }
         return b.append("</section><div class=\"event-end-actions\">"+link("/","← Về trang Khám phá","btn btn-light")+"</div>").toString();
     }
-    public String adminList(List<Map<String,Object>> routes){
+    public String adminList(ClientSessionDTO session,List<Map<String,Object>> routes){
         StringBuilder b=new StringBuilder("<div class=\"section-header\"><div><h2>Quản lý đường đi sự kiện</h2><p>Tạo luồng nhập học, khám sức khỏe và gắn các bước vào POI.</p></div>"
              +link("/admin/event-route",icon("plus")+"Tạo lộ trình","btn")+"</div>"
              +"<div class=\"event-note\">Các tuyến mẫu chỉ mang tính tham khảo. Hãy cập nhật địa điểm, lịch tổ chức và xác nhận trước khi bỏ trạng thái mẫu.</div>"
@@ -63,10 +63,17 @@ public final class EventRouteView {
             long id=Data.id(r,"id");
             b.append("<tr><td><strong>").append(e(val(r,"title"))).append("</strong><br><small>").append(e(val(r,"routeCode"))).append("</small></td>"
              +"<td>").append(e(r.get("stopCount"))).append("</td><td>")
-             .append(Data.bool(r,"published",false)?"Đang công bố":"Bản nháp")
+             .append(Data.bool(r,"published",false)?"Đang công bố":"Đã ẩn")
              .append(Data.bool(r,"template",false)?" · Mẫu":"")
-             .append("</td><td>").append(link("/admin/event-route?id="+id,"Chỉnh sửa","btn btn-light btn-small"))
-             .append("</td></tr>");
+             .append("</td><td><div class=\"row-actions\">")
+             .append(link("/admin/event-route?id="+id,"Chỉnh sửa","btn btn-light btn-small"))
+             .append("<form class=\"inline-form\" method=\"post\" action=\"/admin/event-route/visibility\">")
+             .append(hidden("csrf",session.csrf)).append(hidden("id",id))
+             .append("<input type=\"hidden\" name=\"published\" value=\"")
+             .append(Data.bool(r,"published",false)?"false":"true").append("\">")
+             .append("<button class=\"btn btn-light btn-small\" type=\"submit\">")
+             .append(Data.bool(r,"published",false)?"Ẩn":"Hiện")
+             .append("</button></form></div></td></tr>");
         }
         if(routes.isEmpty())b.append("<tr><td colspan=\"4\">Chưa có lộ trình.</td></tr>");
         return b.append("</tbody></table></div></section>").toString();

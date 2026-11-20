@@ -59,5 +59,9 @@ public class EventRouteBUS {
         }
         return dao.save(id,route,stops);
     }
-    public void delete(long id){one(id,true);dao.delete(id);}
+    public void setPublished(long id,boolean published){
+        if(id<=0)throw new IllegalArgumentException("Mã lộ trình không hợp lệ.");
+        one(id,true);
+        dao.setPublished(id,published);
+    }
 }

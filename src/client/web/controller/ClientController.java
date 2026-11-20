@@ -433,7 +433,7 @@ public final class ClientController {
             page(x,ss,"Hướng dẫn đường đi","routes",eventRoutes.publicDetail(api.eventRoute(ss,routeId,false)));
             return;
         } if(p.equals("/admin/event-routes")&&method.equals("GET")) {
-            page(x,ss,"Quản lý đường đi sự kiện","admin",eventRoutes.adminList(api.eventRoutes(ss,true)));
+            page(x,ss,"Quản lý đường đi sự kiện","admin",eventRoutes.adminList(ss,api.eventRoutes(ss,true)));
             return;
         } if(p.equals("/admin/event-route")&&method.equals("GET")) {
             long routeId=id(q);
@@ -469,11 +469,15 @@ public final class ClientController {
                 page(x,ss,"Biên tập đường đi","admin",eventRoutes.adminForm(ss,draft,api.pois(ss,true),ex.getMessage()));
             }
             return;
-        } if(p.equals("/admin/event-route/delete")&&method.equals("POST")) {
+        } if(p.equals("/admin/event-route/visibility")&&method.equals("POST")) {
             long routeId=id(f);
             if(routeId<=0)throw new Http.Error(400,"Mã lộ trình không hợp lệ.");
-            api.deleteEventRoute(ss,routeId);
-            success(x,"/admin/event-routes","Đã xóa lộ trình.");
+            String requested=f.getOrDefault("published","");
+            if(!Set.of("true","false").contains(requested))
+                throw new Http.Error(400,"Trạng thái lộ trình không hợp lệ.");
+            boolean published="true".equals(requested);
+            api.setEventRouteVisibility(ss,routeId,published);
+            success(x,"/admin/event-routes",published?"Đã hiện lộ trình.":"Đã ẩn lộ trình.");
             return;
         } if(p.equals("/map")&&method.equals("GET")) {
             page(x,ss,"Bản đồ","map",visitor.map(ss,api.pois(ss,false),id(q),"osm".equals(q.get("basemap"))));

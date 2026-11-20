@@ -92,7 +92,7 @@ public class EventRouteDAO {
     }
 
     @Transactional
-    public void delete(long id) {
-        jdbc.update("DELETE FROM tour_routes WHERE id=?",id);
+    public void setPublished(long id,boolean published) {
+        jdbc.update("UPDATE tour_routes SET is_visible=? WHERE id=?",published,id);
     }
 }

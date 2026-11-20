@@ -28,8 +28,15 @@ public class EventRouteController {
     public Map<String,Object> update(@PathVariable long id,@RequestBody Map<String,Object> body,HttpServletRequest request){
         auth.requireAdmin(request);return Map.of("id",bus.save(id,body));
     }
-    @DeleteMapping("/api/admin/event-routes/{id}")
-    public void delete(@PathVariable long id,HttpServletRequest request){auth.requireAdmin(request);bus.delete(id);}
+    @PatchMapping("/api/admin/event-routes/{id}/visibility")
+    public Map<String,Object> visibility(@PathVariable long id,@RequestBody Map<String,Object> body,HttpServletRequest request){
+        auth.requireAdmin(request);
+        Object value=body.get("published");
+        if(!(value instanceof Boolean))throw new IllegalArgumentException("Trạng thái lộ trình không hợp lệ.");
+        boolean published=(Boolean)value;
+        bus.setPublished(id,published);
+        return Map.of("id",id,"published",published);
+    }
     @ExceptionHandler(NoSuchElementException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String,String> notFound(NoSuchElementException ex){return Map.of("message",ex.getMessage());}
