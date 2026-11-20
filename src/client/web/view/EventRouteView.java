@@ -17,7 +17,7 @@ public final class EventRouteView {
             +"<h1 id=\"event-unavailable-title\">Lộ trình chưa được công bố</h1>"
             +"<p>Lộ trình này hiện đang tạm ẩn và chưa mở cho sinh viên tham quan."
             +" Vui lòng quay lại trang tham quan để lựa chọn các lộ trình hiện có.</p>"
-            +link("/event-routes","← Trở về trang tham quan","btn")
+            +link("/","← Trở về trang tham quan","btn")
             +"</section>";
     }
     public String publicList(List<Map<String,Object>> routes){
