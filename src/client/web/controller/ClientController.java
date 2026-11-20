@@ -398,7 +398,9 @@ public final class ClientController {
             page(x,ss,Data.text(poi,"poiName"),"places",visitor.detail(poi,languages,n,audio,lang,preview,error));
             return;
         } if(p.equals("/event-routes")&&method.equals("GET")) {
-            List<Map<String,Object>> publishedRoutes=api.eventRoutes(ss,false);
+            List<Map<String,Object>> publishedRoutes=api.eventRoutes(ss,false).stream()
+                .filter(route -> !"NOP_HO_SO".equals(Data.text(route,"routeCode")))
+                .toList();
             String requestedCode=q.getOrDefault("code", "");
             if (!requestedCode.isBlank()) {
                 Map<String,Object> destination=null;
@@ -408,20 +410,8 @@ public final class ClientController {
                         break;
                     }
                 }
-                // 'Nộp hồ sơ' is step 3 in the existing in-person admission workflow.
-                boolean jumpToPaperwork=false;
-                if (destination==null && "NOP_HO_SO".equals(requestedCode)) {
-                    for (Map<String,Object> route:publishedRoutes) {
-                        if ("NHAP_HOC_TRUC_TIEP".equals(Data.text(route,"routeCode"))) {
-                            destination=route;
-                            jumpToPaperwork=true;
-                            break;
-                        }
-                    }
-                }
                 if (destination!=null) {
-                    Http.redirect(x,"/event-route?id="+Data.id(destination,"id")
-                            +(jumpToPaperwork?"#event-step-3":""));
+                    Http.redirect(x,"/event-route?id="+Data.id(destination,"id"));
                     return;
                 }
             }
@@ -430,7 +420,12 @@ public final class ClientController {
         } if(p.equals("/event-route")&&method.equals("GET")) {
             long routeId=id(q);
             if(routeId<=0)throw new Http.Error(400,"Vui lòng chọn lộ trình.");
-            page(x,ss,"Hướng dẫn đường đi","routes",eventRoutes.publicDetail(api.eventRoute(ss,routeId,false)));
+            Map<String,Object> selectedRoute=api.eventRoute(ss,routeId,false);
+            if ("NOP_HO_SO".equals(Data.text(selectedRoute,"routeCode"))) {
+                Http.redirect(x,"/event-routes");
+                return;
+            }
+            page(x,ss,"Hướng dẫn đường đi","routes",eventRoutes.publicDetail(selectedRoute));
             return;
         } if(p.equals("/admin/event-routes")&&method.equals("GET")) {
             page(x,ss,"Quản lý đường đi sự kiện","admin",eventRoutes.adminList(ss,api.eventRoutes(ss,true)));

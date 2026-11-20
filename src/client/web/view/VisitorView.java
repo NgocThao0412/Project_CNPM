@@ -51,7 +51,7 @@ public final class VisitorView {
             + "<nav class=\"home-shortcuts\" aria-label=\"Các mục đường đi và khám phá\">"
             + homeShortcut("/event-routes?code=NHAP_HOC_TRUC_TIEP", "user", "Nhập học trực tiếp")
             + homeShortcut("/event-routes?code=KHAM_SUC_KHOE_DAU_KHOA", "check", "Khám sức khỏe")
-            + homeShortcut("/event-routes?code=NOP_HO_SO", "book", "Nộp hồ sơ")
+            + homeShortcut("/event-routes?code=SINH_HOAT_DAU_KHOA", "book", "Sinh hoạt đầu khóa")
             + homeShortcut("/places", "map", "Tham quan khuôn viên")
             + "</nav>"
             + "<section class=\"home-location-section\"><div class=\"section-header\"><div>"

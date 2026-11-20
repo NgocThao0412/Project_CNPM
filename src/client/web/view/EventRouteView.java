@@ -15,7 +15,7 @@ public final class EventRouteView {
     public String publicList(List<Map<String,Object>> routes){
         StringBuilder b=new StringBuilder("<div class=\"page-intro\"><div>"
           +"<h1>Đường đi cho tân sinh viên</h1><p>Xem thứ tự các bước nhập học, khám sức khỏe và sinh hoạt đầu khóa.</p>"
-          +"</div>"+link("/map",icon("map")+"Xem bản đồ","btn btn-light")+"</div>"
+          +"</div>"+(routes.isEmpty()?"":link("/map",icon("map")+"Xem bản đồ","btn btn-light"))+"</div>"
           +"<section class=\"event-cards\">");
         for(var route:routes){
             long id=Data.id(route,"id");
@@ -26,7 +26,7 @@ public final class EventRouteView {
              .append("</small>").append(link("/event-route?id="+id,"Xem luồng đường đi "+icon("arrow"),"btn"))
              .append("</div></article>");
         }
-        if(routes.isEmpty())b.append("<div class=\"empty\"><h2>Chưa có lộ trình được công bố</h2><p>Quản trị viên có thể tạo và công bố tại mục Đường đi sự kiện.</p></div>");
+        if(routes.isEmpty())b.append("<div class=\"empty\"><h2>Chưa có lộ trình nào được thêm</h2><p>Hiện chưa có lộ trình để hiển thị cho sinh viên.</p>"+link("/","← Trở về trang chủ","btn")+"</div>");
         return b.append("</section>").toString();
     }
     public String publicDetail(Map<String,Object> route){
