@@ -92,12 +92,7 @@ public final class VisitorView {
         "Sinh hoạt đầu khóa"
     ) : "")
 
-+ (visibleRouteCodes.contains("THAM_QUAN_KHUON_VIEN")
-    ? homeShortcut(
-        "/places",
-        "map",
-        "Tham quan khuôn viên"
-    ) : "")
++ homeShortcut("/event-routes", "map", "Xem thêm lộ trình")
             + "</nav>"
             + "<section class=\"home-location-section\"><div class=\"section-header\"><div>"
             + "<h2>Khám phá địa điểm</h2><p>Tìm hiểu các địa điểm trong khuôn viên Trường Đại học Sài Gòn qua thuyết minh âm thanh.</p>"
