@@ -31,6 +31,20 @@ Thay YOUR_MAPTILER_API_KEY bằng mã API Key vừa lấy.
 - Bước 4: Khởi động Client trong cùng cửa sổ PowerShell: java -jar src/client/target/Client.jar
 - Bước 5: Truy cập http://localhost:8080 và mở chức năng bản đồ để kiểm tra.
 
+### Cấu hình Email cho Auth Service
+Trước khi build hoặc chạy Auth Service, mở PowerShell tại thư mục dự án và nhập:
+```powershell
+$env:SGU_MAIL_USERNAME = "ci-test@example.com"
+$env:SGU_MAIL_APP_PASSWORD = "ci-dummy-password"
+$env:SGU_PASSWORD_RESET_SECRET = "local-test-secret-2026"
+```
+
+Sau đó build trong cùng Terminal:
+```powershell
+.\mvnw.cmd clean verify
+```
+**Lưu ý:** Các giá trị trên chỉ dùng để kiểm thử, không gửi được email thật. Để sử dụng chức năng quên mật khẩu, cần thay bằng email, mật khẩu ứng dụng và khóa bí mật hợp lệ. Không đưa thông tin thật lên GitHub.
+
 ### 2. Khởi tạo cơ sở dữ liệu
 Mở MySQL Workbench, tạo database `sgu_audio_guide` và import file SQL trong thư mục `Database`.
 Cấu hình tài khoản MySQL trong các file `application.properties` của backend và `config.properties` của Client.
