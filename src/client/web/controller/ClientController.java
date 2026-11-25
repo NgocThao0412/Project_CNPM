@@ -357,8 +357,16 @@ public final class ClientController {
             success(x,"/login","Đã đăng xuất.");
             return;
         } if(p.equals("/")&&method.equals("GET")) {
-            page(x,ss,"Khám phá","home",visitor.home(api.pois(ss,false),api.languages(ss)));
-            return;
+    var publishedRoutes = api.eventRoutes(ss,false);
+
+    page(x,ss,"Khám phá","home",
+        visitor.home(
+            api.pois(ss,false),
+            api.languages(ss),
+            publishedRoutes
+        )
+    );
+    return;
         } if(p.equals("/places")&&method.equals("GET")) {
             page(x,ss,"Địa điểm","places",visitor.places(api.pois(ss,false),q.getOrDefault("q",""),q.getOrDefault("page","1")));
             return;

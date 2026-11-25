@@ -1,8 +1,21 @@
 package web.view;
-import core.*;
-import web.DTO.*;
-import java.util.*;
-import static web.view.Html.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import core.Data;
+import core.Http;
+import core.Settings;
+import web.DTO.ClientSessionDTO;
+import static web.view.Html.e;
+import static web.view.Html.excerpt;
+import static web.view.Html.hidden;
+import static web.view.Html.icon;
+import static web.view.Html.input;
+import static web.view.Html.link;
+import static web.view.Html.seconds;
 /** Server-rendered Java UI shared by iOS Safari, Android Chrome and desktop browsers. */
 public final class VisitorView {
     private final Settings s;
@@ -34,7 +47,16 @@ public final class VisitorView {
             + "<span class=\"home-shortcut-arrow\">" + icon("arrow") + "</span>",
             "home-shortcut");
     }
-    public String home(List<Map<String,Object>> pois,List<Map<String,Object>> langs) {
+    public String home(
+    List<Map<String,Object>> pois,
+    List<Map<String,Object>> langs,
+    List<Map<String,Object>> publishedRoutes
+) {
+    Set<String> visibleRouteCodes = new HashSet<>();
+
+    for (Map<String,Object> route : publishedRoutes) {
+        visibleRouteCodes.add(Data.text(route, "routeCode"));
+    }
         // The campus is a real background image, not a screenshot with text baked in.
         // Live Java-generated links, buttons, and headings stay accessible on phones.
         String hero = "<section class=\"hero hero--immersive\" aria-labelledby=\"hero-heading\">"
@@ -49,10 +71,33 @@ public final class VisitorView {
             + "</div></div></section>";
         return hero
             + "<nav class=\"home-shortcuts\" aria-label=\"Các mục đường đi và khám phá\">"
-            + homeShortcut("/event-routes?code=NHAP_HOC_TRUC_TIEP", "user", "Nhập học trực tiếp")
-            + homeShortcut("/event-routes?code=KHAM_SUC_KHOE_DAU_KHOA", "check", "Khám sức khỏe")
-            + homeShortcut("/event-routes?code=SINH_HOAT_DAU_KHOA", "book", "Sinh hoạt đầu khóa")
-            + homeShortcut("/places", "map", "Tham quan khuôn viên")
+            + (visibleRouteCodes.contains("NHAP_HOC_TRUC_TIEP")
+    ? homeShortcut(
+        "/event-routes?code=NHAP_HOC_TRUC_TIEP",
+        "user",
+        "Nhập học trực tiếp"
+    ) : "")
+
++ (visibleRouteCodes.contains("KHAM_SUC_KHOE_DAU_KHOA")
+    ? homeShortcut(
+        "/event-routes?code=KHAM_SUC_KHOE_DAU_KHOA",
+        "check",
+        "Khám sức khỏe"
+    ) : "")
+
++ (visibleRouteCodes.contains("SINH_HOAT_DAU_KHOA")
+    ? homeShortcut(
+        "/event-routes?code=SINH_HOAT_DAU_KHOA",
+        "book",
+        "Sinh hoạt đầu khóa"
+    ) : "")
+
++ (visibleRouteCodes.contains("THAM_QUAN_KHUON_VIEN")
+    ? homeShortcut(
+        "/places",
+        "map",
+        "Tham quan khuôn viên"
+    ) : "")
             + "</nav>"
             + "<section class=\"home-location-section\"><div class=\"section-header\"><div>"
             + "<h2>Khám phá địa điểm</h2><p>Tìm hiểu các địa điểm trong khuôn viên Trường Đại học Sài Gòn qua thuyết minh âm thanh.</p>"
