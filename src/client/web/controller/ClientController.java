@@ -406,9 +406,7 @@ public final class ClientController {
             page(x,ss,Data.text(poi,"poiName"),"places",visitor.detail(poi,languages,n,audio,lang,preview,error));
             return;
         } if(p.equals("/event-routes")&&method.equals("GET")) {
-            List<Map<String,Object>> publishedRoutes=api.eventRoutes(ss,false).stream()
-                .filter(route -> !"NOP_HO_SO".equals(Data.text(route,"routeCode")))
-                .toList();
+            List<Map<String,Object>> publishedRoutes=api.eventRoutes(ss,false);
             String requestedCode=q.getOrDefault("code", "");
             if (!requestedCode.isBlank()) {
                 Map<String,Object> destination=null;
@@ -437,10 +435,6 @@ public final class ClientController {
                 selectedRoute=api.eventRoute(ss,routeId,false);
             } catch(Http.Error ex) {
                 if(ex.status!=404)throw ex;
-                page(x,ss,"Lộ trình chưa được công bố","routes",eventRoutes.publicUnavailable());
-                return;
-            }
-            if ("NOP_HO_SO".equals(Data.text(selectedRoute,"routeCode"))) {
                 page(x,ss,"Lộ trình chưa được công bố","routes",eventRoutes.publicUnavailable());
                 return;
             }
