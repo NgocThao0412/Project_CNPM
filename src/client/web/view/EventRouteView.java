@@ -66,11 +66,17 @@ public final class EventRouteView {
         }
         return b.append("</section><div class=\"event-end-actions\">"+link("/","← Về trang Khám phá","btn btn-light")+"</div>").toString();
     }
-    public String adminList(ClientSessionDTO session,List<Map<String,Object>> routes){
+    public String adminList(ClientSessionDTO session,List<Map<String,Object>> routes,String q){
         StringBuilder b=new StringBuilder("<div class=\"section-header\"><div><h2>Quản lý đường đi sự kiện</h2></div>"
              +link("/admin/event-route",icon("plus")+"Tạo lộ trình","btn")+"</div>"
+             +VisitorView.search("/admin/event-routes",q,"Tìm theo tên hoặc mã lộ trình...")
              +"<section class=\"panel\"><div class=\"table-wrap\"><table class=\"data-table\"><thead><tr><th>Lộ trình</th><th>Số bước</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody>");
+        String term=q.trim().toLowerCase(Locale.ROOT);
+        int matched=0;
         for(var r:routes){
+            if(!val(r,"title").toLowerCase(Locale.ROOT).contains(term)
+                && !val(r,"routeCode").toLowerCase(Locale.ROOT).contains(term))continue;
+            matched++;
             long id=Data.id(r,"id");
             boolean publicNow=Data.bool(r,"published",false) && !Data.bool(r,"template",false);
             boolean draft=!publicNow && Data.bool(r,"template",false);
@@ -89,6 +95,7 @@ public final class EventRouteView {
              .append("</div></td></tr>");
         }
         if(routes.isEmpty())b.append("<tr><td colspan=\"4\">Chưa có lộ trình.</td></tr>");
+        else if(matched==0)b.append("<tr><td colspan=\"4\">Không tìm thấy lộ trình phù hợp.</td></tr>");
         return b.append("</tbody></table></div></section>").toString();
     }
     private static String value(Map<String,Object> form,String key){return e(val(form,key));}
