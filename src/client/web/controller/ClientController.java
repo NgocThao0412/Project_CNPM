@@ -441,7 +441,7 @@ public final class ClientController {
             page(x,ss,"Hướng dẫn đường đi","routes",eventRoutes.publicDetail(selectedRoute));
             return;
         } if(p.equals("/admin/event-routes")&&method.equals("GET")) {
-            page(x,ss,"Quản lý đường đi sự kiện","admin",eventRoutes.adminList(ss,api.eventRoutes(ss,true)));
+            page(x,ss,"Quản lý đường đi sự kiện","admin",eventRoutes.adminList(ss,api.eventRoutes(ss,true),q.getOrDefault("q","")));
             return;
         } if(p.equals("/admin/event-route")&&method.equals("GET")) {
             long routeId=id(q);
